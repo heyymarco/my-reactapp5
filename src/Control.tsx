@@ -4,6 +4,9 @@ import UseStyles from './UseStyles';
 
 import colors from './colors';
 import borders, * as border from './borders';
+import spacers from './spacers';
+import stripOuts from './strip-outs';
+import './typos';
 
 
 
@@ -14,9 +17,11 @@ const styles = {
             {
                 '--control-more-ext--': 'ok',
             },
-            border.all()
+            border.all(),
+            stripOuts.control(),
         ],
         background: colors.white,
+        padding: spacers.xs
     },
     disabled: {
         opacity: 0.5,

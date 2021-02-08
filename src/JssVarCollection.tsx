@@ -82,6 +82,7 @@ export default class JssVarCollection<TItem> {
 
         const items = this._items;
         const varItems: Dictionary<string | any[]> = {};
+        const reservedKeyword = /^(none|unset|inherit)$/;
         for (const name in items) { // set up values
             const value = items[name];
             if (Array.isArray(value)) {
@@ -93,39 +94,56 @@ export default class JssVarCollection<TItem> {
                 }
                 arr = arr.slice(); // copy array object
 
+
+                let modified = false;
                 for (let index = 0; index < arr.length; index++) {
-                    const arrItem = arr[index];
+                    const arrItem: any = arr[index];
+                    if ((typeof(arrItem) === 'string') && reservedKeyword.test(arrItem as string)) continue; // ignore reserved keywords
+                    if (Array.isArray(arrItem)) continue; // ignore prev value if it's kind of array
+
 
                     for (const prevName in items) {
                         if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
-                        const prevValue = items[prevName];
+
+                        const prevValue: any = items[prevName];
+                        if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
                         if (Array.isArray(prevValue)) continue; // ignore prev value if it's kind of array
 
-                        if (arrItem === prevValue) arr[index] = `var(${this._getVarName(prevName)})`;
-                        if (typeof(arrItem) !== 'string') arr[index] = this._toString(arrItem);
+
+                        if (arrItem === prevValue) {
+                            arr[index] = `var(${this._getVarName(prevName)})`;
+                            modified = true;
+                        }
+                        else if (typeof(arrItem) !== 'string') {
+                            arr[index] = this._toString(arrItem);
+                            modified = true;
+                        }
                     }
                 }
-
-                varItems[this._getVarName(name)] = deep ? [arr] : arr;
-
-            } else {
-                let modified = false;
-                for (const prevName in items) {
-                    if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
-                    const prevValue = items[prevName];
-                    if (Array.isArray(prevValue)) continue; // ignore prev value if it's kind of array
-    
-                    if (value === prevValue) {
-                        varItems[this._getVarName(name)] = `var(${this._getVarName(prevName)})`;
-    
-                        modified = true;
-                        break;
-                    }
+                if (modified) {
+                    varItems[this._getVarName(name)] = deep ? [arr] : arr;
+                    continue;
                 }
-    
-                if (!modified) {
-                    varItems[this._getVarName(name)] = this._toString(items[name]);
+            }
+
+
+            let modified = false;
+            for (const prevName in items) {
+                if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
+
+                const prevValue = items[prevName];
+                if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
+
+                
+                if (value === prevValue) {
+                    varItems[this._getVarName(name)] = `var(${this._getVarName(prevName)})`;
+
+                    modified = true;
+                    break;
                 }
+            }
+            if (!modified) {
+                varItems[this._getVarName(name)] = this._toString(items[name]);
             }
         }
         this._varItems = varItems;

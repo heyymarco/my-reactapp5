@@ -7,7 +7,7 @@ import {ThemeProvider} from 'react-jss';
 import colors from './colors';
 
 
-colors.red = '#ee0011';
+// colors.red = '#ee0011';
 
 
 const theme = {
