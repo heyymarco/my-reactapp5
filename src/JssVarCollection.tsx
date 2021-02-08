@@ -8,23 +8,25 @@ type Var = string;
 type Empty = undefined | null;
 
 export default class JssVarCollection<TItem> {
-    private _items: Dictionary<TItem>;
-    private _itemsProxy: Dictionary<TItem | Var | Empty>;
-    private _toString : ((value: TItem) => string);
+    private _config      : Dictionary<string>;
+    private _configProxy : Dictionary<string>;
 
-    private _config: Dictionary<string>;
-    private _configProxy: Dictionary<string>;
+    private _items       : Dictionary<TItem>;
+    private _itemsProxy  : Dictionary<TItem | Var | Empty>;
+    private _toString    : ((value: TItem) => string);
 
-    private _css: Jss.StyleSheet<'@global'> | null = null;
+    private _varItems    : Dictionary<string | any[]> = {};
+
+    private _css         : Jss.StyleSheet<'@global'> | null = null;
 
 
     constructor(
         items    : Dictionary<TItem>,
-        config   : Dictionary<string> = { varPrefix: '' },
-        parser   : ((item: any) => TItem) | null = null,
+        config   : Dictionary<string>               = { varPrefix: '' },
+        parser   : ((item: any) => TItem)    | null = null,
         toString : ((item: TItem) => string) | null = null
     ) {
-        this._config = config;
+        this._config      = config;
         this._configProxy = new Proxy(config, {
             set: (target, name: string, value) => {
         
@@ -39,8 +41,8 @@ export default class JssVarCollection<TItem> {
         });
 
 
-        this._toString = toString ?? ((item) => `${item}`);
-        this._items = items;
+        this._toString   = toString ?? ((item) => `${item}`);
+        this._items      = items;
         this._itemsProxy = new Proxy(this._items, {
             get: (items, name: string) => {
                 if (!Reflect.has(items, name)) return undefined;
@@ -79,7 +81,7 @@ export default class JssVarCollection<TItem> {
 
 
         const items = this._items;
-        const varItems: Dictionary<string | any[]> = {}; // clear values
+        const varItems: Dictionary<string | any[]> = {};
         for (const name in items) { // set up values
             const value = items[name];
             if (Array.isArray(value)) {
@@ -126,6 +128,7 @@ export default class JssVarCollection<TItem> {
                 }
             }
         }
+        this._varItems = varItems;
 
 
         const styles = {
@@ -140,4 +143,14 @@ export default class JssVarCollection<TItem> {
 
     get items() { return this._itemsProxy; }
     get config() { return this._configProxy; }
+
+    private _valuesProxy: Dictionary<string | any[]> | null = null;
+    get values() {
+        return this._valuesProxy ?? (this._valuesProxy = (() =>
+            new Proxy(this._varItems, {
+                get: (varItems, name: string)     => varItems[this._getVarName(name)],
+                set: (items, name: string, value) => { throw new Error('property is read only.'); }
+            })
+        )());
+    }
 }

@@ -3,11 +3,10 @@ import React from 'react';
 import UseStyles from './UseStyles';
 
 import colors from './colors';
-import * as border from './borders';
+import borders, * as border from './borders';
 
 
 
-console.log(border.all());
 const styles = {
     main: {
         '--control--': 'ok',
