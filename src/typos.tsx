@@ -1,16 +1,16 @@
 import JssVarCollection from './JssVarCollection';
 import colors from './colors';
 
-
-
-type TypoValue = number | string | (number | string)[];
-type TypoList  = { [index: string]: TypoValue };
-// const unset = 'unset';
-const none  = 'none';
+import * as second from './typos-second';
 
 
 
-const basics: TypoList = {
+// const unset   = 'unset';
+const none    = 'none';
+// const inherit = 'inherit';
+
+// define default props' value to be stored into css vars:
+const basics = {
     fontSizeNm            : '1rem',
 
     fontFamilySansSerief  : ['system-ui', '-apple-system', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', '"Liberation Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
@@ -33,7 +33,7 @@ const basics: TypoList = {
     backg                 : colors.white as string,
 };
 
-const typos = Object.assign({},
+const props = Object.assign({},
     basics,
     {
         fontSizeXs        : [['calc(', basics.fontSizeNm, '*', 0.50  , ')']],
@@ -57,13 +57,18 @@ const typos = Object.assign({},
 
 
 
-const collection = new JssVarCollection<TypoValue>(
-    typos,
-    { varPrefix: ''},
-    (raw)   => raw,
-    (value) => `${value}`
+// convert props => varProps:
+const collection = new JssVarCollection(
+    /*items  :*/ props as { [index: string]: any },
+    /*config :*/ { varPrefix: ''}
 );
-const config = collection.config;
-const items  = collection.items;
-export { config, items as typos };
-export default items;
+const config   = collection.config;
+const varProps = collection.varProps as typeof props;
+// export the configurable props:
+export { config, varProps as typos };
+export default varProps;
+
+
+
+// re-export some imports:
+export { second };

@@ -5,7 +5,7 @@ const none  = 'none';
 /**
  * removes a browser's default styling on hyperlink.
  */
-export function link() { return {
+export const link = () => ({
     color             : unset, // reset blue color
     textDecoration    : unset, // reset underline
     cursor            : unset, // reset hand pointer
@@ -18,13 +18,13 @@ export function link() { return {
         outline       : unset, // reset focus outline
         outlineOffset : unset, // reset focus outline
     },
-};}
+});
 
 
 /**
  * removes a browser's default styling on control (input, textarea, button, etc).
  */
-export function control() { return {
+export const control = () => ({
     appearance        : none,
 
     textRendering     : unset,
@@ -47,13 +47,13 @@ export function control() { return {
         outline       : unset, // reset focus outline
         outlineOffset : unset, // reset focus outline
     },
-};}
+});
 
 
 /**
  * removes a browser's default styling on list (ul > li) & (ol > li).
  */
-export function list() { return {
+export const list = () => ({
     listStyleType      : none,
     marginBlockStart   : unset,
     marginBlockEnd     : unset,
@@ -65,7 +65,7 @@ export function list() { return {
         display        : 'inline',
         textAlign      : unset,
     }
-};}
+});
 
 
 const exports = { link, control, list };

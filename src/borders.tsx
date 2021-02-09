@@ -3,70 +3,62 @@ import colors           from './colors';
 
 
 
-type StrokeValueNum = string | number;
-type StrokeListNum = { [index: string]: StrokeValueNum };
-
-type StrokeValueKey = string;
-type StrokeListKey = { [index: string]: StrokeValueKey };
-
-type StrokeValues = (StrokeValueNum | StrokeValueKey)[][];
-type StrokeValueComplex = StrokeValueNum | StrokeValueKey | StrokeValues;
-type StrokeListComplex = { [index: string]: StrokeValueComplex };
-
-
-
-const widths: StrokeListNum = {
+// define default props' value to be stored into css vars:
+const widths = {
     none: '0px',
     hair: '1px',
     thin: '2px',
     bold: '4px',
 };
 
-const props: StrokeListKey = {
+const others = {
     color: (colors.darkTransp as string) ?? 'currentColor',
     style: 'solid',
 };
 
-const strokes: StrokeListComplex = Object.assign({},
+const props = Object.assign({},
     widths,
-    props,
+    others,
     {
-        defaultWidth: widths.hair,
-        default: [[props.style, widths.hair, props.color]]
+        defaultWidth : widths.hair,
+        default      : [[others.style, widths.hair, others.color]] as (string[][] | string),
     }
 );
 
 
 
-const collection = new JssVarCollection<StrokeValueComplex>(
-    strokes,
-    { varPrefix: 'bd'},
-    (raw)   => raw,
-    (value) => `${value}`
+// convert props => varProps:
+const collection = new JssVarCollection(
+    /*props  :*/ props,
+    /*config :*/ { varPrefix: 'bd'}
 );
-const config = collection.config;
-const items  = collection.items;
-const strokesPost = collection.values;
-export { config, items as borders };
-export default items;
+const config   = collection.config;
+const varProps = collection.varProps as typeof props;
+const valProps = collection.valProps as typeof props;
+// export the configurable props:
+export { config, varProps as borders };
+export default varProps;
 
 
 
-const defaultStyle = () => ((strokesPost?.default as StrokeValues)?.[0]?.[0] ?? items?.style ?? 'solid') as StrokeValueKey;
-const defaultWidth = () => ((strokesPost?.default as StrokeValues)?.[0]?.[1] ?? items?.defaultWidth ?? items?.hair ?? '1px') as StrokeValueKey;
-const defaultColor = () => ((strokesPost?.default as StrokeValues)?.[0]?.[2] ?? items?.color ?? 'currentcolor') as StrokeValueKey;
-const all = (width?: StrokeValueNum) => {
+// export our mixins:
+// property of .default, .style, .defaultWidth, & .color "might" has deleted by user => use nullish op for safety => .?
+const defaultStyle = () => ((valProps?.default as string[][])?.[0]?.[0] ?? varProps?.style ?? 'solid');
+const defaultWidth = () => ((valProps?.default as string[][])?.[0]?.[1] ?? varProps?.defaultWidth ?? varProps?.hair ?? '1px');
+const defaultColor = () => ((valProps?.default as string[][])?.[0]?.[2] ?? varProps?.color ?? 'currentcolor');
+type Width = number | string;
+const all = (width?: Width) => {
     const defWidth = defaultWidth();
-    return { border: (((width ?? defWidth) === defWidth) ? items?.default : undefined) ?? [[defaultStyle(), (width ?? defWidth), defaultColor()]] };
+    return { border: (((width ?? defWidth) === defWidth) ? varProps?.default : undefined) ?? [[defaultStyle(), (width ?? defWidth), defaultColor()]] };
 };
-const top       = (width?: StrokeValueNum) => ({ borderTop    : all(width).border });
-const bottom    = (width?: StrokeValueNum) => ({ borderBottom : all(width).border });
-const left      = (width?: StrokeValueNum) => ({ borderLeft   : all(width).border });
-const right     = (width?: StrokeValueNum) => ({ borderRight  : all(width).border });
+const top       = (width?: Width) => ({ borderTop    : all(width).border });
+const bottom    = (width?: Width) => ({ borderBottom : all(width).border });
+const left      = (width?: Width) => ({ borderLeft   : all(width).border });
+const right     = (width?: Width) => ({ borderRight  : all(width).border });
 export { all, top, bottom, left, right };
 
-const notTop    = (width?: StrokeValueNum) => ((border) => ({                    borderBottom: border, borderLeft: border, borderRight: border }))(all(width).border);
-const notBottom = (width?: StrokeValueNum) => ((border) => ({ borderTop: border,                       borderLeft: border, borderRight: border }))(all(width).border);
-const notLeft   = (width?: StrokeValueNum) => ((border) => ({ borderTop: border, borderBottom: border,                     borderRight: border }))(all(width).border);
-const notRight  = (width?: StrokeValueNum) => ((border) => ({ borderTop: border, borderBottom: border, borderLeft: border,                     }))(all(width).border);
+const notTop    = (width?: Width) => ((border) => ({                    borderBottom: border, borderLeft: border, borderRight: border }))(all(width).border);
+const notBottom = (width?: Width) => ((border) => ({ borderTop: border,                       borderLeft: border, borderRight: border }))(all(width).border);
+const notLeft   = (width?: Width) => ((border) => ({ borderTop: border, borderBottom: border,                     borderRight: border }))(all(width).border);
+const notRight  = (width?: Width) => ((border) => ({ borderTop: border, borderBottom: border, borderLeft: border,                     }))(all(width).border);
 export { notTop, notBottom, notLeft, notRight };

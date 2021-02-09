@@ -1,32 +1,47 @@
 import jss, * as Jss from 'jss';
-import preset from 'jss-preset-default';
+import presetDefault from 'jss-preset-default';
 
 
 
 type Dictionary<TValue> = { [index: string]: TValue };
-type Var = string;
-type Empty = undefined | null;
 
-export default class JssVarCollection<TItem> {
-    private _config      : Dictionary<string>;
-    private _configProxy : Dictionary<string>;
+/*
+    set varProps.foo       = Color(255, 0, 0)      => TItem
 
-    private _items       : Dictionary<TItem>;
-    private _itemsProxy  : Dictionary<TItem | Var | Empty>;
-    private _toString    : ((value: TItem) => string);
+    get varProps.foo       = return var(--pr-fooA) => string
+    get varProps.notExists = return undefined      => undefined
+*/
+type Var   = string;
 
-    private _varItems    : Dictionary<string | any[]> = {};
+/*
+    get valProps.fooC => return { margin: '10px', opacity: 0.5 } => '10px', 0.5 => string, number
+    get valProps.fooD => return { font-family: ['Arial', 'Roboto']; margin: [[10px 5px]], } => CssValue[], CssValue[][]
+*/
+type CssValue     = string | number;
+type CSSValueComp = CssValue | CssValue[] | CssValue[][];
 
-    private _css         : Jss.StyleSheet<'@global'> | null = null;
+export default class JssVarCollection<TProp> {
+    private _config        : Dictionary<string>;
+    private _configProxy   : Dictionary<string>;
+
+    private _props         : Dictionary<TProp>;
+    private _varPropsProxy : Dictionary<TProp | Var>; // TItem for set, Var | Empty for get
+    
+    private _toString      : ((value: TProp) => string);
+    private _valProps      : Dictionary<CSSValueComp> = {};
+
+    private _css           : Jss.StyleSheet<'@global'> | null = null;
 
 
     constructor(
-        items    : Dictionary<TItem>,
+        props    : Dictionary<TProp>,
         config   : Dictionary<string>               = { varPrefix: '' },
-        parser   : ((item: any) => TItem)    | null = null,
-        toString : ((item: TItem) => string) | null = null
+        parser   : ((item: any) => TProp)    | null = null,
+        toString : ((item: TProp) => string) | null = null
     ) {
-        this._config      = config;
+        this._config = config;
+
+        // a proxy to "watch" any config changes:
         this._configProxy = new Proxy(config, {
             set: (target, name: string, value) => {
         
@@ -41,22 +56,22 @@ export default class JssVarCollection<TItem> {
         });
 
 
-        this._toString   = toString ?? ((item) => `${item}`);
-        this._items      = items;
-        this._itemsProxy = new Proxy(this._items, {
-            get: (items, name: string) => {
-                if (!Reflect.has(items, name)) return undefined;
+        
+        this._props = props;
+        this._varPropsProxy = new Proxy(this._props, {
+            get: (props, name: string) => {
+                if (!Reflect.has(props, name)) return undefined;
         
                 return `var(${this._getVarName(name)})`;
             },
-            set: (items, name: string, value) => {
+            set: (props, name: string, value) => {
         
                 if (!value) {
-                    delete items[name];
+                    delete props[name];
                 } else {
-                    const newValue = parser ? parser(value) : (value as TItem);
-                    if (items[name] !== newValue) {
-                        items[name] = newValue;
+                    const newValue = parser ? parser(value) : (value as TProp);
+                    if (props[name] !== newValue) {
+                        props[name] = newValue;
         
                         this._rebuildJss(); // setting changed => need to rebuild the jss
                     }
@@ -65,6 +80,11 @@ export default class JssVarCollection<TItem> {
                 return true;
             }
         });
+
+
+
+        this._toString   = toString ?? ((item) => `${item}`);
+
 
 
         this._rebuildJss();
@@ -80,11 +100,12 @@ export default class JssVarCollection<TItem> {
         this._css?.detach();
 
 
-        const items = this._items;
-        const varItems: Dictionary<string | any[]> = {};
+
+        const props = this._props;
+        const valProps: Dictionary<CSSValueComp> = {};
         const reservedKeyword = /^(none|unset|inherit)$/;
-        for (const name in items) { // set up values
-            const value = items[name];
+        for (const name in props) { // set up values
+            const value = props[name];
             if (Array.isArray(value)) {
                 let arr = value as any[];
                 let deep = false;
@@ -99,13 +120,13 @@ export default class JssVarCollection<TItem> {
                 for (let index = 0; index < arr.length; index++) {
                     const arrItem: any = arr[index];
                     if ((typeof(arrItem) === 'string') && reservedKeyword.test(arrItem as string)) continue; // ignore reserved keywords
-                    if (Array.isArray(arrItem)) continue; // ignore prev value if it's kind of array
+                    if (Array.isArray(arrItem)) continue; // ignore value if it's kind of array
 
 
-                    for (const prevName in items) {
+                    for (const prevName in props) {
                         if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
 
-                        const prevValue: any = items[prevName];
+                        const prevValue = props[prevName];
                         if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
                         if (Array.isArray(prevValue)) continue; // ignore prev value if it's kind of array
 
@@ -121,52 +142,53 @@ export default class JssVarCollection<TItem> {
                     }
                 }
                 if (modified) {
-                    varItems[this._getVarName(name)] = deep ? [arr] : arr;
+                    valProps[this._getVarName(name)] = deep ? [arr] : arr;
                     continue;
                 }
             }
 
 
             let modified = false;
-            for (const prevName in items) {
+            for (const prevName in props) {
                 if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
 
-                const prevValue = items[prevName];
+                const prevValue = props[prevName];
                 if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
 
                 
                 if (value === prevValue) {
-                    varItems[this._getVarName(name)] = `var(${this._getVarName(prevName)})`;
+                    valProps[this._getVarName(name)] = `var(${this._getVarName(prevName)})`;
 
                     modified = true;
                     break;
                 }
             }
             if (!modified) {
-                varItems[this._getVarName(name)] = this._toString(items[name]);
+                valProps[this._getVarName(name)] = this._toString(value);
             }
         }
-        this._varItems = varItems;
+        this._valProps = valProps;
 
 
         const styles = {
             '@global': {
-                ':root': varItems
+                ':root': valProps
             }
         };
-        this._css = jss.setup(preset()).createStyleSheet(styles);
+        this._css = jss.setup(presetDefault()).createStyleSheet(styles);
         this._css.attach();
     }
 
 
-    get items() { return this._itemsProxy; }
-    get config() { return this._configProxy; }
+    get config()   { return this._configProxy; }
 
-    private _valuesProxy: Dictionary<string | any[]> | null = null;
-    get values() {
-        return this._valuesProxy ?? (this._valuesProxy = (() =>
-            new Proxy(this._varItems, {
-                get: (varItems, name: string)     => varItems[this._getVarName(name)],
+    get varProps() { return this._varPropsProxy;  }
+
+    private _valPropsProxy: Dictionary<CSSValueComp> | null = null;
+    get valProps() {
+        return this._valPropsProxy ?? (this._valPropsProxy = (() =>
+            new Proxy(this._props as unknown as Dictionary<CSSValueComp>, {
+                get: (items, name: string)        => this._valProps[this._getVarName(name)],
                 set: (items, name: string, value) => { throw new Error('property is read only.'); }
             })
         )());

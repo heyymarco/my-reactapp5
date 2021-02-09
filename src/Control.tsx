@@ -17,8 +17,8 @@ const styles = {
             {
                 '--control-more-ext--': 'ok',
             },
-            border.all(),
             stripOuts.control(),
+            border.all(),
         ],
         background: colors.white,
         padding: spacers.xs
