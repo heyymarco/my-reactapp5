@@ -1,5 +1,5 @@
-import * as base     from './typos-base';
-import JssVarCollection from './JssVarCollection';
+import * as base        from './base';
+import JssVarCollection from '../JssVarCollection';
 
 
 

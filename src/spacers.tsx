@@ -11,6 +11,7 @@ const basics = {
 const props = Object.assign({},
     basics,
     {
+        default: basics.md,
         xs : [['calc(', basics.md, '/', 4  , ')']] as ((string | number)[][] | string),
         sm : [['calc(', basics.md, '/', 2  , ')']] as ((string | number)[][] | string),
         lg : [['calc(', basics.md, '*', 1.5, ')']] as ((string | number)[][] | string),

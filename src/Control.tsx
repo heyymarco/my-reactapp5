@@ -6,7 +6,7 @@ import colors from './colors';
 import borders, * as border from './borders';
 import spacers from './spacers';
 import stripOuts from './strip-outs';
-import './typos';
+import './typos/index';
 
 
 

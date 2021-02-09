@@ -106,6 +106,7 @@ export default class JssVarCollection<TProp> {
         const reservedKeyword = /^(none|unset|inherit)$/;
         for (const name in props) { // set up values
             const value = props[name];
+            if (value === undefined) continue; // skip undefined prop
             if (Array.isArray(value)) {
                 let arr = value as any[];
                 let deep = false;
@@ -127,6 +128,7 @@ export default class JssVarCollection<TProp> {
                         if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
 
                         const prevValue = props[prevName];
+                        if (prevValue === undefined) continue; // skip undefined prop
                         if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
                         if (Array.isArray(prevValue)) continue; // ignore prev value if it's kind of array
 
@@ -164,7 +166,7 @@ export default class JssVarCollection<TProp> {
                 }
             }
             if (!modified) {
-                valProps[this._getVarName(name)] = this._toString(value);
+                valProps[this._getVarName(name)] = Array.isArray(value) ? (Array.isArray((value as CssValue[])[0]) ? (value as CssValue[][]) : (value as CssValue[])) : this._toString(value);
             }
         }
         this._valProps = valProps;

@@ -1,7 +1,5 @@
-import JssVarCollection from './JssVarCollection';
-import colors from './colors';
-
-import * as second from './typos-second';
+import JssVarCollection from '../JssVarCollection';
+import colors           from '../colors';
 
 
 
@@ -36,6 +34,7 @@ const basics = {
 const props = Object.assign({},
     basics,
     {
+        fontSize          : basics.fontSizeNm,
         fontSizeXs        : [['calc(', basics.fontSizeNm, '*', 0.50  , ')']],
         fontSizeSm        : [['calc(', basics.fontSizeNm, '*', 0.75  , ')']],
         fontSizeMd        : [['calc(', basics.fontSizeNm, '*', 1.25  , ')']],
@@ -45,13 +44,10 @@ const props = Object.assign({},
         fontSizeXxxl      : [['calc(', basics.fontSizeNm, '*', 2.25  , ')']],
 
         fontFamily        : basics.fontFamilySansSerief,
-        fontFamilyDefault : basics.fontFamilySansSerief,
 
         fontWeight        : basics.fontWeightNormal,
-        fontWeightDefault : basics.fontWeightNormal,
 
         lineHeight        : basics.lineHeightNm,
-        lineHeightDefault : basics.lineHeightNm,
     }
 );
 
@@ -65,10 +61,5 @@ const collection = new JssVarCollection(
 const config   = collection.config;
 const varProps = collection.varProps as typeof props;
 // export the configurable props:
-export { config, varProps as typos };
+export { config, varProps as props };
 export default varProps;
-
-
-
-// re-export some imports:
-export { second };

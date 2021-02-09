@@ -35,7 +35,9 @@ export default class App extends React.Component {
 					</a>
 					<Button></Button>
 					<p>this is normal text</p>
-					<p className="text-second">this is secondary text</p>
+					<p className="txt-sec">this is secondary text</p>
+					<p className="lead">this is lead text</p>
+					<h1>this is title</h1>
 				</header>
 			</ThemeProvider></div>
 		);

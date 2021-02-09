@@ -4,7 +4,7 @@ import presetDefault from 'jss-preset-default';
 
 
 export interface Props {
-    fontSize       : string | number   ;
+    fontSize       : string | number   | (string | number)[][];
     fontFamily     : string | string[] ;
     fontWeight     : string | number   ;
     fontStyle      : string            ;
