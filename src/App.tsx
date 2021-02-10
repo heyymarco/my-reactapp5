@@ -38,6 +38,14 @@ export default class App extends React.Component {
 					<p className="txt-sec">this is secondary text</p>
 					<p className="lead">this is lead text</p>
 					<h1>this is title</h1>
+					<h1 className="display-2">this is title</h1>
+					<blockquote>this is blockquote</blockquote>
+					<p>the <mark>marked text</mark> here</p>
+					<p>the <code>body&#123; font-family: 'Arial' &#125;</code> here</p>
+					<p>press <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>del</kbd></p>
+					<p><del>deleted</del> <s>wrong</s> <ins>added new</ins> <u>please understand</u> <small>i'm tiny</small> <strong>please understand</strong> <b>important</b> <em>remember me</em> <i>forget me</i></p>
+					<hr />
+					<p>hello world</p>
 				</header>
 			</ThemeProvider></div>
 		);

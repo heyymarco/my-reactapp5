@@ -1,13 +1,17 @@
 import * as base        from './base';
 
+import borders          from '../borders';
+import spacers          from '../spacers';
+
 import JssVarCollection from '../JssVarCollection';
 
 
 
-export interface Props
-    extends base.Props {
-
+export interface Props {
     color             : string          ;
+    opacity           : string | number ;
+
+    width             : string | number ;
 
     marginBlockStart  : string | number ;
     marginBlockEnd    : string | number ;
@@ -20,17 +24,13 @@ const inherit = 'inherit';
 
 // define default props' value to be stored into css vars:
 const props: Props = {
-    fontSize          : inherit,
-    fontFamily        : inherit,
-    fontWeight        : inherit,
-    fontStyle         : inherit,
-    textDecoration    : inherit,
-    lineHeight        : inherit,
-
     color             : inherit,
+    opacity           : 0.25,
+
+    width             : borders.hair,
     
-    marginBlockStart  : '0px',
-    marginBlockEnd    : '1em',
+    marginBlockStart  : spacers.default,
+    marginBlockEnd    : spacers.default,
     marginInlineStart : '0px',
     marginInlineEnd   : '0px',
 };
@@ -40,7 +40,7 @@ const props: Props = {
 // convert props => varProps:
 const collection = new JssVarCollection(
     /*items  :*/ props as unknown as { [index: string]: any },
-    /*config :*/ { varPrefix: 'p'}
+    /*config :*/ { varPrefix: 'hr'}
 );
 const config   = collection.config;
 const varProps = collection.varProps as typeof props;
@@ -52,8 +52,12 @@ export default varProps;
 
 // define the css class using configurable css vars:
 base.declareCss({
-    'p, .p': {
-        extend  : varProps,
-        display : 'block',
+    'hr': {
+        extend          : varProps,
+        display         : 'block',
+        backgroundColor : 'currentColor',
+        width           : null,
+        height          : varProps.width,
+        border          : '0px',
     },
 });

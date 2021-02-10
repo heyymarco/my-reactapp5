@@ -1,6 +1,8 @@
 import * as base        from './base';
-import * as par         from './paragraph';
-import * as gen         from './general';
+import type * as par    from './paragraph';
+
+import gens             from './general';
+
 import JssVarCollection from '../JssVarCollection';
 
 
@@ -8,25 +10,25 @@ import JssVarCollection from '../JssVarCollection';
 export interface Props
     extends par.Props {
     
-    fontSize1 : string | number   | (string | number)[][];
-    fontSize2 : string | number   | (string | number)[][];
-    fontSize3 : string | number   | (string | number)[][];
-    fontSize4 : string | number   | (string | number)[][];
-    fontSize5 : string | number   | (string | number)[][];
-    fontSize6 : string | number   | (string | number)[][];
+    fontSize1 : string | number | (string | number)[][];
+    fontSize2 : string | number | (string | number)[][];
+    fontSize3 : string | number | (string | number)[][];
+    fontSize4 : string | number | (string | number)[][];
+    fontSize5 : string | number | (string | number)[][];
+    fontSize6 : string | number | (string | number)[][];
 }
-const unset   = 'unset';
+// const unset   = 'unset';
 // const none    = 'none';
 const inherit = 'inherit';
 
 // define default props' value to be stored into css vars:
 const props: Props = {
-    fontSize1         : [['calc(', 2.25, '*', gen.props.fontSize, ')']],
-    fontSize2         : [['calc(', 2.00, '*', gen.props.fontSize, ')']],
-    fontSize3         : [['calc(', 1.75, '*', gen.props.fontSize, ')']],
-    fontSize4         : [['calc(', 1.50, '*', gen.props.fontSize, ')']],
-    fontSize5         : [['calc(', 1.25, '*', gen.props.fontSize, ')']],
-    fontSize6         : [['calc(', 1.00, '*', gen.props.fontSize, ')']],
+    fontSize1         : [['calc(', 2.25, '*', gens.fontSize, ')']],
+    fontSize2         : [['calc(', 2.00, '*', gens.fontSize, ')']],
+    fontSize3         : [['calc(', 1.75, '*', gens.fontSize, ')']],
+    fontSize4         : [['calc(', 1.50, '*', gens.fontSize, ')']],
+    fontSize5         : [['calc(', 1.25, '*', gens.fontSize, ')']],
+    fontSize6         : [['calc(', 1.00, '*', gens.fontSize, ')']],
 
     fontSize          : undefined as unknown as string,
     fontFamily        : inherit,
@@ -59,28 +61,33 @@ export default varProps;
 
 
 // define the css class using configurable css vars:
-base.declareCss((() => {
+export function createCss(varProps: typeof props, classLevelDecl: (level: number) => string) {
     const levels = [1,2,3,4,5,6];
     const css: { [index:string]: any } = {};
     
 
 
-    const varPropsReduce = Object.assign({}, varProps) as { [index:string]: any };
-    // delete props .fontSize, .fontSize1-6:
-    delete varPropsReduce.fontSize;
-    levels.forEach(l => delete varPropsReduce[`fontSize${l}`]);
-    
-    // add reduced props into h1-h6,.h1-.h6:
-    css[levels.map(l => `h${l},.h${l}`).join(',')] = varPropsReduce;
+    css[levels.map(classLevelDecl).join(',')] = {
+        extend    : varProps,
+        display   : 'block',
+        fontSize  : null,
+        fontSize1 : null,
+        fontSize2 : null,
+        fontSize3 : null,
+        fontSize4 : null,
+        fontSize5 : null,
+        fontSize6 : null,
+    };
 
 
 
     // defines props.fontSize into each h1-h6:
-    levels.forEach(l => css[`h${l},.h${l}`] = {
-        fontSize: (varProps as { [index:string]: any })[`fontSize${l}`],
+    levels.forEach(level => css[classLevelDecl(level)] = {
+        fontSize: (varProps as { [index:string]: any })[`fontSize${level}`],
     });
 
 
 
     return css;
-})());
+}
+base.declareCss(createCss(varProps, level => `h${level},.h${level}`));

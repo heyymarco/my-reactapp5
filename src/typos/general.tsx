@@ -1,5 +1,6 @@
-import JssVarCollection from '../JssVarCollection';
 import colors           from '../colors';
+
+import JssVarCollection from '../JssVarCollection';
 
 
 

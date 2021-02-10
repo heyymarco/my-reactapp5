@@ -1,6 +1,9 @@
 import * as base        from './base';
-import * as par         from './paragraph';
-import * as gen         from './general';
+
+import pars             from './paragraph';
+import type * as par    from './paragraph';
+import gens             from './general';
+
 import JssVarCollection from '../JssVarCollection';
 
 
@@ -14,19 +17,19 @@ export interface Props
 
 // define default props' value to be stored into css vars:
 const props: Props = {
-    fontSize          : gen.props.fontSizeMd,
-    fontFamily        : par.props.fontFamily,
-    fontWeight        : gen.props.fontWeightLight,
-    fontStyle         : par.props.fontStyle,
-    textDecoration    : par.props.textDecoration,
-    lineHeight        : par.props.lineHeight,
+    fontSize          : gens.fontSizeMd,
+    fontFamily        : pars.fontFamily,
+    fontWeight        : gens.fontWeightLight,
+    fontStyle         : pars.fontStyle,
+    textDecoration    : pars.textDecoration,
+    lineHeight        : pars.lineHeight,
 
-    color             : par.props.color,
+    color             : pars.color,
     
-    marginBlockStart  : par.props.marginBlockStart,
-    marginBlockEnd    : par.props.marginBlockEnd,
-    marginInlineStart : par.props.marginInlineStart,
-    marginInlineEnd   : par.props.marginInlineEnd,
+    marginBlockStart  : pars.marginBlockStart,
+    marginBlockEnd    : pars.marginBlockEnd,
+    marginInlineStart : pars.marginInlineStart,
+    marginInlineEnd   : pars.marginInlineEnd,
 };
 
 
@@ -46,5 +49,8 @@ export default varProps;
 
 // define the css class using configurable css vars:
 base.declareCss({
-    '.lead': varProps,
+    '.lead': {
+        extend  : varProps,
+        display : 'block',
+    },
 });

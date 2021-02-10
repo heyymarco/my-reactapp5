@@ -1,5 +1,6 @@
 import JssVarCollection from './JssVarCollection';
 import colors           from './colors';
+import * as radius      from './borders-radiuses';
 
 
 
@@ -62,3 +63,8 @@ const notBottom = (width?: Width) => ((border) => ({ borderTop: border,         
 const notLeft   = (width?: Width) => ((border) => ({ borderTop: border, borderBottom: border,                     borderRight: border }))(all(width).border);
 const notRight  = (width?: Width) => ((border) => ({ borderTop: border, borderBottom: border, borderLeft: border,                     }))(all(width).border);
 export { notTop, notBottom, notLeft, notRight };
+
+
+
+const radiuses = radius.radiuses;
+export { radiuses, radius };

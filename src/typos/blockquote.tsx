@@ -1,14 +1,14 @@
 import * as base        from './base';
+import type * as par    from './paragraph';
+
+import gens              from './general';
 
 import JssVarCollection from '../JssVarCollection';
 
 
 
 export interface Props
-    extends base.Props {
-
-    color   : string          ;
-    opacity : string | number ;
+    extends par.Props {
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -16,15 +16,19 @@ const inherit = 'inherit';
 
 // define default props' value to be stored into css vars:
 const props: Props = {
-    fontSize       : inherit,
-    fontFamily     : inherit,
-    fontWeight     : inherit,
-    fontStyle      : inherit,
-    textDecoration : inherit,
-    lineHeight     : inherit,
+    fontSize          : gens.fontSizeMd,
+    fontFamily        : inherit,
+    fontWeight        : inherit,
+    fontStyle         : inherit,
+    textDecoration    : inherit,
+    lineHeight        : inherit,
 
-    color          : inherit,
-    opacity        : 0.63,
+    color             : inherit,
+    
+    marginBlockStart  : '0px',
+    marginBlockEnd    : '1em',
+    marginInlineStart : '0px',
+    marginInlineEnd   : '0px',
 };
 
 
@@ -32,7 +36,7 @@ const props: Props = {
 // convert props => varProps:
 const collection = new JssVarCollection(
     /*items  :*/ props as unknown as { [index: string]: any },
-    /*config :*/ { varPrefix: 'sec'}
+    /*config :*/ { varPrefix: 'bq'}
 );
 const config   = collection.config;
 const varProps = collection.varProps as typeof props;
@@ -44,5 +48,8 @@ export default varProps;
 
 // define the css class using configurable css vars:
 base.declareCss({
-    'small, .txt-sec': varProps,
+    'blockquote,.blockquote': {
+        extend  : varProps,
+        display : 'block',
+    },
 });

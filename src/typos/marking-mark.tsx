@@ -1,5 +1,9 @@
 import * as base        from './base';
 
+import colors           from '../colors';
+import borders,
+       * as border      from '../borders';
+
 import JssVarCollection from '../JssVarCollection';
 
 
@@ -7,12 +11,13 @@ import JssVarCollection from '../JssVarCollection';
 export interface Props
     extends base.Props {
 
-    color             : string          ;
+    color        : string                       ;
+    backg        : string | string[][] | object ;
 
-    marginBlockStart  : string | number ;
-    marginBlockEnd    : string | number ;
-    marginInlineStart : string | number ;
-    marginInlineEnd   : string | number ;
+    paddingX     : string | number              ;
+    paddingY     : string | number              ;
+    border       : string | string[][]          ;
+    borderRadius : string | number              ;
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -28,11 +33,12 @@ const props: Props = {
     lineHeight        : inherit,
 
     color             : inherit,
+    backg             : colors.warningTransp as string,
     
-    marginBlockStart  : '0px',
-    marginBlockEnd    : '1em',
-    marginInlineStart : '0px',
-    marginInlineEnd   : '0px',
+    paddingX          : '0.2em',
+    paddingY          : '0em',
+    border            : borders.default,
+    borderRadius      : border.radiuses.sm,
 };
 
 
@@ -40,7 +46,7 @@ const props: Props = {
 // convert props => varProps:
 const collection = new JssVarCollection(
     /*items  :*/ props as unknown as { [index: string]: any },
-    /*config :*/ { varPrefix: 'p'}
+    /*config :*/ { varPrefix: 'mrk'}
 );
 const config   = collection.config;
 const varProps = collection.varProps as typeof props;
@@ -52,8 +58,8 @@ export default varProps;
 
 // define the css class using configurable css vars:
 base.declareCss({
-    'p, .p': {
+    'mark,.mark': {
         extend  : varProps,
-        display : 'block',
+        display : 'inline',
     },
 });

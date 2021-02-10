@@ -1,38 +1,36 @@
 import * as base        from './base';
+import type * as mark   from './marking-mark';
+
+import gens             from './general';
+import colors           from '../colors';
 
 import JssVarCollection from '../JssVarCollection';
 
 
 
 export interface Props
-    extends base.Props {
-
-    color             : string          ;
-
-    marginBlockStart  : string | number ;
-    marginBlockEnd    : string | number ;
-    marginInlineStart : string | number ;
-    marginInlineEnd   : string | number ;
+    extends mark.Props {
 }
 // const unset   = 'unset';
-// const none    = 'none';
+const none    = 'none';
 const inherit = 'inherit';
 
 // define default props' value to be stored into css vars:
 const props: Props = {
-    fontSize          : inherit,
-    fontFamily        : inherit,
-    fontWeight        : inherit,
-    fontStyle         : inherit,
-    textDecoration    : inherit,
+    fontSize          : [['calc((', gens.fontSizeSm, '+', gens.fontSizeMd, ')/2)']],
+    fontFamily        : gens.fontFamilyMonospace,
+    fontWeight        : gens.fontWeightNormal,
+    fontStyle         : none,
+    textDecoration    : none,
     lineHeight        : inherit,
 
-    color             : inherit,
+    color             : colors.pink as string,
+    backg             : none,
     
-    marginBlockStart  : '0px',
-    marginBlockEnd    : '1em',
-    marginInlineStart : '0px',
-    marginInlineEnd   : '0px',
+    paddingX          : none,
+    paddingY          : none,
+    border            : none,
+    borderRadius      : none,
 };
 
 
@@ -40,7 +38,7 @@ const props: Props = {
 // convert props => varProps:
 const collection = new JssVarCollection(
     /*items  :*/ props as unknown as { [index: string]: any },
-    /*config :*/ { varPrefix: 'p'}
+    /*config :*/ { varPrefix: 'code'}
 );
 const config   = collection.config;
 const varProps = collection.varProps as typeof props;
@@ -52,8 +50,8 @@ export default varProps;
 
 // define the css class using configurable css vars:
 base.declareCss({
-    'p, .p': {
+    'code,.code,var,.var,samp,.samp': {
         extend  : varProps,
-        display : 'block',
+        display : 'inline',
     },
 });
