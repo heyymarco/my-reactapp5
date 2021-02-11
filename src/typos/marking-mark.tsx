@@ -4,7 +4,7 @@ import colors           from '../colors';
 import borders,
        * as border      from '../borders';
 
-import JssVarCollection from '../JssVarCollection';
+import JssVarCollection from '../jss-var-collection';
 
 
 

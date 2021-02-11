@@ -4,7 +4,7 @@ import type * as mark   from './marking-mark';
 import gens             from './general';
 import colors           from '../colors';
 
-import JssVarCollection from '../JssVarCollection';
+import JssVarCollection from '../jss-var-collection';
 
 
 

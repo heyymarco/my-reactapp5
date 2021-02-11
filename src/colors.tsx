@@ -1,5 +1,5 @@
-import JssVarCollection from './JssVarCollection';
-import Color from 'color';
+import JssVarCollection from './jss-var-collection';
+import Color            from 'color';
 
 
 
@@ -69,3 +69,10 @@ const varProps = collection.varProps as typeof props;
 // export the configurable props:
 export { config, varProps as colors };
 export default varProps;
+
+
+const themesProxy = new Proxy(themes, {
+    get: (items, name: string)        => (varProps  as { [index: string]: Color})[name],
+    set: (items, name: string, value) => (varProps  as { [index: string]: Color})[name] = value,
+});
+export { themesProxy as themes };

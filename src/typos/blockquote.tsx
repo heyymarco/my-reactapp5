@@ -3,7 +3,7 @@ import type * as par    from './paragraph';
 
 import gens              from './general';
 
-import JssVarCollection from '../JssVarCollection';
+import JssVarCollection from '../jss-var-collection';
 
 
 

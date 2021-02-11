@@ -3,7 +3,7 @@ import type * as par    from './paragraph';
 
 import gens             from './general';
 
-import JssVarCollection from '../JssVarCollection';
+import JssVarCollection from '../jss-var-collection';
 
 
 
@@ -82,9 +82,11 @@ export function createCss(varProps: typeof props, classLevelDecl: (level: number
 
 
     // defines props.fontSize into each h1-h6:
-    levels.forEach(level => css[classLevelDecl(level)] = {
-        fontSize: (varProps as { [index:string]: any })[`fontSize${level}`],
-    });
+    for (const level of levels) {
+        css[classLevelDecl(level)] = {
+            fontSize: (varProps as { [index:string]: any })[`fontSize${level}`],
+        }
+    }
 
 
 

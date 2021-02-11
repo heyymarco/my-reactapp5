@@ -3,7 +3,7 @@ import * as base        from './base';
 import borders          from '../borders';
 import spacers          from '../spacers';
 
-import JssVarCollection from '../JssVarCollection';
+import JssVarCollection from '../jss-var-collection';
 
 
 

@@ -1,4 +1,6 @@
-import jss           from 'jss';
+import { 
+       create as createJss,
+       Jss }                     from 'jss';
 import jssPluginFunctions        from 'jss-plugin-rule-value-function';
 // import jssPluginObservable       from 'jss-plugin-rule-value-observable';
 // import jssPluginTemplate         from 'jss-plugin-template';
@@ -15,7 +17,7 @@ import jssPluginNormalizeShorthands from '../jss-plugin-normalize-shorthands';
 
 
 
-type Expression = (string | number | Expression)[] | (string | number | Expression)[][];
+export type Expression = (string | number | Expression)[] | (string | number | Expression)[][];
 export interface Props {
     fontSize       : string | number   | Expression;
     fontFamily     : string | string[] ;
@@ -27,24 +29,28 @@ export interface Props {
 
 
 
+let jssCache: Jss | null = null;
 export function declareCss(css : object) {
-    jss.setup({
-        plugins: [
-          jssPluginFunctions(),
-          // jssPluginObservable({}),
-          // jssPluginTemplate(),
-          jssPluginGlobal(),
-          jssPluginExtend(),
-          jssPluginNested(),
-          // jssPluginCompose(),
-          jssPluginCamelCase(),
-          // jssPluginDefaultUnit({}),
-          jssPluginExpand(),
-          // jssPluginVendorPrefixer(),
-          // jssPluginPropsSort(),
-          jssPluginNormalizeShorthands()
-        ]
-      }).createStyleSheet({
+    (jssCache ?? (jssCache = (() =>
+        createJss().setup({
+            plugins: [
+                jssPluginFunctions(),
+                // jssPluginObservable({}),
+                // jssPluginTemplate(),
+                jssPluginGlobal(),
+                jssPluginExtend(),
+                jssPluginNested(),
+                // jssPluginCompose(),
+                jssPluginCamelCase(),
+                // jssPluginDefaultUnit({}),
+                jssPluginExpand(),
+                // jssPluginVendorPrefixer(),
+                // jssPluginPropsSort(),
+                jssPluginNormalizeShorthands()
+            ]
+        })
+    )()))
+    .createStyleSheet({
         '@global': css
     }).attach();
 }

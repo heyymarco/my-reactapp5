@@ -1,4 +1,4 @@
-import JssVarCollection from './JssVarCollection';
+import JssVarCollection from './jss-var-collection';
 import colors           from './colors';
 import * as radius      from './borders-radiuses';
 

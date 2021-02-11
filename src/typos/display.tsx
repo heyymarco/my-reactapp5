@@ -4,7 +4,7 @@ import heads,
        * as head        from './heading';
 import gens             from './general';
 
-import JssVarCollection from '../JssVarCollection';
+import JssVarCollection from '../jss-var-collection';
 
 
 

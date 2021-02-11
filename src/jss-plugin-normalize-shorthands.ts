@@ -2,13 +2,21 @@ import type { Plugin, Rule, JssStyle, StyleSheet } from 'jss';
 
 
 
+const shorthands: { [index: string]: string } = {
+    backg   : 'background',
+    anim    : 'animation',
+};
+
 type StyleEx = { [index: string]: any };
 export default function normalizeShorthands(): Plugin {
     return {
         onProcessStyle: (style: JssStyle, rule: Rule, sheet?: StyleSheet): JssStyle => {
-            if ('backg' in style) {
-                style['background'] = style.backg;
-                delete style.backg;
+            
+            for (const prop in shorthands) {
+                if (prop in style) {
+                    (style as StyleEx)[shorthands[prop]] = (style as StyleEx)[prop];
+                    delete (style as StyleEx)[prop];
+                }
             }
 
             

@@ -1,4 +1,7 @@
-import * as general        from './general';
+import * as base           from './base';
+
+import generals,
+       * as general        from './general';
 import * as secondary      from './secondary';
 
 import * as paragraph      from './paragraph';
@@ -19,7 +22,10 @@ import * as horizontalRule from './horizontal-rule';
 
 
 
+export default generals;
 export {
+    base,
+
     general,
     secondary,
 
