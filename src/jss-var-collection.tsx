@@ -110,7 +110,7 @@ export default class JssVarCollection<TProp> {
             get: (props, name: string) => {
                 if (!Reflect.has(props, name)) return undefined;
         
-                return `var(${this._getVarName(name)})`;
+                return `var(${this.getVarName(name)})`;
             },
             set: (props, name: string, value) => {
         
@@ -139,7 +139,7 @@ export default class JssVarCollection<TProp> {
     }
 
 
-    private _getVarName(baseName: string): string {
+    private getVarName(baseName: string): string {
         baseName = baseName.replace(/^@keyframes\s+/, 'keyframes-');
 
         const varPrefix = this._config.varPrefix;
@@ -150,96 +150,152 @@ export default class JssVarCollection<TProp> {
         this._css?.detach();
 
 
-
-        const props = this._props;
-        const valProps: Dictionary<CSSValueComp> = {};
+        
         const keyframes: Dictionary<object> = {};
-        const reservedKeyword = /^(none|unset|inherit)$/;
-        for (const [name, value] of Object.entries(props)) { // set up values
-            if (value === undefined) continue; // skip undefined prop
-            if (Array.isArray(value)) {
-                let arr = value as any[];
-                let deep = false;
-                if ((arr.length === 1) && Array.isArray(arr[0])) {
-                    arr = arr[0] as any[];
-                    deep = true;
+        const replaceDuplicates = <TSrc, TRef>(srcProps: TSrc, refProps: TRef, propRename?: ((name: string) => string)) => {
+            if (!propRename) propRename = (name) => name; // if no custom renamer => set default handler
+            let globalModified = false; // a flag determines the outProps is different than srcProps
+            const outProps: Dictionary<CSSValueComp> = {}; // an object for storing unmodified & modified properties from srcProps
+
+
+            const isCombinable = (value: any) => {
+                if (value === undefined) return false; // skip undefined prop
+                if ((typeof(value) === 'string') && (/^(none|unset|inherit)$/).test(value as string)) return false; // ignore reserved keywords
+                // if (Array.isArray(value)) return false; // ignore prev value if it's kind of array
+                return true; // passed
+            };
+            const isSelf = (name: string, prevName: string) => {
+                if ((srcProps as unknown as object) !== (refProps as unknown as object)) return false;
+                return (name === prevName);
+            };
+            const findDuplicateVar = (name: string, value: any) => {
+                for (const [prevName, prevValue] of Object.entries(refProps)) { // search for duplicate props' value
+                    if (isSelf(name, prevName)) break; // stop search if reaches current pos (search for prev values only)
+
+                    if (!isCombinable(prevValue)) continue; // skip uncombinable prop
+
+
+                    if (value === prevValue) {
+                        return `var(${this.getVarName(prevName)})`;
+                    }
+                } // for // searching for duplicates
+
+                return null; // not found
+            }
+
+
+            for (const [name, value] of Object.entries(srcProps)) { // walk each props in srcProps
+                if (value === undefined) continue; // skip undefined prop
+                if (Array.isArray(value)) {
+                    let arr = value as any[];
+                    let deep = false;
+                    if ((arr.length === 1) && Array.isArray(arr[0])) {
+                        arr = arr[0] as any[];
+                        deep = true;
+                    }
+                    arr = arr.slice(); // copy array object
+
+
+                    let modified = false;
+                    for (let index = 0; index < arr.length; index++) { // walk each arrayItem in arr
+                        const arrItem = arr[index];
+
+                        if (!isCombinable(arrItem)) continue; // skip uncombinable prop
+
+
+                        const found = findDuplicateVar(name, arrItem);
+                        if (found) {
+                            arr[index] = found;
+
+                            modified = true;
+                            globalModified = true;
+                        }
+
+
+                        if ((!modified) && (typeof(arrItem) !== 'string')) {
+                            arr[index] = this._toString(arrItem);
+
+                            modified = true;
+                            globalModified = true;
+                        }
+                    } // for // walk each arrayItem in arr
+
+
+                    // save the unmodified/modified array:
+                    outProps[propRename(name)] = modified ? (deep ? [arr] : arr) : (value as (CssValue[] | CssValue[][]));
+                    if (modified) continue; // continue to investigating next prop, do not execute *code below*
                 }
-                arr = arr.slice(); // copy array object
+
+                // *code below*:
 
 
                 let modified = false;
-                for (let index = 0; index < arr.length; index++) {
-                    const arrItem: any = arr[index];
-                    if ((typeof(arrItem) === 'string') && reservedKeyword.test(arrItem as string)) continue; // ignore reserved keywords
-                    if (Array.isArray(arrItem)) continue; // ignore value if it's kind of array
-
-
-                    for (const [prevName, prevValue] of Object.entries(props)) { // searching for duplicates
-                        if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
-
-                        if (prevValue === undefined) continue; // skip undefined prop
-                        if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
-                        if (Array.isArray(prevValue)) continue; // ignore prev value if it's kind of array
-
-
-                        if (arrItem === prevValue) {
-                            arr[index] = `var(${this._getVarName(prevName)})`;
-                            modified = true;
-                        }
-                    } // for // searching for duplicates
-
-                    if ((!modified) && (typeof(arrItem) !== 'string')) {
-                        arr[index] = this._toString(arrItem);
-                        modified = true;
-                    }
-                } // for arrItem....arrItem
-
-
-                valProps[this._getVarName(name)] = modified ? (deep ? [arr] : arr) : (value as CSSValueComp);
-                if (modified) continue;
-            }
-
-
-            let modified = false;
-            for (const prevName in props) {
-                if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
-
-                const prevValue = props[prevName];
-                if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
-
-                
-                if (value === prevValue) {
-                    valProps[this._getVarName(name)] = `var(${this._getVarName(prevName)})`;
+                const found = findDuplicateVar(name, value);
+                if (found) {
+                    outProps[propRename(name)] = found;
 
                     modified = true;
-                    break;
+                    globalModified = true;
                 }
-            }
-            if (!modified) {
-                valProps[this._getVarName(name)] = (() => {
-                    const match = name.match(/(?<=@keyframes\s+).+/)?.[0];
-                    if (match) {
-                        const found = Object.entries(keyframes).find(ent => (ent[1] === (value as unknown as object)));
-                        if (found) return found[0];
+                
+                
+                if (!modified) {
+                    outProps[propRename(name)] = (() => {
+                        const match = name.match(/(?<=@keyframes\s+).+/)?.[0];
+                        if (match) {
+                            modified = true;
 
 
-                        const kfName = generateKeyframeName(match);
-                        keyframes[`@keyframes ${kfName}`] = (value as unknown as object);
-                        return kfName;
-                    }
+                            // if current keyframe equals to one of stored keyframes => use the matched stored keyframe
+                            const found = Object.entries(keyframes).find(ent => (ent[1] === (value as unknown as object)));
+                            if (found) return found[0]; // return the stored keyframe's name
 
 
-                    if (Array.isArray(value)) return (value as (CssValue[] | CssValue[][]));
-                    return this._toString(value);
-                })();
-            }
+                            // if not found => generate a unique keyframe's name
+                            const kfName = generateKeyframeName(match);
+                            keyframes[`@keyframes ${kfName}`] = (value as unknown as object);
+                            return kfName; // return the new keyframe's name
+                        }
+
+
+                        // do not modify array => the array was already investigated & maybe transformed
+                        if (Array.isArray(value)) return (value as (CssValue[] | CssValue[][]));
+
+
+                        modified = true;
+                        return this._toString(value);
+                    })();
+                    if (modified) globalModified = true;
+                }
+            } // for // walk each props in srcProps
+
+
+            return globalModified ? outProps : undefined;
         }
-        this._valProps = valProps;
+        const props = this._props;
+        this._valProps = replaceDuplicates(props, props, (name) => this.getVarName(name)) ?? (props as unknown as Dictionary<CSSValueComp>);
+        
+
+
+        for (const [id, keyframe] of Object.entries(keyframes)) {
+            const keyframe2 = Object.assign({}, keyframe);
+            let modified = false;
+
+            for (const [key, frame] of Object.entries(keyframe2)) {
+                const frameRep = replaceDuplicates(frame, props);
+                if (frameRep) {
+                    (keyframe2 as { [key: string]: any })[key] = frameRep;
+                    modified = true;
+                }
+            } // for
+
+            if (modified) keyframes[id] = keyframe2;
+        } // for
 
 
 
         const global = {
-            ':root': valProps,
+            ':root': this._valProps,
         };
         Object.assign(global, keyframes);
         const styles = {
@@ -260,7 +316,7 @@ export default class JssVarCollection<TProp> {
     get valProps() {
         return this._valPropsProxy ?? (this._valPropsProxy = (() =>
             new Proxy(this._props as unknown as Dictionary<CSSValueComp>, {
-                get: (items, name: string)        => this._valProps[this._getVarName(name)],
+                get: (items, name: string)        => this._valProps[this.getVarName(name)],
                 set: (items, name: string, value) => { throw new Error('property is read only.'); }
             })
         )());
