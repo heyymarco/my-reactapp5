@@ -41,15 +41,36 @@ export interface Props
     filter         : string | string[][]                   ;
     filterHover    : string | string[][]                   ;
 
-    anim           : string | string[][]                   ;
-    animHover      : string | string[][]                   ;
-    animLeave      : string | string[][]                   ;
+    anim           : string | (string | object)[][]        ;
+    animHover      : string | (string | object)[][]        ;
+    animLeave      : string | (string | object)[][]        ;
+
+    '@keyframes none'  : object                            ;
+    '@keyframes hover' : object                            ;
+    '@keyframes leave' : object                            ;
 }
 // const unset   = 'unset';
-// const none    = 'none';
+const none    = 'none';
 const inherit = 'inherit';
 
 // define default props' value to be stored into css vars:
+const keyframesNone  = {  };
+const keyframesHover = {
+    from: {
+        background: 'red',
+    },
+    to: {
+        background: 'blue',
+    }
+};
+const keyframesLeave = {
+    from: {
+        color: 'red',
+    },
+    to: {
+        color: 'blue',
+    }
+};
 const props: Props = {
     fontSize       : typos.fontSizeNm,
     fontSizeSm     : [['calc((', typos.fontSizeSm, '+', typos.fontSizeNm, ')/2)']],
@@ -60,7 +81,7 @@ const props: Props = {
     textDecoration : inherit,
     lineHeight     : inherit,
 
-    color          : 'contrast',
+    color          : typos.color,
     backg          : 'rgba(255, 255, 255, 0)', // transp white, so the foreg color will be black
     backgGrad      : [['linear-gradient(180deg, rgba(255,255,255, 0.15), rgba(255,255,255, 0))', 'border-box']],
 
@@ -86,9 +107,12 @@ const props: Props = {
     filter         : 'brightness(100%)',
     filterHover    : 'brightness(85%)',
 
-    anim           : 'elm-anim-none',
-    animHover      : [['150ms', 'ease-out', 'both', 'elm-anim-hover']],
-    animLeave      : [['150ms', 'ease-out', 'both', 'elm-anim-leave']],
+    '@keyframes none' : keyframesNone,
+    '@keyframes hover': keyframesHover,
+    '@keyframes leave': keyframesLeave,
+    anim           : [[keyframesNone]],
+    animHover      : [['150ms', 'ease-out', 'both', keyframesHover]],
+    animLeave      : [['150ms', 'ease-out', 'both', keyframesLeave]],
 };
 
 
@@ -105,23 +129,78 @@ export { config, varProps as props };
 
 
 
+const stateHover = (content: object) => ({
+    '&:hover,&:focus': {
+        extend: [content]
+    }
+});
+const stateNotHover = (content: object) => ({
+    '&:not(:hover):not(:focus)': {
+        extend: [content]
+    }
+});
+const stateLeave = (content: object) => ({
+    '&.leave,&.blur': {
+        extend: [content]
+    }
+});
+const stateNotLeave = (content: object) => ({
+    '&:not(.leave):not(.blur)': {
+        extend: [content]
+    }
+});
+
+const stateDisabled = (content: object) => ({
+    '&:disabled,&.disabled': {
+        extend: [content]
+    }
+});
+const stateNotDisabled = (content: object) => ({
+    '&:not(:disabled):not(.disabled)': {
+        extend: [content]
+    }
+});
+const stateEnabled = (content: object) => ({
+    '&.enabled': {
+        extend: [content]
+    }
+});
+const stateNotEnabled = (content: object) => ({
+    '&:not(.enabled)': {
+        extend: [content]
+    }
+});
+
+const states = {
+    extend:[
+        stateNotDisabled({extend:[
+            stateHover({
+                '--elm-animHoverLeave': varProps.animHover,
+            }),
+            stateLeave({
+                '--elm-animHoverLeave': varProps.animLeave,
+            }),
+        ]}),
+    ],
+
+    '--elm-animHoverLeave': none,
+    anim: [varProps.anim, 'var(--elm-animHoverLeave)'],
+};
+
 const styles = {
     main: {
         extend: [
-            varProps,
+            (() => {
+                const varProps2: { [key: string]: any } = { };
+                for (const [key, value] of Object.entries(varProps)) {
+                    if ((/(Sm|Lg|Hover|Leave)$|^@/).test(key)) continue;
+                    varProps2[key] = value;
+                }
+                return varProps2;
+            })(),
+            states,
         ],
-        fontSizeSm     : null,
-        fontSizeLg     : null,
         backgGrad      : null,
-        paddingXSm     : null,
-        paddingYSm     : null,
-        paddingXLg     : null,
-        paddingYLg     : null,
-        borderRadiusSm : null,
-        borderRadiusLg : null,
-        filterHover    : null,
-        animHover      : null,
-        animLeave      : null,
     },
 }
 type StylesAny = { [index: string]: any };
@@ -139,6 +218,7 @@ for (let [theme, value] of Object.entries(color.themes)) {
     theme = pascalCase(theme);
     (styles as StylesAny)[`theme${theme}`] = {
         backg: value,
+        color: (color.themesText as StylesAny)[theme],
     };
 }
 export { styles };

@@ -80,7 +80,7 @@ export default class JssVarCollection<TProp> {
             },
             set: (props, name: string, value) => {
         
-                if (!value) {
+                if ((value === undefined) || (value === null)) {
                     delete props[name];
                 } else {
                     const newValue = parser ? parser(value) : (value as TProp);
@@ -106,6 +106,8 @@ export default class JssVarCollection<TProp> {
 
 
     private _getVarName(baseName: string): string {
+        baseName = baseName.replace(/^@keyframes\s+/, 'keyframes-');
+
         const varPrefix = this._config.varPrefix;
         return `${varPrefix ? `--${varPrefix}-` : '--'}${baseName}`;
     }
@@ -117,9 +119,9 @@ export default class JssVarCollection<TProp> {
 
         const props = this._props;
         const valProps: Dictionary<CSSValueComp> = {};
+        const keyframes: Dictionary<object> = {};
         const reservedKeyword = /^(none|unset|inherit)$/;
-        for (const name in props) { // set up values
-            const value = props[name];
+        for (const [name, value] of Object.entries(props)) { // set up values
             if (value === undefined) continue; // skip undefined prop
             if (Array.isArray(value)) {
                 let arr = value as any[];
@@ -138,10 +140,9 @@ export default class JssVarCollection<TProp> {
                     if (Array.isArray(arrItem)) continue; // ignore value if it's kind of array
 
 
-                    for (const prevName in props) {
+                    for (const [prevName, prevValue] of Object.entries(props)) { // searching for duplicates
                         if (prevName === name) break; // stop search if reaches current pos (search for prev values only)
 
-                        const prevValue = props[prevName];
                         if (prevValue === undefined) continue; // skip undefined prop
                         if ((typeof(prevValue) === 'string') && reservedKeyword.test(prevValue as string)) continue; // ignore reserved keywords
                         if (Array.isArray(prevValue)) continue; // ignore prev value if it's kind of array
@@ -151,16 +152,17 @@ export default class JssVarCollection<TProp> {
                             arr[index] = `var(${this._getVarName(prevName)})`;
                             modified = true;
                         }
-                        else if (typeof(arrItem) !== 'string') {
-                            arr[index] = this._toString(arrItem);
-                            modified = true;
-                        }
+                    } // for // searching for duplicates
+
+                    if ((!modified) && (typeof(arrItem) !== 'string')) {
+                        arr[index] = this._toString(arrItem);
+                        modified = true;
                     }
-                }
-                if (modified) {
-                    valProps[this._getVarName(name)] = deep ? [arr] : arr;
-                    continue;
-                }
+                } // for arrItem....arrItem
+
+
+                valProps[this._getVarName(name)] = modified ? (deep ? [arr] : arr) : (value as CSSValueComp);
+                if (modified) continue;
             }
 
 
@@ -180,16 +182,33 @@ export default class JssVarCollection<TProp> {
                 }
             }
             if (!modified) {
-                valProps[this._getVarName(name)] = Array.isArray(value) ? (Array.isArray((value as CssValue[])[0]) ? (value as CssValue[][]) : (value as CssValue[])) : this._toString(value);
+                valProps[this._getVarName(name)] = (() => {
+                    const match = name.match(/(?<=@keyframes\s+).+/)?.[0];
+                    if (match) {
+                        const found = Object.entries(keyframes).find(ent => (ent[1] === (value as unknown as object)));
+                        if (found) return found[0];
+
+
+                        const kfName = `${match}-hash`;
+                        keyframes[`@keyframes ${kfName}`] = (value as unknown as object);
+                        return kfName;
+                    }
+
+
+                    if (Array.isArray(value)) return (value as (CssValue[] | CssValue[][]));
+                    return this._toString(value);
+                })();
             }
         }
         this._valProps = valProps;
 
 
+        const global = {
+            ':root': valProps,
+        };
+        Object.assign(global, keyframes);
         const styles = {
-            '@global': {
-                ':root': valProps
-            }
+            '@global': global,
         };
         this._css = jss.setup({
             plugins: [

@@ -34,25 +34,42 @@ const themes = {
 };
 
 let transpLevel = 0.25;
+const transpColor = (color: Color) => color.alpha(transpLevel) as (Color | string)
 const themesTransp = {
-    primaryTransp   : (themes.primary   as Color).alpha(transpLevel) as (Color | string),
-    secondaryTransp : (themes.secondary as Color).alpha(transpLevel) as (Color | string),
-    successTransp   : (themes.success   as Color).alpha(transpLevel) as (Color | string),
-    infoTransp      : (themes.info      as Color).alpha(transpLevel) as (Color | string),
-    warningTransp   : (themes.warning   as Color).alpha(transpLevel) as (Color | string),
-    dangerTransp    : (themes.danger    as Color).alpha(transpLevel) as (Color | string),
-    lightTransp     : (themes.light     as Color).alpha(transpLevel) as (Color | string),
-    darkTransp      : (themes.dark      as Color).alpha(transpLevel) as (Color | string),
+    primaryTransp   : transpColor(themes.primary   as Color),
+    secondaryTransp : transpColor(themes.secondary as Color),
+    successTransp   : transpColor(themes.success   as Color),
+    infoTransp      : transpColor(themes.info      as Color),
+    warningTransp   : transpColor(themes.warning   as Color),
+    dangerTransp    : transpColor(themes.danger    as Color),
+    lightTransp     : transpColor(themes.light     as Color),
+    darkTransp      : transpColor(themes.dark      as Color),
 };
 // const themesTransp = { };
 // for (const name in themes) {
 //     themesTransp[`${name}Transp`] = Color(themes[name]).alpha(transpLevel);
 // }
 
-const props = Object.assign({},
+const textColor = (color: Color) => (color.isLight() ? themes.dark : themes.light) as (Color | string);
+const themesText = {
+    primaryText   : textColor(themes.primary   as Color),
+    secondaryText : textColor(themes.secondary as Color),
+    successText   : textColor(themes.success   as Color),
+    infoText      : textColor(themes.info      as Color),
+    warningText   : textColor(themes.warning   as Color),
+    dangerText    : textColor(themes.danger    as Color),
+    lightText     : textColor(themes.light     as Color),
+    darkText      : textColor(themes.dark      as Color),
+};
+
+const props2 = Object.assign({},
     basics,
     themes,
-    themesTransp
+    themesTransp,
+);
+const props = Object.assign({},
+    props2,
+    themesText,
 );
 
 
@@ -66,8 +83,9 @@ const collection = new JssVarCollection(
 );
 const config   = collection.config;
 const varProps = collection.varProps as typeof props;
+const valProps = collection.valProps as typeof props;
 // export the configurable props:
-export { config, varProps as colors };
+export { config, varProps as colors, valProps as colorValues };
 export default varProps;
 
 
@@ -76,3 +94,10 @@ const themesProxy = new Proxy(themes, {
     set: (items, name: string, value) => (varProps  as { [index: string]: Color})[name] = value,
 });
 export { themesProxy as themes };
+
+
+const themesTextProxy = new Proxy(themesText, {
+    get: (items, name: string)        => (varProps  as { [index: string]: Color})[name],
+    set: (items, name: string, value) => (varProps  as { [index: string]: Color})[name] = value,
+});
+export { themesTextProxy as themesText };
