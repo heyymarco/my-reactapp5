@@ -1,6 +1,7 @@
 import { 
-       create as createJss,
-       Jss }                     from 'jss';
+    create as createJss
+}                                from 'jss';
+import type * as Jss             from 'jss';
 import jssPluginFunctions        from 'jss-plugin-rule-value-function';
 // import jssPluginObservable       from 'jss-plugin-rule-value-observable';
 // import jssPluginTemplate         from 'jss-plugin-template';
@@ -29,27 +30,32 @@ export interface Props {
 
 
 
-let jssCache: Jss | null = null;
+let customJssCache: Jss.Jss | null = null;
+const getCustomJss = () => {
+    if (customJssCache) return customJssCache;
+
+    customJssCache = createJss().setup({
+        plugins: [
+            jssPluginFunctions(),
+            // jssPluginObservable({}),
+            // jssPluginTemplate(),
+            jssPluginGlobal(),
+            jssPluginExtend(),
+            jssPluginNested(),
+            // jssPluginCompose(),
+            jssPluginCamelCase(),
+            // jssPluginDefaultUnit({}),
+            jssPluginExpand(),
+            // jssPluginVendorPrefixer(),
+            // jssPluginPropsSort(),
+            jssPluginNormalizeShorthands()
+        ]
+    });
+
+    return customJssCache;
+}
 export function declareCss(css : object) {
-    (jssCache ?? (jssCache = (() =>
-        createJss().setup({
-            plugins: [
-                jssPluginFunctions(),
-                // jssPluginObservable({}),
-                // jssPluginTemplate(),
-                jssPluginGlobal(),
-                jssPluginExtend(),
-                jssPluginNested(),
-                // jssPluginCompose(),
-                jssPluginCamelCase(),
-                // jssPluginDefaultUnit({}),
-                jssPluginExpand(),
-                // jssPluginVendorPrefixer(),
-                // jssPluginPropsSort(),
-                jssPluginNormalizeShorthands()
-            ]
-        })
-    )()))
+    getCustomJss()
     .createStyleSheet({
         '@global': css
     }).attach();

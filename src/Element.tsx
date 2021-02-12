@@ -41,36 +41,23 @@ export interface Props
     filter         : string | string[][]                   ;
     filterHover    : string | string[][]                   ;
 
-    anim           : string | (string | object)[][]        ;
-    animHover      : string | (string | object)[][]        ;
-    animLeave      : string | (string | object)[][]        ;
-
     '@keyframes none'  : object                            ;
     '@keyframes hover' : object                            ;
     '@keyframes leave' : object                            ;
+    '@keyframes leaveCopy' : object                            ; // TODO: remove this test
+
+    anim           : string | (string | object)[][]        ;
+    animHover      : string | (string | object)[][]        ;
+    animLeave      : string | (string | object)[][]        ;
 }
 // const unset   = 'unset';
 const none    = 'none';
 const inherit = 'inherit';
 
 // define default props' value to be stored into css vars:
-const keyframesNone  = {  };
-const keyframesHover = {
-    from: {
-        background: 'red',
-    },
-    to: {
-        background: 'blue',
-    }
-};
-const keyframesLeave = {
-    from: {
-        color: 'red',
-    },
-    to: {
-        color: 'blue',
-    }
-};
+const keyframesNone  = { };
+const keyframesHover = { from: undefined, to: undefined }; // re-defined later, we need to construct varProps first
+const keyframesLeave = { from: undefined, to: undefined }; // re-defined later, we need to construct varProps first
 const props: Props = {
     fontSize       : typos.fontSizeNm,
     fontSizeSm     : [['calc((', typos.fontSizeSm, '+', typos.fontSizeNm, ')/2)']],
@@ -110,10 +97,28 @@ const props: Props = {
     '@keyframes none' : keyframesNone,
     '@keyframes hover': keyframesHover,
     '@keyframes leave': keyframesLeave,
+    '@keyframes leaveCopy': keyframesLeave,
     anim           : [[keyframesNone]],
     animHover      : [['150ms', 'ease-out', 'both', keyframesHover]],
     animLeave      : [['150ms', 'ease-out', 'both', keyframesLeave]],
 };
+Object.assign(keyframesHover, {
+    from: {
+        filter: [[
+            props.filter,
+        ]],
+    },
+    to: {
+        filter: [[
+            props.filter,
+            props.filterHover,
+        ]],
+    }
+});
+Object.assign(keyframesLeave, {
+    from : keyframesHover.to,
+    to   : keyframesHover.from
+});
 
 
 
@@ -126,6 +131,10 @@ const config   = collection.config;
 const varProps = collection.varProps as typeof props;
 // export the configurable props:
 export { config, varProps as props };
+
+
+
+// collection.rebuildJss();
 
 
 
@@ -183,7 +192,7 @@ const states = {
         ]}),
     ],
 
-    '--elm-animHoverLeave': none,
+    '--elm-animHoverLeave': [[keyframesNone]],
     anim: [varProps.anim, 'var(--elm-animHoverLeave)'],
 };
 

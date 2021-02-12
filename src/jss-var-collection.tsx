@@ -1,4 +1,8 @@
-import jss, * as Jss from 'jss';
+import { 
+    create as createJss,
+    createGenerateId
+}                                from 'jss';
+import type * as Jss             from 'jss';
 
 // import presetDefault from 'jss-preset-default';
 import jssPluginFunctions        from 'jss-plugin-rule-value-function';
@@ -14,6 +18,36 @@ import jssPluginExpand           from 'jss-plugin-expand';
 // import jssPluginVendorPrefixer   from 'jss-plugin-vendor-prefixer';
 // import jssPluginPropsSort        from 'jss-plugin-props-sort';
 import jssPluginNormalizeShorthands from './jss-plugin-normalize-shorthands';
+
+
+
+let customJssCache: Jss.Jss | null = null;
+const getCustomJss = () => {
+    if (customJssCache) return customJssCache;
+
+    customJssCache = createJss().setup({
+        plugins: [
+            jssPluginFunctions(),
+            // jssPluginObservable({}),
+            // jssPluginTemplate(),
+            jssPluginGlobal(),
+            jssPluginExtend(),
+            jssPluginNested(),
+            // jssPluginCompose(),
+            jssPluginCamelCase(),
+            // jssPluginDefaultUnit({}),
+            jssPluginExpand(),
+            // jssPluginVendorPrefixer(),
+            // jssPluginPropsSort(),
+            jssPluginNormalizeShorthands()
+        ]
+    });
+
+    return customJssCache;
+}
+
+let idGenerator = createGenerateId();
+const generateKeyframeName = (baseName: string) => idGenerator({key: baseName} as Jss.Rule)
 
 
 
@@ -62,7 +96,7 @@ export default class JssVarCollection<TProp> {
                 if (target[name] !== value) {
                     target[name] = value;
                     
-                    this._rebuildJss(); // setting changed => need to rebuild the jss
+                    this.rebuildJss(); // setting changed => need to rebuild the jss
                 }
         
                 return true;
@@ -87,7 +121,7 @@ export default class JssVarCollection<TProp> {
                     if (props[name] !== newValue) {
                         props[name] = newValue;
         
-                        this._rebuildJss(); // setting changed => need to rebuild the jss
+                        this.rebuildJss(); // setting changed => need to rebuild the jss
                     }
                 }
         
@@ -101,7 +135,7 @@ export default class JssVarCollection<TProp> {
 
 
 
-        this._rebuildJss();
+        this.rebuildJss();
     }
 
 
@@ -112,7 +146,7 @@ export default class JssVarCollection<TProp> {
         return `${varPrefix ? `--${varPrefix}-` : '--'}${baseName}`;
     }
 
-    private _rebuildJss() {
+    public rebuildJss() {
         this._css?.detach();
 
 
@@ -189,7 +223,7 @@ export default class JssVarCollection<TProp> {
                         if (found) return found[0];
 
 
-                        const kfName = `${match}-hash`;
+                        const kfName = generateKeyframeName(match);
                         keyframes[`@keyframes ${kfName}`] = (value as unknown as object);
                         return kfName;
                     }
@@ -203,6 +237,7 @@ export default class JssVarCollection<TProp> {
         this._valProps = valProps;
 
 
+
         const global = {
             ':root': valProps,
         };
@@ -210,23 +245,9 @@ export default class JssVarCollection<TProp> {
         const styles = {
             '@global': global,
         };
-        this._css = jss.setup({
-            plugins: [
-              jssPluginFunctions(),
-              // jssPluginObservable({}),
-              // jssPluginTemplate(),
-              jssPluginGlobal(),
-              jssPluginExtend(),
-              jssPluginNested(),
-              // jssPluginCompose(),
-              jssPluginCamelCase(),
-              // jssPluginDefaultUnit({}),
-              jssPluginExpand(),
-              // jssPluginVendorPrefixer(),
-              // jssPluginPropsSort(),
-              jssPluginNormalizeShorthands()
-            ]
-          }).createStyleSheet(styles);
+        this._css =
+            getCustomJss()
+            .createStyleSheet(styles);
         this._css.attach();
     }
 
