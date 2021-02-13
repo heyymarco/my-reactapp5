@@ -47,7 +47,9 @@ const getCustomJss = () => {
 }
 
 let idGenerator = createGenerateId();
-const generateKeyframeName = (baseName: string) => idGenerator({key: baseName} as Jss.Rule)
+const generateKeyframeName = (baseName: string) => idGenerator({key: baseName} as Jss.Rule);
+
+const matchKeyframeName = /(?<=@keyframes\s+).+/;
 
 
 
@@ -110,6 +112,8 @@ export default class JssVarCollection<TProp> {
             get: (cssProps, name: string) => {
                 if (!Reflect.has(cssProps, name)) return undefined;
         
+                if (matchKeyframeName.test(name)) return cssProps[name];
+
                 return `var(${this.getVarName(name)})`;
             },
             set: (cssProps, name: string, value) => {
@@ -185,6 +189,29 @@ export default class JssVarCollection<TProp> {
 
 
             for (const [name, value] of Object.entries(srcProps)) { // walk each props in srcProps
+                const foundKf = name.match(matchKeyframeName)?.[0];
+                if (foundKf) {
+                    // if current keyframe equals to one of stored keyframes => use the matched stored keyframe
+                    const found = Object.entries(keyframes).find(ent => (ent[1] === (value as unknown as object)));
+                    if (found) {
+                        outProps[propRename(name)] = found[0]; // replace with the stored keyframe's name
+
+                        globalModified = true;
+                        continue;
+                    }
+
+
+                    // if not found => generate a unique keyframe's name
+                    const kfName = generateKeyframeName(foundKf);
+                    keyframes[`@keyframes ${kfName}`] = (value as unknown as object);
+                    outProps[propRename(name)] = kfName; // replace with the new keyframe's name
+
+                    globalModified = true;
+                    continue;
+                }
+
+
+
                 if (value === undefined) continue; // skip undefined prop
                 if (Array.isArray(value)) {
                     let arr = value as any[];
@@ -241,23 +268,6 @@ export default class JssVarCollection<TProp> {
                 
                 if (!modified) {
                     outProps[propRename(name)] = (() => {
-                        const match = name.match(/(?<=@keyframes\s+).+/)?.[0];
-                        if (match) {
-                            modified = true;
-
-
-                            // if current keyframe equals to one of stored keyframes => use the matched stored keyframe
-                            const found = Object.entries(keyframes).find(ent => (ent[1] === (value as unknown as object)));
-                            if (found) return found[0]; // return the stored keyframe's name
-
-
-                            // if not found => generate a unique keyframe's name
-                            const kfName = generateKeyframeName(match);
-                            keyframes[`@keyframes ${kfName}`] = (value as unknown as object);
-                            return kfName; // return the new keyframe's name
-                        }
-
-
                         // do not modify array => the array was already investigated & maybe transformed
                         if (Array.isArray(value)) return (value as (CssValue[] | CssValue[][]));
 
@@ -278,10 +288,14 @@ export default class JssVarCollection<TProp> {
 
 
         for (const [id, keyframe] of Object.entries(keyframes)) {
+            if ((keyframe === undefined) || (keyframe === null)) continue;
+
             const keyframe2 = Object.assign({}, keyframe);
             let modified = false;
 
             for (const [key, frame] of Object.entries(keyframe2)) {
+                if ((frame === undefined) || (frame === null)) continue;
+
                 const frameRep = replaceDuplicates(frame, cssProps);
                 if (frameRep) {
                     (keyframe2 as { [key: string]: any })[key] = frameRep;

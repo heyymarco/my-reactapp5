@@ -33,7 +33,7 @@ const themes = {
     dark      : Color('#212529') as (Color | string),
 };
 
-let transpLevel = 0.25;
+let transpLevel = 0.5;
 const transpColor = (color: Color) => color.alpha(transpLevel) as (Color | string)
 const themesTransp = {
     primaryTransp   : transpColor(themes.primary   as Color),

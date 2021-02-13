@@ -1,7 +1,8 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Element, {Button} from './Element';
+import Element from './Element';
+import Control from './Control';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -68,8 +69,8 @@ const App = (props: any) => (
 				>
 					Learn React
 				</a>
-				<Element></Element>
-				<Button></Button>
+				<Element theme='primary' enableGradient={true}></Element>
+				<Control theme='primary'></Control>
 				<p>this is normal text</p>
 				<p className="txt-sec">this is secondary text</p>
 				<p className="lead">this is lead text</p>
