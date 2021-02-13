@@ -72,7 +72,7 @@ export default class JssVarCollection<TProp> {
     private _config        : Dictionary<string>;
     private _configProxy   : Dictionary<string>;
 
-    private _props         : Dictionary<TProp>;
+    private _cssProps      : Dictionary<TProp>;
     private _varPropsProxy : Dictionary<TProp | Var>; // TItem for set, Var | Empty for get
     
     private _toString      : ((value: TProp) => string);
@@ -82,7 +82,7 @@ export default class JssVarCollection<TProp> {
 
 
     constructor(
-        props    : Dictionary<TProp>,
+        cssProps : Dictionary<TProp>,
         config   : Dictionary<string>               = { varPrefix: '' },
         parser   : ((item: any) => TProp)    | null = null,
         toString : ((item: TProp) => string) | null = null
@@ -105,21 +105,21 @@ export default class JssVarCollection<TProp> {
 
 
         
-        this._props = props;
-        this._varPropsProxy = new Proxy(this._props, {
-            get: (props, name: string) => {
-                if (!Reflect.has(props, name)) return undefined;
+        this._cssProps = cssProps;
+        this._varPropsProxy = new Proxy(this._cssProps, {
+            get: (cssProps, name: string) => {
+                if (!Reflect.has(cssProps, name)) return undefined;
         
                 return `var(${this.getVarName(name)})`;
             },
-            set: (props, name: string, value) => {
+            set: (cssProps, name: string, value) => {
         
                 if ((value === undefined) || (value === null)) {
-                    delete props[name];
+                    delete cssProps[name];
                 } else {
                     const newValue = parser ? parser(value) : (value as TProp);
-                    if (props[name] !== newValue) {
-                        props[name] = newValue;
+                    if (cssProps[name] !== newValue) {
+                        cssProps[name] = newValue;
         
                         this.rebuildJss(); // setting changed => need to rebuild the jss
                     }
@@ -169,7 +169,7 @@ export default class JssVarCollection<TProp> {
                 return (name === prevName);
             };
             const findDuplicateVar = (name: string, value: any) => {
-                for (const [prevName, prevValue] of Object.entries(refProps)) { // search for duplicate props' value
+                for (const [prevName, prevValue] of Object.entries(refProps)) { // search for duplicate cssProps' value
                     if (isSelf(name, prevName)) break; // stop search if reaches current pos (search for prev values only)
 
                     if (!isCombinable(prevValue)) continue; // skip uncombinable prop
@@ -272,8 +272,8 @@ export default class JssVarCollection<TProp> {
 
             return globalModified ? outProps : undefined;
         }
-        const props = this._props;
-        this._valProps = replaceDuplicates(props, props, (name) => this.getVarName(name)) ?? (props as unknown as Dictionary<CSSValueComp>);
+        const cssProps = this._cssProps;
+        this._valProps = replaceDuplicates(cssProps, cssProps, (name) => this.getVarName(name)) ?? (cssProps as unknown as Dictionary<CSSValueComp>);
         
 
 
@@ -282,7 +282,7 @@ export default class JssVarCollection<TProp> {
             let modified = false;
 
             for (const [key, frame] of Object.entries(keyframe2)) {
-                const frameRep = replaceDuplicates(frame, props);
+                const frameRep = replaceDuplicates(frame, cssProps);
                 if (frameRep) {
                     (keyframe2 as { [key: string]: any })[key] = frameRep;
                     modified = true;
@@ -315,7 +315,7 @@ export default class JssVarCollection<TProp> {
     private _valPropsProxy: Dictionary<CSSValueComp> | null = null;
     get valProps() {
         return this._valPropsProxy ?? (this._valPropsProxy = (() =>
-            new Proxy(this._props as unknown as Dictionary<CSSValueComp>, {
+            new Proxy(this._cssProps as unknown as Dictionary<CSSValueComp>, {
                 get: (items, name: string)        => this._valProps[this.getVarName(name)],
                 set: (items, name: string, value) => { throw new Error('property is read only.'); }
             })

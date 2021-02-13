@@ -8,8 +8,8 @@ import JssVarCollection from '../jss-var-collection';
 
 
 
-export interface Props
-    extends base.Props {
+export interface CssProps
+    extends base.CssProps {
 
     color        : string                       ;
     backg        : string | string[][] | object ;
@@ -23,8 +23,8 @@ export interface Props
 // const none    = 'none';
 const inherit = 'inherit';
 
-// define default props' value to be stored into css vars:
-const props: Props = {
+// define default cssProps' value to be stored into css vars:
+const cssProps: CssProps = {
     fontSize          : inherit,
     fontFamily        : inherit,
     fontWeight        : inherit,
@@ -43,15 +43,15 @@ const props: Props = {
 
 
 
-// convert props => varProps:
+// convert cssProps => varProps:
 const collection = new JssVarCollection(
-    /*items  :*/ props as unknown as { [index: string]: any },
-    /*config :*/ { varPrefix: 'mrk'}
+    /*cssProps :*/ cssProps as unknown as { [index: string]: any },
+    /*config   :*/ { varPrefix: 'mrk'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as typeof props;
-// export the configurable props:
-export { config, varProps as props };
+const varProps = collection.varProps as typeof cssProps;
+// export the configurable varPops:
+export { config, varProps as cssProps };
 export default varProps;
 
 

@@ -7,8 +7,8 @@ import JssVarCollection from '../jss-var-collection';
 
 
 
-export interface Props
-    extends par.Props {
+export interface CssProps
+    extends par.CssProps {
     
     fontSize1 : string | number | (string | number)[][];
     fontSize2 : string | number | (string | number)[][];
@@ -21,8 +21,8 @@ export interface Props
 // const none    = 'none';
 const inherit = 'inherit';
 
-// define default props' value to be stored into css vars:
-const props: Props = {
+// define default cssProps' value to be stored into css vars:
+const cssProps: CssProps = {
     fontSize1         : [['calc(', 2.25, '*', gens.fontSize, ')']],
     fontSize2         : [['calc(', 2.00, '*', gens.fontSize, ')']],
     fontSize3         : [['calc(', 1.75, '*', gens.fontSize, ')']],
@@ -47,28 +47,29 @@ const props: Props = {
 
 
 
-// convert props => varProps:
+// convert cssProps => varProps:
 const collection = new JssVarCollection(
-    /*items  :*/ props as unknown as { [index: string]: any },
-    /*config :*/ { varPrefix: 'h'}
+    /*cssProps :*/ cssProps as unknown as { [index: string]: any },
+    /*config   :*/ { varPrefix: 'h'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as typeof props;
-// export the configurable props:
-export { config, varProps as props };
+const varProps = collection.varProps as typeof cssProps;
+// export the configurable varPops:
+export { config, varProps as cssProps };
 export default varProps;
 
 
 
 // define the css class using configurable css vars:
-export function createCss(varProps: typeof props, classLevelDecl: (level: number) => string) {
+export function createCss(varProps: typeof cssProps, classLevelDecl: (level: number) => string) {
     const levels = [1,2,3,4,5,6];
-    const css: { [index:string]: any } = {};
+    const newVarProps: { [index:string]: any } = {};
     
 
 
-    css[levels.map(classLevelDecl).join(',')] = {
+    newVarProps[levels.map(classLevelDecl).join(',')] = {
         extend    : varProps,
+        
         display   : 'block',
         fontSize  : null,
         fontSize1 : null,
@@ -81,15 +82,15 @@ export function createCss(varProps: typeof props, classLevelDecl: (level: number
 
 
 
-    // defines props.fontSize into each h1-h6:
+    // defines newVarProps.fontSize into each h1-h6:
     for (const level of levels) {
-        css[classLevelDecl(level)] = {
+        newVarProps[classLevelDecl(level)] = {
             fontSize: (varProps as { [index:string]: any })[`fontSize${level}`],
         }
     }
 
 
 
-    return css;
+    return newVarProps;
 }
 base.declareCss(createCss(varProps, level => `h${level},.h${level}`));

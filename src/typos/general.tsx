@@ -8,7 +8,7 @@ import JssVarCollection from '../jss-var-collection';
 const none    = 'none';
 // const inherit = 'inherit';
 
-// define default props' value to be stored into css vars:
+// define default cssProps' value to be stored into css vars:
 const basics = {
     fontSizeNm            : '1rem',
 
@@ -32,7 +32,7 @@ const basics = {
     backg                 : colors.white as string,
 };
 
-const props = Object.assign({},
+const cssProps = Object.assign({},
     basics,
     {
         fontSize          : basics.fontSizeNm,
@@ -51,16 +51,17 @@ const props = Object.assign({},
         lineHeight        : basics.lineHeightNm,
     }
 );
+export type CssProps = typeof cssProps;
 
 
 
-// convert props => varProps:
+// convert cssProps => varProps:
 const collection = new JssVarCollection(
-    /*items  :*/ props as { [index: string]: any },
-    /*config :*/ { varPrefix: ''}
+    /*cssProps :*/ cssProps as { [index: string]: any },
+    /*config   :*/ { varPrefix: ''}
 );
 const config   = collection.config;
-const varProps = collection.varProps as typeof props;
-// export the configurable props:
-export { config, varProps as props };
+const varProps = collection.varProps as typeof cssProps;
+// export the configurable varPops:
+export { config, varProps as cssProps };
 export default varProps;

@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Element from './Element';
+import Element, {Button} from './Element';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -68,7 +68,8 @@ const App = (props: any) => (
 				>
 					Learn React
 				</a>
-				<Element>hello element!</Element>
+				<Element></Element>
+				<Button></Button>
 				<p>this is normal text</p>
 				<p className="txt-sec">this is secondary text</p>
 				<p className="lead">this is lead text</p>
