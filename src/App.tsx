@@ -5,6 +5,7 @@ import logo from './logo.svg';
 import './App.css';
 import Element from './Element';
 import Control from './Control';
+import Button from './Button';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -54,14 +55,18 @@ const jss = createJss().setup({
 });
 
 export default function App (props: any) {
-	const [active, setActive] = useState(true);
-	const [enabled, setEnabled] = useState(false);
+	const [enabled, setEnabled] = useState(true);
+	const [active, setActive] = useState(false);
+	const [focus, setFocus] = useState(false);
 
+	const handleChangeEnabled = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setEnabled(e.target.checked);
+	}
 	const handleChangeActive = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setActive(e.target.checked);
 	}
-	const handleChangeEnabled = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setEnabled(e.target.checked);
+	const handleChangeFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setFocus(e.target.checked);
 	}
 
 	return(<JssProvider jss={jss}><ThemeProvider theme={theme}>
@@ -80,10 +85,18 @@ export default function App (props: any) {
 					Learn React
 				</a>
 				<Element theme='primary' enableGradient={true}></Element>
-				<Control theme='primary' enableGradient={true} active={active} enabled={enabled}></Control>
+				<Control theme='primary' enableGradient={true} enabled={enabled} active={active} focus={focus}></Control>
+				<Button  theme='primary' enableGradient={true} enabled={enabled} active={active} focus={focus} text='Hello Button'></Button>
 				<p>
 					Active status: {active ? 'actived' : 'deactived'}
 				</p>
+				<label>
+					<input type='checkbox'
+						checked={enabled}
+						onChange={handleChangeEnabled}
+					/>
+					enabled
+				</label>
 				<label>
 					<input type='checkbox'
 						checked={active}
@@ -93,10 +106,10 @@ export default function App (props: any) {
 				</label>
 				<label>
 					<input type='checkbox'
-						checked={enabled}
-						onChange={handleChangeEnabled}
+						checked={focus}
+						onChange={handleChangeFocus}
 					/>
-					enabled
+					focus
 				</label>
 				<p>this is normal text</p>
 				<p className="txt-sec">this is secondary text</p>

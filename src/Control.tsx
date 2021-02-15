@@ -4,15 +4,15 @@ import
     useEffect }            from 'react';
 
 import
-    colors,
-    * as color             from './colors';
-import
     * as Elements          from './Element';
 import {
     stateEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled,
     stateHover, stateLeave, stateHoverLeave,
     filterValidProps,
 }                          from './Element';
+import
+    colors,
+    * as color             from './colors';
 import stipOuts            from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
@@ -514,9 +514,9 @@ export interface Props
     extends
         Elements.Props
 {
-    focus?:   boolean,
-    active?:  boolean,
-    enabled?: boolean,
+    focus?:   boolean
+    active?:  boolean
+    enabled?: boolean
 }
 export default function Control(props: Props) {
     const styles         = useStyles();
@@ -560,6 +560,8 @@ export default function Control(props: Props) {
                 stateFocusBlur.handleAnimationEnd();
                 stateActPass.handleAnimationEnd();
             }}
-        >Base Control</button>
+        >
+            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Element'}
+        </button>
     );
 }

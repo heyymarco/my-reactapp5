@@ -78,7 +78,7 @@ const cssProps: CssProps = {
     lineHeight        : inherit,
 
     color             : typos.color,
-    backg             : 'lightblue',//rgba(255, 255, 255, 0)', // transp white, so the foreg color will be black
+    backg             : 'rgba(255, 255, 255, 0)', // transp white, so the foreg color will be black
     backgGrad         : [['linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(0,0,0, 0.2))', 'border-box']],
 
     paddingX          : [['calc((', spacers.sm as string, '+', spacers.md as string, ')/2)']],
@@ -289,7 +289,7 @@ export { states, styles2 as styles, useStyles };
 
 
 export interface VariantSize {
-    size?: 'sm' | 'lg',
+    size?: 'sm' | 'lg'
 }
 export function useVariantSize(props: VariantSize, styles: Record<string, string>) {
     return {
@@ -298,7 +298,7 @@ export function useVariantSize(props: VariantSize, styles: Record<string, string
 }
 
 export interface VariantTheme {
-    theme?: string,
+    theme?: string
 }
 export function useVariantTheme(props: VariantTheme, styles: Record<string, string>) {
     return {
@@ -307,7 +307,7 @@ export function useVariantTheme(props: VariantTheme, styles: Record<string, stri
 }
 
 export interface VariantGradient {
-    enableGradient?: boolean,
+    enableGradient?: boolean
 }
 export function useVariantGradient(props: VariantGradient, styles: Record<'gradient', string>) {
     return {
