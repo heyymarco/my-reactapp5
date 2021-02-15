@@ -58,7 +58,7 @@ const jss = createJss().setup({
 
 export default function App (props: any) {
 	const [active, setActive] = useState(true);
-	const [enabled, setEnabled] = useState(true);
+	const [enabled, setEnabled] = useState(false);
 
 	const handleChangeActive = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setActive(e.target.checked);
@@ -83,7 +83,7 @@ export default function App (props: any) {
 					Learn React
 				</a>
 				<Element theme='primary' enableGradient={true}></Element>
-				<Control theme='primary' active={active} enabled={enabled}></Control>
+				<Control theme='primary' enableGradient={true} active={active} enabled={enabled}></Control>
 				<p>
 					Active status: {active ? 'actived' : 'deactived'}
 				</p>

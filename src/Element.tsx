@@ -53,8 +53,8 @@ export interface CssProps
     '@keyframes hover' : object
     '@keyframes leave' : object
 
-    anim               : string | (string | object)[][]
     animNone           : string | (string | object)[][]
+    anim               : string | (string | object)[][]
     animHover          : string | (string | object)[][]
     animLeave          : string | (string | object)[][]
 }
@@ -107,8 +107,8 @@ const cssProps: CssProps = {
     '@keyframes none' : keyframesNone,
     '@keyframes hover': keyframesHover,
     '@keyframes leave': keyframesLeave,
-    anim              : [[keyframesNone]],
     animNone          : [[keyframesNone]],
+    anim              : [[keyframesNone]],
     animHover         : [['150ms', 'ease-out', 'both', keyframesHover]],
     animLeave         : [['300ms', 'ease-out', 'both', keyframesLeave]],
 };
@@ -145,6 +145,37 @@ export { config, varProps as cssProps };
 
 
 
+const stateEnabled            = (content: object) => ({
+    '&.enabled': { // .enabled
+        extend: [content]
+    }
+});
+const stateNotEnabled         = (content: object) => ({
+    '&:not(.enabled)': { // not-.enabled
+        extend: [content]
+    }
+});
+const stateDisabled           = (content: object) => ({
+    '&:disabled,&.disabled': { // :disabled or .disabled
+        extend: [content]
+    }
+});
+const stateNotDisabled        = (content: object) => ({
+    '&:not(:disabled):not(.disabled)': { // not-:disabled and not-.disabled
+        extend: [content]
+    }
+});
+const stateEnabledDisabled    = (content: object) => ({
+    '&.enabled,&:disabled,&.disabled': { // .enabled or :disabled or .disabled
+        extend: [content]
+    }
+});
+const stateNotEnabledDisabled = (content: object) => ({
+    '&:not(.enabled):not(:disabled):not(.disabled)': { // not-.enabled and not-:disabled and not-.disabled
+        extend: [content]
+    }
+});
+
 const stateHover              = (content: object) => ({
     '&:hover,&:focus': { // hover or focus
         extend: [content]
@@ -177,37 +208,6 @@ const stateNotHoverLeave      = (content: object) => ({
     }
 });
 
-const stateEnabled            = (content: object) => ({
-    '&.enabled': { // .enabled
-        extend: [content]
-    }
-});
-const stateNotEnabled         = (content: object) => ({
-    '&:not(.enabled)': { // not-.enabled
-        extend: [content]
-    }
-});
-const stateDisabled           = (content: object) => ({
-    '&:disabled,&.disabled': { // :disabled or .disabled
-        extend: [content]
-    }
-});
-const stateNotDisabled        = (content: object) => ({
-    '&:not(:disabled):not(.disabled)': { // not-:disabled and not-.disabled
-        extend: [content]
-    }
-});
-const stateEnabledDisabled    = (content: object) => ({
-    '&.enabled,&:disabled,&.disabled': { // .enabled or :disabled or .disabled
-        extend: [content]
-    }
-});
-const stateNotEnabledDisabled = (content: object) => ({
-    '&:not(.enabled):not(:disabled):not(.disabled)': { // not-.enabled and not-:disabled and not-.disabled
-        extend: [content]
-    }
-});
-
 const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
     const varProps2: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(varProps)) {
@@ -218,19 +218,19 @@ const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
 }
 
 const mixins = {
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
+    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     filterValidProps,
 };
 export {
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
+    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     filterValidProps,
 };
 export { mixins };
 
 const states = {
-    '--elm-animHoverLeave': [[varProps['@keyframes none']]],
+    '--elm-animHoverLeave': varProps.animNone,
     anim: [
         varProps.anim,
         'var(--elm-animHoverLeave)',
@@ -255,9 +255,10 @@ const styles = {
             filterValidProps(varProps),
             states,
         ],
+        backg: `var(--elm-backg-comp,${varProps.backg})`,
     },
     gradient: {
-        backg: [
+        '--elm-backg-comp': [
             varProps.backgGrad,
             varProps.backg,
         ],
@@ -267,17 +268,17 @@ const varProps2 = varProps as any;
 for (let size of ['sm', 'lg']) {
     size = pascalCase(size);
     (styles as any)[`size${size}`] = {
-        fontSize     : varProps2[`fontSize${size}`],
-        paddingX     : varProps2[`paddingX${size}`],
-        paddingY     : varProps2[`paddingY${size}`],
-        borderRadius : varProps2[`borderRadius${size}`],
+        '--elm-fontSize'     : varProps2[`fontSize${size}`],
+        '--elm-paddingX'     : varProps2[`paddingX${size}`],
+        '--elm-paddingY'     : varProps2[`paddingY${size}`],
+        '--elm-borderRadius' : varProps2[`borderRadius${size}`],
     };
 }
 for (const [theme, value] of Object.entries(color.themes)) {
     const Theme = pascalCase(theme);
     (styles as any)[`theme${Theme}`] = {
-        backg: value,
-        color: (colors as any)[`${theme}Text`],
+        '--elm-backg': value,
+        '--elm-color': (colors as any)[`${theme}Text`],
     };
 }
 
@@ -335,18 +336,18 @@ export interface Props
 {
 }
 export default function Element(props: Props) {
-    const styles      = useStyles();
-    const varSize     = useVariantSize(props, styles);
-    const varTheme    = useVariantTheme(props, styles);
-    const varGradient = useVariantGradient(props, styles);
-    const stateLeave  = useStateLeave();
+    const styles       = useStyles();
+    const variSize     = useVariantSize(props, styles);
+    const variTheme    = useVariantTheme(props, styles);
+    const variGradient = useVariantGradient(props, styles);
+    const stateLeave   = useStateLeave();
 
     return (
         <div className={[
                 styles.main,
-                varSize.class,
-                varTheme.class,
-                varGradient.class,
+                variSize.class,
+                variTheme.class,
+                variGradient.class,
 
                 stateLeave.class
             ].join(' ')}
