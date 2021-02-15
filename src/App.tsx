@@ -1,4 +1,7 @@
-import React from 'react';
+import
+    React, {
+    useState,
+    useEffect }            from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Element from './Element';
@@ -53,8 +56,18 @@ const jss = createJss().setup({
 	]
 });
 
-const App = (props: any) => (
-	<JssProvider jss={jss}><ThemeProvider theme={theme}>
+export default function App (props: any) {
+	const [active, setActive] = useState(true);
+	const [enabled, setEnabled] = useState(true);
+
+	const handleChangeActive = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setActive(e.target.checked);
+	}
+	const handleChangeEnabled = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setEnabled(e.target.checked);
+	}
+
+	return(<JssProvider jss={jss}><ThemeProvider theme={theme}>
 		<div className='App'>
 			<header className="App-header">
 				<img src={logo} className="App-logo" alt="logo" />
@@ -70,7 +83,24 @@ const App = (props: any) => (
 					Learn React
 				</a>
 				<Element theme='primary' enableGradient={true}></Element>
-				<Control theme='primary'></Control>
+				<Control theme='primary' active={active} enabled={enabled}></Control>
+				<p>
+					Active status: {active ? 'actived' : 'deactived'}
+				</p>
+				<label>
+					<input type='checkbox'
+						checked={active}
+						onChange={handleChangeActive}
+					/>
+					active
+				</label>
+				<label>
+					<input type='checkbox'
+						checked={enabled}
+						onChange={handleChangeEnabled}
+					/>
+					enabled
+				</label>
 				<p>this is normal text</p>
 				<p className="txt-sec">this is secondary text</p>
 				<p className="lead">this is lead text</p>
@@ -85,6 +115,5 @@ const App = (props: any) => (
 				<p>hello world</p>
 			</header>
 		</div>
-	</ThemeProvider></JssProvider>
-);
-export default App;
+	</ThemeProvider></JssProvider>);
+};

@@ -146,63 +146,64 @@ export { config, varProps as cssProps };
 
 
 const stateHover              = (content: object) => ({
-    '&:hover,&:focus': {
+    '&:hover,&:focus': { // hover or focus
         extend: [content]
     }
 });
 const stateNotHover           = (content: object) => ({
-    '&:not(:hover):not(:focus)': {
+    '&:not(:hover):not(:focus)': { // not-hover and not-focus
         extend: [content]
     }
 });
-const stateLeave              = (content: object) => ({
-    '&.leave,&.blur': {
-        extend: [content]
-    }
-});
+const stateLeave              = (content: object) =>
+    stateNotHover({ // not-hover and not-focus and (leave or blur)
+        extend:[{'&.leave,&.blur': {
+            extend: [content]
+        }}]
+    });
 const stateNotLeave           = (content: object) => ({
-    '&:not(.leave):not(.blur)': {
+    '&:not(.leave):not(.blur)': { // not-leave and not-blur
         extend: [content]
     }
 });
 const stateHoverLeave         = (content: object) => ({
-    '&:hover,&:focus,&.leave,&.blur': {
+    '&:hover,&:focus,&.leave,&.blur': { // hover or focus or leave or blur
         extend: [content]
     }
 });
 const stateNotHoverLeave      = (content: object) => ({
-    '&:not(:hover):not(:focus):not(.leave):not(.blur)': {
+    '&:not(:hover):not(:focus):not(.leave):not(.blur)': { // not-hover and not-focus and not-leave and not-blur
         extend: [content]
     }
 });
 
-const stateDisabled           = (content: object) => ({
-    '&:disabled,&.disabled': {
-        extend: [content]
-    }
-});
-const stateNotDisabled        = (content: object) => ({
-    '&:not(:disabled):not(.disabled)': {
-        extend: [content]
-    }
-});
 const stateEnabled            = (content: object) => ({
-    '&.enabled': {
+    '&.enabled': { // .enabled
         extend: [content]
     }
 });
 const stateNotEnabled         = (content: object) => ({
-    '&:not(.enabled)': {
+    '&:not(.enabled)': { // not-.enabled
+        extend: [content]
+    }
+});
+const stateDisabled           = (content: object) => ({
+    '&:disabled,&.disabled': { // :disabled or .disabled
+        extend: [content]
+    }
+});
+const stateNotDisabled        = (content: object) => ({
+    '&:not(:disabled):not(.disabled)': { // not-:disabled and not-.disabled
         extend: [content]
     }
 });
 const stateEnabledDisabled    = (content: object) => ({
-    '&.enabled,&:disabled,&.disabled': {
+    '&.enabled,&:disabled,&.disabled': { // .enabled or :disabled or .disabled
         extend: [content]
     }
 });
 const stateNotEnabledDisabled = (content: object) => ({
-    '&:not(.enabled):not(:disabled):not(.disabled)': {
+    '&:not(.enabled):not(:disabled):not(.disabled)': { // not-.enabled and not-:disabled and not-.disabled
         extend: [content]
     }
 });
@@ -218,12 +219,12 @@ const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
 
 const mixins = {
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateDisabled, stateNotDisabled, stateEnabled, stateNotEnabled, stateEnabledDisabled, stateNotEnabledDisabled,
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
     filterValidProps,
 };
 export {
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateDisabled, stateNotDisabled, stateEnabled, stateNotEnabled, stateEnabledDisabled, stateNotEnabledDisabled,
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
     filterValidProps,
 };
 export { mixins };
@@ -282,7 +283,7 @@ for (const [theme, value] of Object.entries(color.themes)) {
 
 const styles2 = styles as unknown as Record<'main'|'sizeSm'|'sizeLg'|'gradient', string>;
 const useStyles = createUseStyles(styles2);
-export { styles2 as styles, useStyles };
+export { states, styles2 as styles, useStyles };
 
 
 
@@ -314,20 +315,15 @@ export function useVariantGradient(props: VariantGradient, styles: Record<'gradi
 }
 
 export function useStateLeave() {
-    const [stateLeave, setStateLeave] = useState<boolean|null>(null);
+    const [leaving, setLeaving] = useState(false);
 
+    const handleLeaving = () => { if (!leaving) setLeaving(true);  }
+    const handleIdle    = () => { if (leaving)  setLeaving(false); }
     return {
-        leave: stateLeave,
-        class: stateLeave ? 'leave': null,
-        handleMouseEnter: () => {
-            setStateLeave(false);
-        },
-        handleMouseLeave: () => {
-            setStateLeave(true);
-        },
-        handleAnimationEnd: () => {
-            setStateLeave(false);
-        }
+        class: leaving ? 'leave': null,
+        handleMouseEnter   : handleIdle,
+        handleMouseLeave   : handleLeaving,
+        handleAnimationEnd : handleIdle,
     };
 }
 

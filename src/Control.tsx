@@ -1,6 +1,7 @@
 import
-    React,
-    { useState }           from 'react';
+    React, {
+    useState,
+    useEffect }            from 'react';
 
 import
     colors,
@@ -17,7 +18,7 @@ import
     * as Elements          from './Element';
 import {
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateDisabled, stateNotDisabled, stateEnabled, stateNotEnabled, stateEnabledDisabled, stateNotEnabledDisabled,
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
     filterValidProps,
 }                          from './Element';
 import stipOuts            from './strip-outs';
@@ -29,15 +30,15 @@ import { pascalCase }      from 'pascal-case';
 
 
 export interface CssProps {
-    boxShadowFocus : (number|string)[][]
+    boxShadowFocus        : (number|string)[][]
 
-    cursorEnabled  : string
-    cursorDisabled : string
+    cursorEnabled         : string
+    cursorDisabled        : string
 
-    filterActive   : string | string[][]
-    filterDisabled : string | string[][]
+    filterHover           : string | string[][]
+    filterActive          : string | string[][]
+    filterDisabled        : string | string[][]
 
-    
     '@keyframes hover'    : object
     '@keyframes leave'    : object
     '@keyframes focus'    : object
@@ -76,7 +77,8 @@ const cssProps: CssProps = {
     cursorEnabled         : 'pointer',
     cursorDisabled        : 'not-allowed',
 
-    filterActive          : [['brightness(65%)', 'contrast(150%)']],
+    filterHover           : 'brightness(65%)', //Elements.cssProps.filterHover,
+    filterActive          : [['brightness(55%)', 'contrast(150%)']],
     filterDisabled        : [['grayscale(50%)',  'opacity(50%)']],
 
     '@keyframes hover'    : keyframesHover,
@@ -87,24 +89,29 @@ const cssProps: CssProps = {
     '@keyframes passive'  : keyframesPassive,
     '@keyframes enabled'  : keyframesEnabled,
     '@keyframes disabled' : keyframesDisabled,
-    animHover             : [['150ms', 'ease-out', 'both', keyframesHover   ]],
-    animLeave             : [['300ms', 'ease-out', 'both', keyframesLeave   ]],
-    animFocus             : [['150ms', 'ease-out', 'both', keyframesFocus   ]],
-    animBlur              : [['300ms', 'ease-out', 'both', keyframesBlur    ]],
-    animActive            : [['150ms', 'ease-out', 'both', keyframesActive  ]],
-    animPassive           : [['300ms', 'ease-out', 'both', keyframesPassive ]],
-    animEnabled           : [['150ms', 'ease-out', 'both', keyframesEnabled ]],
-    animDisabled          : [['300ms', 'ease-out', 'both', keyframesDisabled]],
+    animHover             : [['500ms', 'ease-out', 'both', keyframesHover]],
+    animLeave             : [['500ms', 'ease-out', 'both', keyframesLeave]],
+    animFocus             : [['500ms', 'ease-out', 'both', keyframesFocus   ]],
+    animBlur              : [['500ms', 'ease-out', 'both', keyframesBlur    ]],
+    animActive            : [['500ms', 'ease-out', 'both', keyframesActive  ]], //TODO slowing down anim for debug
+    animPassive           : [['500ms', 'ease-out', 'both', keyframesPassive ]], //TODO slowing down anim for debug
+    animEnabled           : [['500ms', 'ease-out', 'both', keyframesEnabled ]],
+    animDisabled          : [['500ms', 'ease-out', 'both', keyframesDisabled]],
 };
 Object.assign(keyframesHover, {
     from: {
         filter: [[
             Elements.cssProps.filter,
+            'var(--ctrl-filterEnabledDisabled)',
+            'var(--ctrl-filterActivePassive)',
+            // 'var(--ctrl-filterHoverLeave)',
         ]],
     },
     to: {
         filter: [[
             Elements.cssProps.filter,
+            'var(--ctrl-filterEnabledDisabled)',
+            'var(--ctrl-filterActivePassive)',
             'var(--ctrl-filterHoverLeave)',
         ]],
     }
@@ -113,7 +120,6 @@ Object.assign(keyframesLeave, {
     from : keyframesHover.to,
     to   : keyframesHover.from
 });
-
 Object.assign(keyframesFocus, {
     from: {
         boxShadow: [[[
@@ -123,13 +129,54 @@ Object.assign(keyframesFocus, {
     to: {
         boxShadow: [[[
             Elements.cssProps.boxShadow,
-            'var(--ctrl-boxShadowFocusBlur)',
+            cssProps.boxShadowFocus,
         ]]],
     }
 });
 Object.assign(keyframesBlur, {
     from : keyframesFocus.to,
     to   : keyframesFocus.from
+});
+
+Object.assign(keyframesActive, {
+    from: {
+        filter: [[
+            Elements.cssProps.filter,
+            'var(--ctrl-filterEnabledDisabled)',
+            // 'var(--ctrl-filterActivePassive)',
+            'var(--ctrl-filterHoverLeave)',
+        ]],
+    },
+    to: {
+        filter: [[
+            Elements.cssProps.filter,
+            'var(--ctrl-filterEnabledDisabled)',
+            'var(--ctrl-filterActivePassive)',
+            'var(--ctrl-filterHoverLeave)',
+        ]],
+    }
+});
+Object.assign(keyframesPassive, {
+    from : keyframesActive.to,
+    to   : keyframesActive.from
+});
+
+Object.assign(keyframesDisabled, {
+    from: {
+        filter: [[
+            Elements.cssProps.filter,
+        ]],
+    },
+    to: {
+        filter: [[
+            Elements.cssProps.filter,
+            cssProps.filterDisabled,
+        ]],
+    }
+});
+Object.assign(keyframesEnabled, {
+    from : keyframesDisabled.to,
+    to   : keyframesDisabled.from
 });
 
 
@@ -178,52 +225,131 @@ const stateNotFocusBlur      = (content: object) => ({
     }
 });
 
+const stateActive            = (content: object) => ({
+    '&:active,&.active,&.actived': {
+        extend: [content]
+    }
+});
+const stateNotActive         = (content: object) => ({
+    '&:not(:active):not(.active):not(.actived)': {
+        extend: [content]
+    }
+});
+const statePassive           = (content: object) => ({
+    '&.passive': {
+        extend: [content]
+    }
+});
+const stateNotPassive        = (content: object) => ({
+    '&:not(.passive)': {
+        extend: [content]
+    }
+});
+const stateActivePassive     = (content: object) => ({
+    '&:active,&.active,&.actived,&.passive': {
+        extend: [content]
+    }
+});
+const stateNotActivePassive  = (content: object) => ({
+    '&:not(:active):not(.active):not(.actived):not(.passive)': {
+        extend: [content]
+    }
+});
+
+const stateNoAnimStartup  = () =>
+    Elements.stateNotHoverLeave({extend:[
+        stateNotFocusBlur({
+            animationDuration: [['0ms'], '!important'],
+        }),
+    ]});
+
 const mixins = {
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive,
+    stateNoAnimStartup,
 };
 export {
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive,
+    stateNoAnimStartup,
 };
 export { mixins };
 
 
 
 const states = {
-    '--ctrl-filterHoverLeave'   : Elements.cssProps.filterNone,
-    '--ctrl-animHoverLeave'     : Elements.cssProps.animNone,
+    '--ctrl-filterHoverLeave'      : Elements.cssProps.filterNone,
+    '--ctrl-animHoverLeave'        : Elements.cssProps.animNone,
 
-    '--ctrl-boxShadowFocusBlur' : none,
-    '--ctrl-animFocusBlur'      : Elements.cssProps.animNone,
+    '--ctrl-filterActivePassive'   : Elements.cssProps.filterNone,
+    '--ctrl-animActivePassive'     : Elements.cssProps.animNone,
+
+    '--ctrl-animFocusBlur'         : Elements.cssProps.animNone,
+    
+    '--ctrl-filterEnabledDisabled' : Elements.cssProps.filterNone,
+    '--ctrl-animEnabledDisabled'   : Elements.cssProps.animNone,
     anim: [
         Elements.cssProps.anim,
-        'var(--ctrl-animHoverLeave)',
-        'var(--ctrl-animFocusBlur)',
+        // 'var(--ctrl-animEnabledDisabled)',
+        'var(--ctrl-animHoverLeave)',      // first: cursor hovered
+        // 'var(--ctrl-animFocusBlur)',    // then : control got focus
+        'var(--ctrl-animActivePassive)',   // then : press control
     ],
 
 
     extend:[
         stateNotDisabled({extend:[
             stateHoverLeave({
-                '--ctrl-filterHoverLeave': Elements.cssProps.filterHover,
+                '--ctrl-filterHoverLeave': varProps.filterHover,
             }),
             stateHover({
-                '--ctrl-animHoverLeave': varProps.animHover,
+                '--ctrl-animHoverLeave'  : varProps.animHover,
             }),
             stateLeave({
-                '--ctrl-animHoverLeave': varProps.animLeave,
+                '--ctrl-animHoverLeave'  : varProps.animLeave,
             }),
 
 
-            stateFocusBlur({
-                '--ctrl-boxShadowFocusBlur': 'var(--ctrl-boxShadowFocus-theme)',
-            }),
             stateFocus({
                 '--ctrl-animFocusBlur': varProps.animFocus,
             }),
             stateBlur({
                 '--ctrl-animFocusBlur': varProps.animBlur,
             }),
+
+
+            stateActivePassive({
+                '--ctrl-filterActivePassive': varProps.filterActive,
+            }),
+            stateActive({
+                '--ctrl-animActivePassive': varProps.animActive,
+            }),
+            statePassive({
+                '--ctrl-animActivePassive': varProps.animPassive,
+            }),
+            {
+                '&.active,&.actived': { // if activated programmatically (not by user input)
+                    anim: [
+                        Elements.cssProps.anim,
+                        'var(--ctrl-animEnabledDisabled)',
+                        'var(--ctrl-animActivePassive)',   // first: control already pressed, then released
+                        'var(--ctrl-animFocusBlur)',       // then : control may lost focus
+                        'var(--ctrl-animHoverLeave)',      // then : cursor leaved
+                    ],
+                },
+                '&.actived': {extend:[ // if was actived, disable first animation
+                    stateNoAnimStartup(),
+                ]},
+            },
         ]}),
+
+
+        stateEnabled({
+            '--ctrl-animEnabledDisabled': varProps.animEnabled,
+        }),
+        stateDisabled({
+            '--ctrl-animEnabledDisabled': varProps.animDisabled,
+        }),
     ],
 };
 
@@ -254,20 +380,98 @@ export { styles, useStyles };
 
 
 export function useStateBlur() {
-    const [stateBlur, setStateBlur] = useState<boolean|null>(null);
+    const [blurring, setBlurring] = useState(false);
 
+    const handleBlurring = () => { if (!blurring) setBlurring(true);  }
+    const handleIdle     = () => { if (blurring)  setBlurring(false); }
     return {
-        blur : stateBlur,
-        class: stateBlur ? 'blur': null,
-        handleFocus: () => {
-            setStateBlur(false);
-        },
-        handleBlur: () => {
-            setStateBlur(true);
-        },
-        handleAnimationEnd: () => {
-            setStateBlur(false);
+        class: blurring ? 'blur': null,
+        handleFocus        : handleIdle,
+        handleBlur         : handleBlurring,
+        handleAnimationEnd : handleIdle,
+    };
+}
+
+export function useStateActivePassive(props: Props) {
+    const defaultActived = false; // if [active] was not specified => the default value is active=false (released)
+    const [actived,     setActived    ] = useState(props.active ?? defaultActived);
+    const [activating,  setActivating ] = useState(false);
+    const [passivating, setPassivating] = useState(false);
+
+    
+    const newActive = props.active ?? defaultActived;
+    useEffect(() => {
+        if (actived !== newActive) {
+            setActived(newActive);
+
+            if (newActive) {
+                setPassivating(false);
+                setActivating(true);
+            }
+            else {
+                setActivating(false);
+                setPassivating(true);
+            }
         }
+    }, [actived, newActive]);
+
+    
+    const handlePassivating = () => {
+        if (passivating) return; // already being deactivating => action is not required
+        if (actived) return; // already beed actived programatically => cannot be released by mouse/keyboard
+
+        if (activating)  setActivating(false);
+        setPassivating(true);
+    }
+    const handleIdle = () => {
+        // clean up expired animations
+
+        if (activating)  setActivating(false);
+        if (passivating) setPassivating(false);
+    }
+    return {
+        class: (!activating && !passivating) ? (actived ? 'actived' : null) : (activating? 'active' : (passivating ? 'passive': null)),
+        handleMouseDown    : handleIdle,
+        handleKeyDown      : handleIdle,
+        handleMouseUp      : handlePassivating,
+        handleKeyUp        : handlePassivating,
+        handleAnimationEnd : handleIdle,
+    };
+}
+
+export function useStateEnabledDisabled(props: Props) {
+    const defaultEnabled = true; // if [enabled] was not specified => the default value is enabled=true
+    const [enabled,   setEnabled  ] = useState(props.enabled ?? defaultEnabled);
+    const [enabling,  setEnabling ] = useState(false);
+    const [disabling, setDisabling] = useState(false);
+
+    
+    const newEnabled = props.enabled ?? defaultEnabled;
+    useEffect(() => {
+        if (enabled !== newEnabled) {
+            setEnabled(newEnabled);
+
+            if (newEnabled) {
+                setDisabling(false);
+                setEnabling(true);
+            }
+            else {
+                setEnabling(false);
+                setDisabling(true);
+            }
+        }
+    }, [enabled, newEnabled]);
+
+    
+    const handleIdle = () => {
+        // clean up expired animations
+
+        if (enabling)  setEnabling(false);
+        if (disabling) setDisabling(false);
+    }
+    return {
+        class: (!enabling && !disabling) ? (enabled ? null : 'disabled') : (enabling? 'enabled' : (disabling ? 'disabled': null)),
+        handleAnimationEnd : handleIdle,
     };
 }
 
@@ -275,18 +479,24 @@ export interface Props
     extends
         Elements.Props
 {
+    active?:  boolean,
+    enabled?: boolean,
 }
 export default function Control(props: Props) {
-    const styles        = useStyles();
-    const elmStyles     = Elements.useStyles();
-    const varSize       = Elements.useVariantSize(props, elmStyles);
-    const varTheme      = Elements.useVariantTheme(props, styles);
-    const varGradient   = Elements.useVariantGradient(props, elmStyles);
-    const stateLeave    = Elements.useStateLeave();
-    const stateBlur     = useStateBlur();
+    const styles       = useStyles();
+    const elmStyles    = Elements.useStyles();
+    const varSize      = Elements.useVariantSize(props, elmStyles);
+    const varTheme     = Elements.useVariantTheme(props, styles);
+    const varGradient  = Elements.useVariantGradient(props, elmStyles);
+    const stateLeave   = Elements.useStateLeave();
+    const stateBlur    = useStateBlur();
+    const stateActPass = useStateActivePassive(props);
+    const stateEnbDis  = useStateEnabledDisabled(props);
+
+    
 
     return (
-        <input className={[
+        <button className={[
                 styles.main,
                 varSize.class,
                 varTheme.class,
@@ -294,15 +504,24 @@ export default function Control(props: Props) {
 
                 stateLeave.class,
                 stateBlur.class,
+                stateActPass.class,
+                stateEnbDis.class,
             ].join(' ')}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
             onFocus={stateBlur.handleFocus}
             onBlur={stateBlur.handleBlur}
-            onAnimationEnd={() => {stateLeave.handleAnimationEnd(); stateBlur.handleAnimationEnd();}}
-
-            placeholder='Base Control'
-        />
+            onMouseDown={stateActPass.handleMouseDown}
+            onMouseUp={stateActPass.handleMouseUp}
+            onKeyDown={stateActPass.handleKeyDown}
+            onKeyUp={stateActPass.handleKeyUp}
+            onAnimationEnd={() => {
+                stateLeave.handleAnimationEnd();
+                stateBlur.handleAnimationEnd();
+                stateActPass.handleAnimationEnd();
+                stateEnbDis.handleAnimationEnd();
+            }}
+        >Base Control</button>
     );
 }
