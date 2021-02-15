@@ -1,7 +1,6 @@
 import
     React, {
-    useState,
-    useEffect }            from 'react';
+    useState }            from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Element from './Element';
@@ -11,9 +10,7 @@ import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
 import colors from './colors';
 
-import { 
-	create as createJss,
-	Jss }                     from 'jss';
+import { create as createJss }   from 'jss';
 import jssPluginFunctions        from 'jss-plugin-rule-value-function';
 // import jssPluginObservable       from 'jss-plugin-rule-value-observable';
 // import jssPluginTemplate         from 'jss-plugin-template';

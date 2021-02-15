@@ -7,18 +7,10 @@ import
     colors,
     * as color             from './colors';
 import
-    borders,
-    * as border            from './borders';
-import spacers             from './spacers';
-import
-    typos,
-    { base as typoBase }   from './typos/index';
-import
-    Element,
     * as Elements          from './Element';
 import {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled,
+    stateHover, stateLeave, stateHoverLeave,
     filterValidProps,
 }                          from './Element';
 import stipOuts            from './strip-outs';
@@ -384,7 +376,7 @@ const styles = {
         ],
     },
 };
-for (const [theme, value] of Object.entries(color.themes)) {
+for (const [theme] of Object.entries(color.themes)) {
     const Theme = pascalCase(theme);
     const themeProp = `theme${Theme}`;
     (styles as any)[themeProp] = {
@@ -396,7 +388,7 @@ for (const [theme, value] of Object.entries(color.themes)) {
 }
 
 const useStyles = createUseStyles(styles);
-export { styles, useStyles };
+export { states, styles, useStyles };
 
 
 
