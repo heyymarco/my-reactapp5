@@ -6,14 +6,17 @@ import
 import
     * as Elements          from './Element';
 import {
-    filterValidProps,
+    filterValidProps as baseFilterValidProps,
 }                          from './Element';
 import
     * as Controls          from './Control';
+import
+    * as border            from './borders';
 import spacers             from './spacers';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
+import { pascalCase }      from 'pascal-case';
 
 
 
@@ -31,8 +34,10 @@ export interface CssProps {
     gapYLg      : string | number | (string|number)[][]
 }
 // const unset   = 'unset';
-// const none    = 'none';
+const none    = 'none';
 // const inherit = 'inherit';
+const center  = 'center';
+const middle  = 'middle';
 
 // define default cssProps' value to be stored into css vars:
 const cssProps: CssProps = {
@@ -52,7 +57,7 @@ const cssProps: CssProps = {
 // convert cssProps => varProps:
 const collection = new JssVarCollection(
     /*cssProps :*/ cssProps as { [index: string]: any },
-    /*config   :*/ { varPrefix: 'elm'}
+    /*config   :*/ { varPrefix: 'btn'}
 );
 const config   = collection.config;
 const varProps = collection.varProps as typeof cssProps;
@@ -62,17 +67,83 @@ export { config, varProps as cssProps };
 
 
 
+const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
+    const varProps2: { [key: string]: any } = { };
+    for (const [key, value] of Object.entries(baseFilterValidProps(varProps))) {
+        if ((/^(orientation)$/).test(key)) continue;
+        varProps2[key] = value;
+    }
+    return varProps2;
+}
+
 const styles = {
     main: {
         extend: [
             Controls.styles.main,
             filterValidProps(varProps),
         ],
+        
+        // flex settings:
+        display        : 'inline-flex',
+        flexDirection  : varProps.orientation,
+        justifyContent : center,
+        alignItems     : center,
+
+        // typo settings:
+        textAlign      : center,
+        verticalAlign  : middle,
+
+        userSelect     : none, // disable selecting button's text
     },
-    outline: {
+    btnOutline: {
+        extend:[
+            Controls.stateNotActive({
+                '&:not(:hover):not(:focus), &:disabled,&.disabled': {
+                    color       : Elements.cssProps.backg,
+                    backg       : 'transparent',
+                    borderColor : Elements.cssProps.backg,
+                },
+            }),
+        ],
     },
-    link: {
-    },
+    btnLink: { '&:not(._)': { // force to win conflict with main
+        color          : Elements.cssProps.backg,
+        backg          : 'transparent',
+        borderColor    : 'transparent',
+
+
+        // link properties:
+        textDecoration : 'underline',
+        lineHeight     : 1,
+
+        padding        : spacers.xs,
+        borderRadius   : border.radiuses.sm,
+    }},
+    btnOutlineLink: { '&:not(._)': { // force to win conflict with main
+        color          : Elements.cssProps.backg,
+        backg          : 'transparent',
+        borderColor    : Elements.cssProps.backg,
+
+
+        // link properties:
+        textDecoration : 'underline',
+        lineHeight     : 1,
+
+        padding        : spacers.xs,
+        borderRadius   : border.radiuses.sm,
+    }},
+}
+const varProps2 = varProps as any;
+for (let size of ['sm', 'lg']) {
+    const Size = pascalCase(size);
+    const sizeProp = `size${Size}`;
+    (styles as any)[sizeProp] = {
+        extend: [
+            (Elements.styles as any)[sizeProp],
+        ],
+        '--elm-gapX' : varProps2[`gapX${Size}`],
+        '--elm-gapY' : varProps2[`gapY${Size}`],
+    };
 }
 
 const useStyles = createUseStyles(styles);
@@ -80,9 +151,14 @@ export { styles, useStyles };
 
 
 
-type BtnStyle = 'normal' | 'outline' | 'link' | 'outlineLink';
+type BtnStyle = 'outline' | 'link' | 'outlineLink';
 export interface VariantButton {
     btnStyle?: BtnStyle
+}
+export function useVariantButton(props: VariantButton, styles: Record<string, string>) {
+    return {
+        class: props.btnStyle ? (styles as any)[`btn${pascalCase(props.btnStyle)}`] : null,
+    };
 }
 
 export interface Props
@@ -99,12 +175,15 @@ export interface Props
     onClick?     : React.MouseEventHandler<HTMLButtonElement>;
 }
 export default function Button(props: Props) {
-    const styles         = useStyles();
+    const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
     const ctrlStyles     = Controls.useStyles();
-    const variSize       = Elements.useVariantSize(props, elmStyles);
+
+    const variSize       = Elements.useVariantSize(props, styles);
     const variTheme      = Elements.useVariantTheme(props, ctrlStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
+    const variButton     =          useVariantButton(props, styles);
+
     const stateLeave     = Elements.useStateLeave();
     const stateEnbDis    = Controls.useStateEnabledDisabled(props);
     const stateFocusBlur = Controls.useStateFocusBlur(props, stateEnbDis);
@@ -115,9 +194,11 @@ export default function Button(props: Props) {
     return (
         <button className={[
                 styles.main,
+
                 variSize.class,
                 variTheme.class,
                 variGradient.class,
+                variButton.class,
 
                 stateLeave.class,
                 stateEnbDis.class,

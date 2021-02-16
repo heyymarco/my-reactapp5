@@ -239,7 +239,7 @@ export default class JssVarCollection<TProp> {
                         }
 
 
-                        if ((!modified) && (typeof(arrItem) !== 'string')) {
+                        if ((!modified) && (!Array.isArray(arrItem)) && (typeof(arrItem) !== 'string')) {
                             arr[index] = this._toString(arrItem);
 
                             modified = true;

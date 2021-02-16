@@ -519,21 +519,24 @@ export interface Props
     enabled?: boolean
 }
 export default function Control(props: Props) {
-    const styles         = useStyles();
+    const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
+
     const variSize       = Elements.useVariantSize(props, elmStyles);
     const variTheme      = Elements.useVariantTheme(props, styles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
+
     const stateLeave     = Elements.useStateLeave();
-    const stateEnbDis    = useStateEnabledDisabled(props);
-    const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = useStateActivePassive(props, stateEnbDis);
+    const stateEnbDis    =          useStateEnabledDisabled(props);
+    const stateFocusBlur =          useStateFocusBlur(props, stateEnbDis);
+    const stateActPass   =          useStateActivePassive(props, stateEnbDis);
 
     
 
     return (
         <button className={[
                 styles.main,
+                
                 variSize.class,
                 variTheme.class,
                 variGradient.class,

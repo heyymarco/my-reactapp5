@@ -5,6 +5,8 @@ import type { Plugin, Rule, JssStyle, StyleSheet } from 'jss';
 const shorthands: { [index: string]: string } = {
     backg   : 'background',
     anim    : 'animation',
+    'gap-x' : 'column-gap',
+    'gap-y' : 'row-gap',
 };
 
 type StyleEx = { [index: string]: any };

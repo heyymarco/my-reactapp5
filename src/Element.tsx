@@ -255,14 +255,16 @@ const styles = {
             filterValidProps(varProps),
             states,
         ],
-        backg: `var(--elm-backg-comp,${varProps.backg})`,
+
+        '--elm-backgFn': varProps.backg,
+        backg: `var(--elm-backgFn)`,
     },
-    gradient: {
-        '--elm-backg-comp': [
+    gradient: { '&:not(._)': { // force to win conflict with main
+        '--elm-backgFn': [
             varProps.backgGrad,
             varProps.backg,
         ],
-    }
+    }},
 }
 const varProps2 = varProps as any;
 for (let size of ['sm', 'lg']) {
@@ -337,14 +339,19 @@ export interface Props
 }
 export default function Element(props: Props) {
     const styles       = useStyles();
+
     const variSize     = useVariantSize(props, styles);
     const variTheme    = useVariantTheme(props, styles);
     const variGradient = useVariantGradient(props, styles);
+
     const stateLeave   = useStateLeave();
+
+
 
     return (
         <div className={[
                 styles.main,
+                
                 variSize.class,
                 variTheme.class,
                 variGradient.class,
