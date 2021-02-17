@@ -154,8 +154,8 @@ export default function App (props: any) {
 					Theme:
 					{
 						[undefined,'primary','secondary','success','info','warning','danger','light'].map(t =>
-							<label>
-								<input type='radio' key={t}
+							<label key={t ?? ''}>
+								<input type='radio'
 									value={t}
 									checked={theme===t}
 									onChange={handleChangeTheme}

@@ -1,7 +1,4 @@
-import
-    React, {
-    useState,
-    useEffect }            from 'react';
+import React               from 'react';
 
 import
     * as Elements          from './Element';
@@ -160,6 +157,17 @@ export function useVariantButton(props: VariantButton, styles: Record<string, st
         class: props.btnStyle ? (styles as any)[`btn${pascalCase(props.btnStyle)}`] : null,
     };
 }
+export const themeDefaults: {[theme: string]: string} = {
+    default     : 'secondary',
+    outline     : 'secondary',
+    link        : 'primary',
+    outlineLink : 'primary',
+};
+export function useVariantThemeDefault(props: VariantButton) {
+    return () => {
+        return themeDefaults?.[props.btnStyle ?? 'default'] ?? undefined;
+    };
+}
 
 export interface Props
     extends
@@ -180,7 +188,8 @@ export default function Button(props: Props) {
     const ctrlStyles     = Controls.useStyles();
 
     const variSize       = Elements.useVariantSize(props, styles);
-    const variTheme      = Elements.useVariantTheme(props, ctrlStyles);
+    const variThemeDef   =          useVariantThemeDefault(props);
+    const variTheme      = Elements.useVariantTheme(props, ctrlStyles, variThemeDef);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variButton     =          useVariantButton(props, styles);
 

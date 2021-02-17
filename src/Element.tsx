@@ -302,9 +302,10 @@ export function useVariantSize(props: VariantSize, styles: Record<string, string
 export interface VariantTheme {
     theme?: string
 }
-export function useVariantTheme(props: VariantTheme, styles: Record<string, string>) {
+export function useVariantTheme(props: VariantTheme, styles: Record<string, string>, themeDefault?: () => string) {
+    const theme = props.theme ?? themeDefault?.();
     return {
-        class: props.theme ? (styles as any)[`theme${pascalCase(props.theme)}`] : null,
+        class: theme ? (styles as any)[`theme${pascalCase(theme)}`] : null,
     };
 }
 
