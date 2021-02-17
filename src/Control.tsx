@@ -376,16 +376,16 @@ const styles = {
         ],
     },
 };
-for (const [theme] of Object.entries(color.themes)) {
-    const Theme = pascalCase(theme);
-    const themeProp = `theme${Theme}`;
-    (styles as any)[themeProp] = {
-        extend: [
-            (Elements.styles as any)[themeProp],
-        ],
-        '--ctrl-boxShadowFocus-theme': [[varProps.boxShadowFocus, (colors as any)[`${theme}Transp`]]],
-    };
-}
+
+Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
+    extend: [
+        (Elements.styles as any)[themeProp],
+    ],
+    '--ctrl-boxShadowFocus-theme': [[
+        varProps.boxShadowFocus,
+        (colors as any)[`${theme}Transp`],
+    ]],
+}));
 
 const useStyles = createUseStyles(styles);
 export { states, styles, useStyles };
@@ -536,7 +536,7 @@ export default function Control(props: Props) {
     return (
         <button className={[
                 styles.main,
-                
+
                 variSize.class,
                 variTheme.class,
                 variGradient.class,

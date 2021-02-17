@@ -211,7 +211,7 @@ const stateNotHoverLeave      = (content: object) => ({
 const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
     const varProps2: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(varProps)) {
-        if ((/(Sm|Lg|Hover|Leave|Focus|Blur|Active|Passive|Enabled|Disabled|None)$|^(@)|backgGrad/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|Hover|Leave|Focus|Blur|Active|Passive|Enabled|Disabled|None)$|^(@)|backgGrad/).test(key)) continue;
         varProps2[key] = value;
     }
     return varProps2;
@@ -265,24 +265,34 @@ const styles = {
             varProps.backg,
         ],
     }},
+};
+
+export function defineSizes(styles: object, handler: ((size: string, Size: string, sizeProp: string) => object), sizes = ['sm', 'lg']) {
+    for(const size of sizes) {
+        const Size = pascalCase(size);
+        const sizeProp = `size${Size}`;
+        (styles as any)[sizeProp] = handler(size, Size, sizeProp);
+    }
 }
 const varProps2 = varProps as any;
-for (let size of ['sm', 'lg']) {
-    size = pascalCase(size);
-    (styles as any)[`size${size}`] = {
-        '--elm-fontSize'     : varProps2[`fontSize${size}`],
-        '--elm-paddingX'     : varProps2[`paddingX${size}`],
-        '--elm-paddingY'     : varProps2[`paddingY${size}`],
-        '--elm-borderRadius' : varProps2[`borderRadius${size}`],
-    };
+defineSizes(styles, (size, Size, sizeProp) => ({
+    '--elm-fontSize'     : varProps2[`fontSize${Size}`],
+    '--elm-paddingX'     : varProps2[`paddingX${Size}`],
+    '--elm-paddingY'     : varProps2[`paddingY${Size}`],
+    '--elm-borderRadius' : varProps2[`borderRadius${Size}`],
+}));
+
+export function defineThemes(styles: object, handler: ((theme: string, Theme: string, themeProp: string, themeColor: string) => object)) {
+    for(const [theme, themeColor] of Object.entries(color.themes)) {
+        const Theme = pascalCase(theme);
+        const themeProp = `theme${Theme}`;
+        (styles as any)[themeProp] = handler(theme, Theme, themeProp, themeColor as string);
+    }
 }
-for (const [theme, value] of Object.entries(color.themes)) {
-    const Theme = pascalCase(theme);
-    (styles as any)[`theme${Theme}`] = {
-        '--elm-backg': value,
-        '--elm-color': (colors as any)[`${theme}Text`],
-    };
-}
+defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
+    '--elm-backg': themeColor,
+    '--elm-color': (colors as any)[`${theme}Text`],
+}));
 
 const styles2 = styles as unknown as Record<'main'|'sizeSm'|'sizeLg'|'gradient', string>;
 const useStyles = createUseStyles(styles2);
@@ -291,7 +301,7 @@ export { states, styles2 as styles, useStyles };
 
 
 export interface VariantSize {
-    size?: 'sm' | 'lg'
+    size?: 'sm' | 'lg' | string
 }
 export function useVariantSize(props: VariantSize, styles: Record<string, string>) {
     return {
@@ -357,7 +367,7 @@ export default function Element(props: Props) {
                 variTheme.class,
                 variGradient.class,
 
-                stateLeave.class
+                stateLeave.class,
             ].join(' ')}
         
             onMouseEnter={stateLeave.handleMouseEnter}

@@ -6,6 +6,7 @@ import './App.css';
 import Element from './Element';
 import Control from './Control';
 import Button from './Button';
+import Icon from './Icon';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -99,6 +100,7 @@ export default function App (props: any) {
 				<Element theme={theme} enableGradient={true} size={size}></Element>
 				<Control theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus}></Control>
 				<Button  theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+				<Icon icon="instagram" theme={theme} size={size}/>
 				<p>
 					Active status: {active ? 'actived' : 'deactived'}
 				</p>

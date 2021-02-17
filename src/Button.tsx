@@ -129,22 +129,20 @@ const styles = {
         padding        : spacers.xs,
         borderRadius   : border.radiuses.sm,
     }},
-}
-const varProps2 = varProps as any;
-for (let size of ['sm', 'lg']) {
-    const Size = pascalCase(size);
-    const sizeProp = `size${Size}`;
-    (styles as any)[sizeProp] = {
-        extend: [
-            (Elements.styles as any)[sizeProp],
-        ],
-        '--elm-gapX' : varProps2[`gapX${Size}`],
-        '--elm-gapY' : varProps2[`gapY${Size}`],
-    };
-}
+};
 
-const useStyles = createUseStyles(styles);
-export { styles, useStyles };
+const varProps2 = varProps as any;
+Elements.defineSizes(styles, (size, Size, sizeProp) => ({
+    extend: [
+        (Elements.styles as any)[sizeProp],
+    ],
+    '--btn-gapX' : varProps2[`gapX${Size}`],
+    '--btn-gapY' : varProps2[`gapY${Size}`],
+}));
+
+const styles2 = styles as unknown as Record<'main'|'sizeSm'|'sizeLg', string>;
+const useStyles = createUseStyles(styles2);
+export { styles2 as styles, useStyles };
 
 
 
