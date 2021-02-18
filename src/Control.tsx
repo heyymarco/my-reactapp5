@@ -10,14 +10,11 @@ import {
     stateHover, stateLeave, stateHoverLeave,
     filterValidProps,
 }                          from './Element';
-import
-    colors,
-    * as color             from './colors';
+import colors              from './colors';
 import stipOuts            from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
-import { pascalCase }      from 'pascal-case';
 
 
 

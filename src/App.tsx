@@ -100,7 +100,8 @@ export default function App (props: any) {
 				<Element theme={theme} enableGradient={true} size={size}></Element>
 				<Control theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus}></Control>
 				<Button  theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
-				<Icon icon="instagram" theme={theme} size={size}/>
+				<Icon icon="face" theme={theme} size={size}/>
+				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
 				<p>
 					Active status: {active ? 'actived' : 'deactived'}
 				</p>
