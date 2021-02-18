@@ -294,7 +294,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     '--elm-color': (colors as any)[`${theme}Text`],
 }));
 
-const styles2 = styles as unknown as Record<'main'|'sizeSm'|'sizeLg'|'gradient', string>;
+const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg'|'gradient', string>);
 const useStyles = createUseStyles(styles2);
 export { states, styles2 as styles, useStyles };
 

@@ -41,12 +41,12 @@ const cssProps: CssProps = {
     orientation : 'row',
     whiteSpace  : 'normal',
 
-    gapX        : spacers.md,
-    gapY        : spacers.md,
-    gapXSm      : spacers.sm,
-    gapYSm      : spacers.sm,
-    gapXLg      : spacers.lg,
-    gapYLg      : spacers.lg,
+    gapX        : spacers.sm,
+    gapY        : spacers.sm,
+    gapXSm      : spacers.xs,
+    gapYSm      : spacers.xs,
+    gapXLg      : spacers.md,
+    gapYLg      : spacers.md,
 };
 
 
@@ -140,7 +140,7 @@ Elements.defineSizes(styles, (size, Size, sizeProp) => ({
     '--btn-gapY' : varProps2[`gapY${Size}`],
 }));
 
-const styles2 = styles as unknown as Record<'main'|'sizeSm'|'sizeLg', string>;
+const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', string>);
 const useStyles = createUseStyles(styles2);
 export { styles2 as styles, useStyles };
 

@@ -184,14 +184,14 @@ const styles = {
 
 const varProps2 = varProps as any;
 Elements.defineSizes(styles, (size, Size, sizeProp) => ({
-    '--ico-size': varProps2[`size${Size}`],
-}), ['sm', 'nm', 'md', 'lg']);
+    '--ico-size': (size === '1em') ? '1em' : varProps2[`size${Size}`],
+}), ['sm', 'nm', 'md', 'lg', '1em']);
 
 Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     '--ico-color': themeColor,
 }));
 
-const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeNm'|'sizeMd'|'sizeLg', string>);
+const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeNm'|'sizeMd'|'sizeLg'|'size1em', string>);
 const useStyles = createUseStyles(styles2);
 export { styles2 as styles, useStyles };
 
@@ -233,7 +233,7 @@ export default function Icon(props: Props) {
                 variTheme.class,
             ].join(' ')}
 
-            style={imgIcon ? ({'--ico-img': `url("${imgIcon}")`} as React.CSSProperties) : ({})}
+            style={imgIcon ? ({'--ico-img': `url("${imgIcon}")`} as React.CSSProperties) : undefined}
 
             aria-hidden={props['aria-hidden'] ?? true}
         >

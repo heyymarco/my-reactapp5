@@ -7,6 +7,7 @@ import Element from './Element';
 import Control from './Control';
 import Button from './Button';
 import Icon from './Icon';
+import ButtonIcon from './ButtonIcon';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -102,6 +103,14 @@ export default function App (props: any) {
 				<Button  theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
 				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
+				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+					<span>hey</span>
+				</ButtonIcon>
+				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} btnStyle={btnStyle}>
+					<span>hey</span>
+				</ButtonIcon>
+				<ButtonIcon icon="instagram" theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+				</ButtonIcon>
 				<p>
 					Active status: {active ? 'actived' : 'deactived'}
 				</p>
