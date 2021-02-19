@@ -6,7 +6,8 @@ const breakpoints = {
     xl  : 1200,
     xxl : 1400,
 };
-export { breakpoints };
+const breakpoints2 = breakpoints as (typeof breakpoints & { [name: string]: number });
+export { breakpoints2 };
 
 
 
@@ -61,11 +62,109 @@ export function infix(name: string) {
     return `-${name}`;
 }
 
+/**
+ * Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
+ * @param name the name of the given breakpoint.
+ * @param content the content to apply if the media meets the minimum breakpoint width.
+ * @return the css rule object.
+ */
 export function mediaUp(name: string, content: object) {
     const minVal = min(name);
     if (minVal) {
         return {
             [`@media (min-width: ${minVal}px)`]: {
+                extend: [content],
+            }
+        };
+    }
+    else {
+        return content;
+    }
+}
+
+/**
+ * Media of at least the maximum breakpoint width. No query for the smallest breakpoint.
+ * @param name the name of the given breakpoint.
+ * @param content the content to apply if the media meets the maximum breakpoint width.
+ * @return the css rule object.
+ */
+export function mediaDown(name: string, content: object) {
+    const maxVal = max(name);
+    if (maxVal) {
+        return {
+            [`@media (max-width: ${maxVal}px)`]: {
+                extend: [content],
+            }
+        };
+    }
+    else {
+        return content;
+    }
+}
+
+/**
+ * Media that spans multiple breakpoint widths.
+ * @param lower the name of the minimum breakpoint.
+ * @param upper the name of the maximum breakpoint.
+ * @param content the content to apply if the media meets the minimum & maximum breakpoint width.
+ * @return the css rule object.
+ */
+export function mediaBetween(lower: string, upper: string, content: object) {
+    const minVal = min(lower);
+    const maxVal = max(upper);
+    if (minVal && maxVal) {
+        return {
+            [`@media (min-width: ${minVal}px) and (max-width: ${maxVal}px)`]: {
+                extend: [content],
+            }
+        };
+    }
+    else if (minVal) {
+        return {
+            [`@media (min-width: ${minVal}px)`]: {
+                extend: [content],
+            }
+        };
+    }
+    else if (maxVal) {
+        return {
+            [`@media (max-width: ${maxVal}px)`]: {
+                extend: [content],
+            }
+        };
+    }
+    else {
+        return content;
+    }
+}
+
+/**
+ * Media between the breakpoint's minimum and maximum widths.
+ * @param name the name of the given breakpoint.
+ * @param content the content to apply if the media meets the minimum & maximum breakpoint width.
+ * @return the css rule object.
+ */
+export function mediaOnly(name: string, content: object) {
+    const minVal  = min(name);
+    const nextVal = next(name);
+    const maxVal  = nextVal ? max(nextVal) : null;
+    if (minVal && maxVal) {
+        return {
+            [`@media (min-width: ${minVal}px) and (max-width: ${maxVal}px)`]: {
+                extend: [content],
+            }
+        };
+    }
+    else if (minVal) {
+        return {
+            [`@media (min-width: ${minVal}px)`]: {
+                extend: [content],
+            }
+        };
+    }
+    else if (maxVal) {
+        return {
+            [`@media (max-width: ${maxVal}px)`]: {
                 extend: [content],
             }
         };

@@ -40,6 +40,7 @@ export interface CssProps {
     size       : string | number | typoBase.Expression
     sizeSm     : string | number | typoBase.Expression
     sizeNm     : string | number | typoBase.Expression
+    sizeMd     : string | number | typoBase.Expression
     sizeLg     : string | number | typoBase.Expression
 }
 // const unset   = 'unset';

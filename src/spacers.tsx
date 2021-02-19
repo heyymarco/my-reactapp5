@@ -27,7 +27,7 @@ const collection = new JssVarCollection(
     /*config :*/ { varPrefix: 'spc'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as typeof props;
+const varProps = collection.varProps as (typeof props & { [key: string]: (string|number|(string|number)[][]) });
 // export the configurable props:
 export { config, varProps as spacers };
 export default varProps;
