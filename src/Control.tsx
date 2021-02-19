@@ -50,6 +50,19 @@ export interface CssProps {
 // const none    = 'none';
 // const inherit = 'inherit';
 
+// css vars:
+const getVar = (name: string) => `var(${name})`;
+export const vars = {
+    filterEnabledDisabled : '--ctrl-filterEnabledDisabled',
+    filterHoverLeave      : '--ctrl-filterHoverLeave',
+    filterActivePassive   : '--ctrl-filterActivePassive',
+    boxShadowFocusTheme   : '--ctrl-boxShadowFocus-theme',
+    animEnabledDisabled   : '--ctrl-animEnabledDisabled',
+    animHoverLeave        : '--ctrl-animHoverLeave',
+    animFocusBlur         : '--ctrl-animFocusBlur',
+    animActivePassive     : '--ctrl-animActivePassive',
+};
+
 // define default cssProps' value to be stored into css vars:
 // re-defined later, we need to construct varProps first
 const keyframesEnabled  = { from: undefined, to: undefined };
@@ -92,17 +105,17 @@ Object.assign(keyframesDisabled, {
     from: {
         filter: [[
             Elements.cssProps.filter,
-            'var(--ctrl-filterActivePassive)',
-            'var(--ctrl-filterHoverLeave)', // first priority, but now become the second priority
-            // 'var(--ctrl-filterEnabledDisabled)', // last priority, but now become the first priority
+            getVar(vars.filterActivePassive),
+            getVar(vars.filterHoverLeave), // first priority, but now become the second priority
+            // getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
         ]],
     },
     to: {
         filter: [[
             Elements.cssProps.filter,
-            'var(--ctrl-filterActivePassive)',
-            'var(--ctrl-filterHoverLeave)', // first priority, but now become the second priority
-            'var(--ctrl-filterEnabledDisabled)', // last priority, but now become the first priority
+            getVar(vars.filterActivePassive),
+            getVar(vars.filterHoverLeave), // first priority, but now become the second priority
+            getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
         ]],
     }
 });
@@ -115,17 +128,17 @@ Object.assign(keyframesHover, {
     from: {
         filter: [[
             Elements.cssProps.filter,
-            'var(--ctrl-filterEnabledDisabled)', // last priority, rarely happened
-            'var(--ctrl-filterActivePassive)',
-            // 'var(--ctrl-filterHoverLeave)', // first priority, serving smooth responsiveness
+            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
+            getVar(vars.filterActivePassive),
+            // getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
     },
     to: {
         filter: [[
             Elements.cssProps.filter,
-            'var(--ctrl-filterEnabledDisabled)', // last priority, rarely happened
-            'var(--ctrl-filterActivePassive)',
-            'var(--ctrl-filterHoverLeave)', // first priority, serving smooth responsiveness
+            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
+            getVar(vars.filterActivePassive),
+            getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
     }
 });
@@ -138,13 +151,13 @@ Object.assign(keyframesFocus, {
     from: {
         boxShadow: [[[
             Elements.cssProps.boxShadow,
-            // 'var(--ctrl-boxShadowFocus-theme)',
+            // getVar(vars.boxShadowFocusTheme),
         ]]],
     },
     to: {
         boxShadow: [[[
             Elements.cssProps.boxShadow,
-            'var(--ctrl-boxShadowFocus-theme)',
+            getVar(vars.boxShadowFocusTheme),
         ]]],
     }
 });
@@ -157,17 +170,17 @@ Object.assign(keyframesActive, {
     from: {
         filter: [[
             Elements.cssProps.filter,
-            'var(--ctrl-filterEnabledDisabled)', // last priority, rarely happened
-            // 'var(--ctrl-filterActivePassive)',
-            'var(--ctrl-filterHoverLeave)', // first priority, serving smooth responsiveness
+            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
+            // getVar(vars.filterActivePassive),
+            getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
     },
     to: {
         filter: [[
             Elements.cssProps.filter,
-            'var(--ctrl-filterEnabledDisabled)', // last priority, rarely happened
-            'var(--ctrl-filterActivePassive)',
-            'var(--ctrl-filterHoverLeave)', // first priority, serving smooth responsiveness
+            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
+            getVar(vars.filterActivePassive),
+            getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
     }
 });
@@ -277,38 +290,38 @@ export { mixins };
 
 
 const states = {
-    '--ctrl-filterEnabledDisabled' : Elements.cssProps.filterNone,
-    '--ctrl-filterHoverLeave'      : Elements.cssProps.filterNone,
-    '--ctrl-filterActivePassive'   : Elements.cssProps.filterNone,
+    [vars.filterEnabledDisabled]   : Elements.cssProps.filterNone,
+    [vars.filterHoverLeave]        : Elements.cssProps.filterNone,
+    [vars.filterActivePassive]     : Elements.cssProps.filterNone,
 
-    '--ctrl-animEnabledDisabled'   : Elements.cssProps.animNone,
-    '--elm-animHoverLeave'         : undefined, // delete
-    '--ctrl-animHoverLeave'        : Elements.cssProps.animNone,
-    '--ctrl-animFocusBlur'         : Elements.cssProps.animNone,
-    '--ctrl-animActivePassive'     : Elements.cssProps.animNone,
+    [vars.animEnabledDisabled]     : Elements.cssProps.animNone,
+    [Elements.vars.animHoverLeave] : undefined, // delete
+    [vars.animHoverLeave]          : Elements.cssProps.animNone,
+    [vars.animFocusBlur]           : Elements.cssProps.animNone,
+    [vars.animActivePassive]       : Elements.cssProps.animNone,
 
     anim: [
         Elements.cssProps.anim,
-        'var(--ctrl-animEnabledDisabled)', // 1st : ctrl must be enabled
-        'var(--ctrl-animHoverLeave)',      // 2nd : cursor hovered over ctrl
-        'var(--ctrl-animFocusBlur)',       // 3rd : ctrl got focused
-        'var(--ctrl-animActivePassive)',   // 4th : ctrl got pressed
+        getVar(vars.animEnabledDisabled), // 1st : ctrl must be enabled
+        getVar(vars.animHoverLeave),      // 2nd : cursor hovered over ctrl
+        getVar(vars.animFocusBlur),       // 3rd : ctrl got focused
+        getVar(vars.animActivePassive),   // 4th : ctrl got pressed
     ],
 
 
     extend:[
         stateEnabledDisabled({
-            '--ctrl-filterEnabledDisabled': varProps.filterDisabled,
+            [vars.filterEnabledDisabled]       : varProps.filterDisabled,
         }),
         stateEnabled({
-            '--ctrl-animEnabledDisabled'  : varProps.animEnabled,
+            [vars.animEnabledDisabled]         : varProps.animEnabled,
         }),
         stateDisabled({
-            '--ctrl-animEnabledDisabled'  : varProps.animDisabled,
+            [vars.animEnabledDisabled]         : varProps.animDisabled,
             cursor: varProps.cursorDisabled,
         }),
         {
-            '&:disabled:not(.disabled)': {extend:[ // if ctrl was disabled at the first page load, disable first animation
+            '&:disabled:not(.disabled)'  : {extend:[ // if ctrl was disabled at the first page load, disable first animation
                 stateNoAnimStartup(),
             ]},
         },
@@ -316,43 +329,43 @@ const states = {
 
         stateNotDisabled({extend:[
             stateHoverLeave({
-                '--ctrl-filterHoverLeave': varProps.filterHover,
+                [vars.filterHoverLeave]        : varProps.filterHover,
             }),
             stateHover({
-                '--elm-animHoverLeave'   : undefined, // delete
-                '--ctrl-animHoverLeave'  : varProps.animHover,
+                [Elements.vars.animHoverLeave] : undefined, // delete
+                [vars.animHoverLeave]          : varProps.animHover,
             }),
             stateLeave({
-                '--elm-animHoverLeave'   : undefined, // delete
-                '--ctrl-animHoverLeave'  : varProps.animLeave,
+                [Elements.vars.animHoverLeave] : undefined, // delete
+                [vars.animHoverLeave]          : varProps.animLeave,
             }),
 
 
             stateFocus({
-                '--ctrl-animFocusBlur': varProps.animFocus,
+                [vars.animFocusBlur]           : varProps.animFocus,
             }),
             stateBlur({
-                '--ctrl-animFocusBlur': varProps.animBlur,
+                [vars.animFocusBlur]           : varProps.animBlur,
             }),
 
 
             stateActivePassive({
-                '--ctrl-filterActivePassive': varProps.filterActive,
+                [vars.filterActivePassive]     : varProps.filterActive,
             }),
             stateActive({
-                '--ctrl-animActivePassive'  : varProps.animActive,
+                [vars.animActivePassive]       : varProps.animActive,
             }),
             statePassive({
-                '--ctrl-animActivePassive'  : varProps.animPassive,
+                [vars.animActivePassive]       : varProps.animPassive,
             }),
             {
                 '&.active,&.actived': { // if activated programmatically (not by user input)
                     anim: [
                         Elements.cssProps.anim,
-                        'var(--ctrl-animActivePassive)',   // 1st : ctrl already pressed, then released
-                        'var(--ctrl-animHoverLeave)',      // 2nd : cursor leaved
-                        'var(--ctrl-animFocusBlur)',       // 3nd : ctrl lost focus
-                        'var(--ctrl-animEnabledDisabled)', // 4th : ctrl disabled
+                        getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
+                        getVar(vars.animHoverLeave),      // 2nd : cursor leaved
+                        getVar(vars.animFocusBlur),       // 3nd : ctrl lost focus
+                        getVar(vars.animEnabledDisabled), // 4th : ctrl disabled
                     ],
                 },
                 '&.actived': {extend:[ // if ctrl was activated at the first page load, disable first animation
@@ -378,7 +391,7 @@ Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     extend: [
         (Elements.styles as any)[themeProp],
     ],
-    '--ctrl-boxShadowFocus-theme': [[
+    [vars.boxShadowFocusTheme]: [[
         varProps.boxShadowFocus,
         (colors as any)[`${theme}Transp`],
     ]],

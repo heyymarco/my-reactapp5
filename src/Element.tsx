@@ -62,6 +62,13 @@ export interface CssProps
 // const none    = 'none';
 const inherit = 'inherit';
 
+// css vars:
+const getVar = (name: string) => `var(${name})`;
+export const vars = {
+    animHoverLeave : '--elm-animHoverLeave',
+    backgFn        : '--elm-backgFn',
+};
+
 // define default cssProps' value to be stored into css vars:
 const keyframesNone  = { };
 // re-defined later, we need to construct varProps first
@@ -230,20 +237,20 @@ export {
 export { mixins };
 
 const states = {
-    '--elm-animHoverLeave': varProps.animNone,
+    [vars.animHoverLeave]: varProps.animNone,
     anim: [
         varProps.anim,
-        'var(--elm-animHoverLeave)',
+        getVar(vars.animHoverLeave),
     ],
 
 
     extend:[
         stateNotDisabled({extend:[
             stateHover({
-                '--elm-animHoverLeave': varProps.animHover,
+                [vars.animHoverLeave]: varProps.animHover,
             }),
             stateLeave({
-                '--elm-animHoverLeave': varProps.animLeave,
+                [vars.animHoverLeave]: varProps.animLeave,
             }),
         ]}),
     ],
@@ -256,11 +263,11 @@ const styles = {
             states,
         ],
 
-        '--elm-backgFn': varProps.backg,
-        backg: `var(--elm-backgFn)`,
+        [vars.backgFn]: varProps.backg,
+        backg: getVar(vars.backgFn),
     },
     gradient: { '&:not(._)': { // force to win conflict with main
-        '--elm-backgFn': [
+        [vars.backgFn]: [
             varProps.backgGrad,
             varProps.backg,
         ],
