@@ -8,6 +8,7 @@ import Control from './Control';
 import Button from './Button';
 import Icon from './Icon';
 import ButtonIcon from './ButtonIcon';
+import Container from './Container';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -38,23 +39,21 @@ const themeX = {
   }
 }
 
-const jss = createJss().setup({
-	plugins: [
-		jssPluginFunctions(),
-		// jssPluginObservable({}),
-		// jssPluginTemplate(),
-		jssPluginGlobal(),
-		jssPluginExtend(),
-		jssPluginNested(),
-		// jssPluginCompose(),
-		jssPluginCamelCase(),
-		// jssPluginDefaultUnit({}),
-		jssPluginExpand(),
-		// jssPluginVendorPrefixer(),
-		// jssPluginPropsSort(),
-		jssPluginNormalizeShorthands()
-	]
-});
+const jss = createJss().setup({plugins:[
+	jssPluginFunctions(),
+	// jssPluginObservable({}),
+	// jssPluginTemplate(),
+	jssPluginGlobal(),
+	jssPluginExtend(),
+	jssPluginNested(),
+	// jssPluginCompose(),
+	jssPluginCamelCase(),
+	// jssPluginDefaultUnit({}),
+	jssPluginExpand(),
+	// jssPluginVendorPrefixer(),
+	// jssPluginPropsSort(),
+	jssPluginNormalizeShorthands()
+]});
 
 export default function App (props: any) {
 	const [enabled, setEnabled] = useState(true);
@@ -85,7 +84,7 @@ export default function App (props: any) {
 
 	return(<JssProvider jss={jss}><ThemeProvider theme={themeX}>
 		<div className='App'>
-			<header className="App-header">
+			<Container className="App-header">
 				<img src={logo} className="App-logo" alt="logo" />
 				<p>
 					Edit <code>src/App.tsx</code> and save to reload.
@@ -224,7 +223,7 @@ export default function App (props: any) {
 				<p><del>deleted</del> <s>wrong</s> <ins>added new</ins> <u>please understand</u> <small>i'm tiny</small> <strong>please understand</strong> <b>important</b> <em>remember me</em> <i>forget me</i></p>
 				<hr />
 				<p>hello world</p>
-			</header>
+			</Container>
 		</div>
 	</ThemeProvider></JssProvider>);
 };

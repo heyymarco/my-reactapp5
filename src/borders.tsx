@@ -34,8 +34,8 @@ const collection = new JssVarCollection(
     /*config :*/ { varPrefix: 'bd'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as (typeof props & { [key: string]: (string|number|(string|number)[][]) });
-const valProps = collection.valProps as (typeof props & { [key: string]: (string|number|(string|number)[][]) });
+const varProps = collection.varProps as (typeof props & { [key: string]: (undefined|string|number|(string|number)[][]) });
+const valProps = collection.valProps as (typeof props & { [key: string]: (undefined|string|number|(string|number)[][]) });
 // export the configurable props:
 export { config, varProps as borders };
 export default varProps;

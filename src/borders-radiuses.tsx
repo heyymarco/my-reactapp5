@@ -26,7 +26,7 @@ const collection = new JssVarCollection(
     /*config :*/ { varPrefix: 'bd-rd'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as (typeof props & { [key: string]: (string|number|(string|number)[][]) });
+const varProps = collection.varProps as (typeof props & { [key: string]: (undefined|string|number|(string|number)[][]) });
 // export the configurable props:
 export { config, varProps as radiuses };
 export default varProps;

@@ -204,12 +204,12 @@ export { config, varProps as cssProps };
 
 
 
-const stateFocus              = (content: object) => ({
+const stateFocus             = (content: object) => ({
     '&:focus,&.focus': {
         extend: [content]
     }
 });
-const stateNotFocus           = (content: object) => ({
+const stateNotFocus          = (content: object) => ({
     '&:not(:focus):not(.focus)': {
         extend: [content]
     }

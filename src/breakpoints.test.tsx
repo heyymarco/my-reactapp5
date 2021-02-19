@@ -49,7 +49,7 @@ test('breakpoint.mediaUp', () => {
         }
         else {
             if (!result?.[`@media (min-width: ${breakpoint.min(name)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
     } // for
 });
@@ -65,7 +65,7 @@ test('breakpoint.mediaDown', () => {
         }
         else {
             if (!result?.[`@media (max-width: ${breakpoint.max(name)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (max-width: ${breakpoint.max(name)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (max-width: ${breakpoint.max(name)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
     } // for
 });
@@ -81,15 +81,15 @@ test('breakpoint.mediaBetween', () => {
 
         if (breakpoint.min(name) && breakpoint.max(nextName)) {
             if (!result?.[`@media (min-width: ${breakpoint.min(name)}px) and (max-width: ${breakpoint.max(nextName)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px) and (max-width: ${breakpoint.max(nextName)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px) and (max-width: ${breakpoint.max(nextName)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
         else if (breakpoint.min(name)) {
             if (!result?.[`@media (min-width: ${breakpoint.min(name)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
         else if (breakpoint.max(nextName)) {
             if (!result?.[`@media (max-width: ${breakpoint.max(nextName)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (max-width: ${breakpoint.max(nextName)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (max-width: ${breakpoint.max(nextName)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
         else {
             throw new Error('algoritm error');
@@ -108,15 +108,15 @@ test('breakpoint.mediaOnly', () => {
 
         if (breakpoint.min(name) && breakpoint.max(nextName)) {
             if (!result?.[`@media (min-width: ${breakpoint.min(name)}px) and (max-width: ${breakpoint.max(nextName)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px) and (max-width: ${breakpoint.max(nextName)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px) and (max-width: ${breakpoint.max(nextName)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
         else if (breakpoint.min(name)) {
             if (!result?.[`@media (min-width: ${breakpoint.min(name)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (min-width: ${breakpoint.min(name)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
         else if (breakpoint.max(nextName)) {
             if (!result?.[`@media (max-width: ${breakpoint.max(nextName)}px)`]) throw new Error('algoritm error');
-            if ( result?.[`@media (max-width: ${breakpoint.max(nextName)}px)`]?.extend?.[0]?.['--test'] !== 'ok') throw new Error('algoritm error');
+            if ( result?.[`@media (max-width: ${breakpoint.max(nextName)}px)`]?.['--test'] !== 'ok') throw new Error('algoritm error');
         }
         else {
             throw new Error('algoritm error');

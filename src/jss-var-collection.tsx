@@ -25,23 +25,21 @@ let customJssCache: Jss.Jss | null = null;
 const getCustomJss = () => {
     if (customJssCache) return customJssCache;
 
-    customJssCache = createJss().setup({
-        plugins: [
-            jssPluginFunctions(),
-            // jssPluginObservable({}),
-            // jssPluginTemplate(),
-            jssPluginGlobal(),
-            jssPluginExtend(),
-            jssPluginNested(),
-            // jssPluginCompose(),
-            jssPluginCamelCase(),
-            // jssPluginDefaultUnit({}),
-            jssPluginExpand(),
-            // jssPluginVendorPrefixer(),
-            // jssPluginPropsSort(),
-            jssPluginNormalizeShorthands()
-        ]
-    });
+    customJssCache = createJss().setup({plugins:[
+        jssPluginFunctions(),
+        // jssPluginObservable({}),
+        // jssPluginTemplate(),
+        jssPluginGlobal(),
+        jssPluginExtend(),
+        jssPluginNested(),
+        // jssPluginCompose(),
+        jssPluginCamelCase(),
+        // jssPluginDefaultUnit({}),
+        jssPluginExpand(),
+        // jssPluginVendorPrefixer(),
+        // jssPluginPropsSort(),
+        jssPluginNormalizeShorthands()
+    ]});
 
     return customJssCache;
 }
@@ -317,8 +315,8 @@ export default class JssVarCollection<TProp> {
         };
         this._css =
             getCustomJss()
-            .createStyleSheet(styles);
-        this._css.attach();
+            .createStyleSheet(styles)
+            .attach();
     }
 
 

@@ -6,8 +6,8 @@ const breakpoints = {
     xl  : 1200,
     xxl : 1400,
 };
-const breakpoints2 = breakpoints as (typeof breakpoints & { [name: string]: number });
-export { breakpoints2 };
+const breakpoints2 = breakpoints as (typeof breakpoints & { [name: string]: (undefined|number) });
+export { breakpoints2 as breakpoints };
 
 
 
@@ -72,9 +72,7 @@ export function mediaUp(name: string, content: object) {
     const minVal = min(name);
     if (minVal) {
         return {
-            [`@media (min-width: ${minVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (min-width: ${minVal}px)`]: content,
         };
     }
     else {
@@ -92,9 +90,7 @@ export function mediaDown(name: string, content: object) {
     const maxVal = max(name);
     if (maxVal) {
         return {
-            [`@media (max-width: ${maxVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (max-width: ${maxVal}px)`]: content,
         };
     }
     else {
@@ -114,23 +110,17 @@ export function mediaBetween(lower: string, upper: string, content: object) {
     const maxVal = max(upper);
     if (minVal && maxVal) {
         return {
-            [`@media (min-width: ${minVal}px) and (max-width: ${maxVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (min-width: ${minVal}px) and (max-width: ${maxVal}px)`]: content,
         };
     }
     else if (minVal) {
         return {
-            [`@media (min-width: ${minVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (min-width: ${minVal}px)`]: content,
         };
     }
     else if (maxVal) {
         return {
-            [`@media (max-width: ${maxVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (max-width: ${maxVal}px)`]: content,
         };
     }
     else {
@@ -150,23 +140,17 @@ export function mediaOnly(name: string, content: object) {
     const maxVal  = nextVal ? max(nextVal) : null;
     if (minVal && maxVal) {
         return {
-            [`@media (min-width: ${minVal}px) and (max-width: ${maxVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (min-width: ${minVal}px) and (max-width: ${maxVal}px)`]: content,
         };
     }
     else if (minVal) {
         return {
-            [`@media (min-width: ${minVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (min-width: ${minVal}px)`]: content,
         };
     }
     else if (maxVal) {
         return {
-            [`@media (max-width: ${maxVal}px)`]: {
-                extend: [content],
-            }
+            [`@media (max-width: ${maxVal}px)`]: content,
         };
     }
     else {
