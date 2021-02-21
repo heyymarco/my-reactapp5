@@ -28,21 +28,21 @@ export interface CssProps {
     boxShadowFocus        : (number|string)[][]
 
     filterDisabled        : string | string[][]
-    filterHover           : string | string[][]
+    filterHover           : string | string[][]//TODO: del
     filterActive          : string | string[][]
 
     '@keyframes enabled'  : object
     '@keyframes disabled' : object
-    '@keyframes hover'    : object
-    '@keyframes leave'    : object
+    '@keyframes hover'    : object//TODO: del
+    '@keyframes leave'    : object//TODO: del
     '@keyframes focus'    : object
     '@keyframes blur'     : object
     '@keyframes active'   : object
     '@keyframes passive'  : object
     animEnabled           : string | (string | object)[][]
     animDisabled          : string | (string | object)[][]
-    animHover             : string | (string | object)[][]
-    animLeave             : string | (string | object)[][]
+    animHover             : string | (string | object)[][]//TODO: del
+    animLeave             : string | (string | object)[][]//TODO: del
     animFocus             : string | (string | object)[][]
     animBlur              : string | (string | object)[][]
     animActive            : string | (string | object)[][]
@@ -55,16 +55,19 @@ export interface CssProps {
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
 export const vars = {
+    boxShadowFocusFn      : '--ctrl-boxShadowFocusFn',
+
+    
     // anim props:
 
     filterEnabledDisabled : '--ctrl-filterEnabledDisabled',
     animEnabledDisabled   : '--ctrl-animEnabledDisabled',
 
-    filterHoverLeave      : '--ctrl-filterHoverLeave',
-    animHoverLeave        : '--ctrl-animHoverLeave',
+    filterHoverLeave      : '--ctrl-filterHoverLeave',//TODO:del
+    animHoverLeave        : '--ctrl-animHoverLeave',//TODO:del
     
     animFocusBlur         : '--ctrl-animFocusBlur',
-    boxShadowFocusTheme   : '--ctrl-boxShadowFocus-theme',
+    boxShadowFocusBlur    : '--ctrl-boxShadowFocusBlur',
 
     filterActivePassive   : '--ctrl-filterActivePassive',
     animActivePassive     : '--ctrl-animActivePassive',
@@ -74,12 +77,13 @@ export const vars = {
 // re-defined later, we need to construct varProps first
 const keyframesEnabled  = { from: undefined, to: undefined };
 const keyframesDisabled = { from: undefined, to: undefined };
-const keyframesHover    = { from: undefined, to: undefined };
-const keyframesLeave    = { from: undefined, to: undefined };
+const keyframesHover    = { from: undefined, to: undefined };//TODO:del
+const keyframesLeave    = { from: undefined, to: undefined };//TODO:del
 const keyframesFocus    = { from: undefined, to: undefined };
 const keyframesBlur     = { from: undefined, to: undefined };
 const keyframesActive   = { from: undefined, to: undefined };
 const keyframesPassive  = { from: undefined, to: undefined };
+const ecssProps = Elements.cssProps;
 const _cssProps: CssProps = {
     boxShadowFocus        : [[0, 0, 0, '0.2rem']],
 
@@ -87,21 +91,21 @@ const _cssProps: CssProps = {
     cursorDisabled        : 'not-allowed',
 
     filterDisabled        : [['grayscale(50%)',  'opacity(50%)'  ]],
-    filterHover           : Elements.cssProps.filterHover,
+    filterHover           : ecssProps.filterHover,//TODO: del
     filterActive          : [['brightness(65%)', 'contrast(150%)']],
 
     '@keyframes enabled'  : keyframesEnabled,
     '@keyframes disabled' : keyframesDisabled,
-    '@keyframes hover'    : keyframesHover,
-    '@keyframes leave'    : keyframesLeave,
+    '@keyframes hover'    : keyframesHover,//TODO: del
+    '@keyframes leave'    : keyframesLeave,//TODO: del
     '@keyframes focus'    : keyframesFocus,
     '@keyframes blur'     : keyframesBlur,
     '@keyframes active'   : keyframesActive,
     '@keyframes passive'  : keyframesPassive,
     animEnabled           : [['300ms', 'ease-out', 'both', keyframesEnabled ]],
     animDisabled          : [['300ms', 'ease-out', 'both', keyframesDisabled]],
-    animHover             : [['150ms', 'ease-out', 'both', keyframesHover   ]],
-    animLeave             : [['300ms', 'ease-out', 'both', keyframesLeave   ]],
+    animHover             : [['150ms', 'ease-out', 'both', keyframesHover   ]],//TODO: del
+    animLeave             : [['300ms', 'ease-out', 'both', keyframesLeave   ]],//TODO: del
     animFocus             : [['150ms', 'ease-out', 'both', keyframesFocus   ]],
     animBlur              : [['300ms', 'ease-out', 'both', keyframesBlur    ]],
     animActive            : [['150ms', 'ease-out', 'both', keyframesActive  ]],
@@ -126,7 +130,7 @@ export { config, cssProps };
 Object.assign(keyframesDisabled, {
     from: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, but now become the second priority
             // getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
@@ -134,7 +138,7 @@ Object.assign(keyframesDisabled, {
     },
     to: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, but now become the second priority
             getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
@@ -149,7 +153,7 @@ Object.assign(keyframesEnabled, {
 Object.assign(keyframesHover, {
     from: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterEnabledDisabled), // last priority, rarely happened
             getVar(vars.filterActivePassive),
             // getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
@@ -157,7 +161,7 @@ Object.assign(keyframesHover, {
     },
     to: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterEnabledDisabled), // last priority, rarely happened
             getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
@@ -172,14 +176,14 @@ Object.assign(keyframesLeave, {
 Object.assign(keyframesFocus, {
     from: {
         boxShadow: [[[
-            Elements.cssProps.boxShadow,
-            // getVar(vars.boxShadowFocusTheme),
+            ecssProps.boxShadow,
+            // getVar(vars.boxShadowFocusBlur),
         ]]],
     },
     to: {
         boxShadow: [[[
-            Elements.cssProps.boxShadow,
-            getVar(vars.boxShadowFocusTheme),
+            ecssProps.boxShadow,
+            getVar(vars.boxShadowFocusBlur),
         ]]],
     }
 });
@@ -191,7 +195,7 @@ Object.assign(keyframesBlur, {
 Object.assign(keyframesActive, {
     from: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterEnabledDisabled), // last priority, rarely happened
             // getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
@@ -199,7 +203,7 @@ Object.assign(keyframesActive, {
     },
     to: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterEnabledDisabled), // last priority, rarely happened
             getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
@@ -290,20 +294,21 @@ export const stateNoAnimStartup  = () => ({
 
 
 const states = {
-    [vars.filterEnabledDisabled]   : Elements.cssProps.filterNone,
-    [vars.animEnabledDisabled]     : Elements.cssProps.animNone,
+    [vars.filterEnabledDisabled]   : ecssProps.filterNone,
+    [vars.animEnabledDisabled]     : ecssProps.animNone,
 
-    [vars.filterHoverLeave]        : Elements.cssProps.filterNone,
-    [vars.animHoverLeave]          : Elements.cssProps.animNone,
+    [vars.filterHoverLeave]        : ecssProps.filterNone,
+    [vars.animHoverLeave]          : ecssProps.animNone,
 
     [Elements.vars.animHoverLeave] : undefined, // delete
-    [vars.animFocusBlur]           : Elements.cssProps.animNone,
+    [vars.boxShadowFocusBlur]      : [[0, 0, 'transparent']],
+    [vars.animFocusBlur]           : ecssProps.animNone,
 
-    [vars.filterActivePassive]     : Elements.cssProps.filterNone,
-    [vars.animActivePassive]       : Elements.cssProps.animNone,
+    [vars.filterActivePassive]     : ecssProps.filterNone,
+    [vars.animActivePassive]       : ecssProps.animNone,
 
     anim: [
-        Elements.cssProps.anim,
+        ecssProps.anim,
         getVar(vars.animEnabledDisabled), // 1st : ctrl must be enabled
         getVar(vars.animHoverLeave),      // 2nd : cursor hovered over ctrl
         getVar(vars.animFocusBlur),       // 3rd : ctrl got focused
@@ -343,6 +348,9 @@ const states = {
             }),
 
 
+            stateFocusBlur({
+                [vars.boxShadowFocusBlur]      : getVar(vars.boxShadowFocusFn),
+            }),
             stateFocus({
                 [vars.animFocusBlur]           : cssProps.animFocus,
             }),
@@ -364,7 +372,7 @@ const states = {
         {
             '&.active,&.actived': { // if activated programmatically (not by user input)
                 anim: [
-                    Elements.cssProps.anim,
+                    ecssProps.anim,
                     getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
                     getVar(vars.animHoverLeave),      // 2nd : cursor leaved
                     getVar(vars.animFocusBlur),       // 3nd : ctrl lost focus
@@ -393,7 +401,7 @@ Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     extend: [
         (Elements.styles as any)[themeProp],
     ],
-    [vars.boxShadowFocusTheme]: [[
+    [vars.boxShadowFocusFn]: [[
         cssProps.boxShadowFocus,
         (colors as any)[`${theme}Transp`],
     ]],

@@ -43,11 +43,11 @@ const getVar = (name: string) => `var(${name})`;
 export const vars = {
     // anim props:
 
-    filterEnabledDisabled : '--ctrl-filterEnabledDisabled',
-    animEnabledDisabled   : '--ctrl-animEnabledDisabled',
+    filterEnabledDisabled : '--indi-filterEnabledDisabled',
+    animEnabledDisabled   : '--indi-animEnabledDisabled',
 
-    filterActivePassive   : '--ctrl-filterActivePassive',
-    animActivePassive     : '--ctrl-animActivePassive',
+    filterActivePassive   : '--indi-filterActivePassive',
+    animActivePassive     : '--indi-animActivePassive',
 };
 
 // define default cssProps' value to be stored into css vars:
@@ -56,6 +56,7 @@ const keyframesEnabled  = { from: undefined, to: undefined };
 const keyframesDisabled = { from: undefined, to: undefined };
 const keyframesActive   = { from: undefined, to: undefined };
 const keyframesPassive  = { from: undefined, to: undefined };
+const ecssProps = Elements.cssProps;
 const _cssProps: CssProps = {
     cursor                : 'pointer',
     cursorDisabled        : 'not-allowed',
@@ -81,7 +82,7 @@ const _cssProps: CssProps = {
 // convert _cssProps => varProps => cssProps:
 const collection = new JssVarCollection(
     /*cssProps :*/ _cssProps as { [index: string]: any },
-    /*config   :*/ { varPrefix: 'ind'}
+    /*config   :*/ { varPrefix: 'indi'}
 );
 const config   = collection.config;
 const cssProps = collection.varProps as typeof _cssProps;
@@ -94,14 +95,14 @@ export { config, cssProps };
 Object.assign(keyframesDisabled, {
     from: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterActivePassive),
             // getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
         ]],
     },
     to: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterActivePassive),
             getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
         ]],
@@ -115,14 +116,14 @@ Object.assign(keyframesEnabled, {
 Object.assign(keyframesActive, {
     from: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterEnabledDisabled), // last priority, rarely happened
             // getVar(vars.filterActivePassive),
         ]],
     },
     to: {
         filter: [[
-            Elements.cssProps.filter,
+            ecssProps.filter,
             getVar(vars.filterEnabledDisabled), // last priority, rarely happened
             getVar(vars.filterActivePassive),
         ]],
@@ -180,14 +181,14 @@ export const mixins = {
 
 
 const states = {
-    [vars.filterEnabledDisabled]   : Elements.cssProps.filterNone,
-    [vars.filterActivePassive]     : Elements.cssProps.filterNone,
+    [vars.filterEnabledDisabled]   : ecssProps.filterNone,
+    [vars.filterActivePassive]     : ecssProps.filterNone,
 
-    [vars.animEnabledDisabled]     : Elements.cssProps.animNone,
-    [vars.animActivePassive]       : Elements.cssProps.animNone,
+    [vars.animEnabledDisabled]     : ecssProps.animNone,
+    [vars.animActivePassive]       : ecssProps.animNone,
 
     anim: [
-        Elements.cssProps.anim,
+        ecssProps.anim,
         getVar(vars.animEnabledDisabled), // 1st : ctrl must be enabled
         getVar(vars.animActivePassive),   // 4th : ctrl got pressed
     ],
@@ -223,7 +224,7 @@ const states = {
         {
             '&.active,&.actived': { // if activated programmatically (not by user input)
                 anim: [
-                    Elements.cssProps.anim,
+                    ecssProps.anim,
                     getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
                     getVar(vars.animEnabledDisabled), // 4th : ctrl disabled
                 ],

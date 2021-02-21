@@ -79,8 +79,8 @@ export const vars = {
 };
 
 // define default cssProps' value to be stored into css vars:
-const keyframesNone  = { };
 // re-defined later, we need to construct varProps first
+const keyframesNone  = { };
 const keyframesHover = { from: undefined, to: undefined };
 const keyframesLeave = { from: undefined, to: undefined };
 const _cssProps: CssProps = {
