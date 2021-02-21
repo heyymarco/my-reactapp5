@@ -41,9 +41,12 @@ export interface CssProps
     borderRadiusSm     : string | number
     borderRadiusLg     : string | number
 
-    boxShadow          : (number|string)[][]
+
+    // anim props:
 
     transition         : string | string[][]
+
+    boxShadow          : (number|string)[][]
 
     filterNone         : 'brightness(100%)'
     filter             : string | string[][]
@@ -52,7 +55,6 @@ export interface CssProps
     '@keyframes none'  : { }
     '@keyframes hover' : object
     '@keyframes leave' : object
-
     animNone           : string | (string | object)[][]
     anim               : string | (string | object)[][]
     animHover          : string | (string | object)[][]
@@ -62,14 +64,18 @@ export interface CssProps
 // const none    = 'none';
 const inherit = 'inherit';
 
-// css vars:
+// internal css vars:
 const getVar = (name: string) => `var(${name})`;
 export const vars = {
-    animHoverLeave : '--elm-animHoverLeave',
-    backgFn        : '--elm-backgFn',
+    backgFn          : '--elm-backgFn',
+    backg            : '--elm-backg',
+    color            : '--elm-color',
 
-    backg          : '--elm-backg',
-    color          : '--elm-color',
+
+    // anim props:
+
+    filterHoverLeave : '--elm-filterHoverLeave',
+    animHoverLeave   : '--elm-animHoverLeave',
 };
 
 // define default cssProps' value to be stored into css vars:
@@ -77,7 +83,7 @@ const keyframesNone  = { };
 // re-defined later, we need to construct varProps first
 const keyframesHover = { from: undefined, to: undefined };
 const keyframesLeave = { from: undefined, to: undefined };
-const cssProps: CssProps = {
+const _cssProps: CssProps = {
     fontSize          : typos.fontSizeNm,
     fontSizeSm        : [['calc((', typos.fontSizeSm, '+', typos.fontSizeNm, ')/2)']],
     fontSizeLg        : typos.fontSizeMd,
@@ -102,13 +108,16 @@ const cssProps: CssProps = {
     borderRadiusSm    : border.radiuses.sm,
     borderRadiusLg    : border.radiuses.lg,
 
-    boxShadow         : [[0, 0, 'transparent']],
+
+    // anim props:
 
     transition        : [
         ['background', '300ms', 'ease-out'],
         ['color'     , '300ms', 'ease-out'],
         ['border'    , '300ms', 'ease-out'],
     ],
+
+    boxShadow         : [[0, 0, 'transparent']],
 
     filterNone        : 'brightness(100%)',
     filter            : 'brightness(100%)',
@@ -122,16 +131,33 @@ const cssProps: CssProps = {
     animHover         : [['150ms', 'ease-out', 'both', keyframesHover]],
     animLeave         : [['300ms', 'ease-out', 'both', keyframesLeave]],
 };
+
+
+
+// convert _cssProps => varProps => cssProps:
+const collection = new JssVarCollection(
+    /*cssProps :*/ _cssProps as { [index: string]: any },
+    /*config   :*/ { varPrefix: 'elm'}
+);
+const config   = collection.config;
+const cssProps = collection.varProps as typeof _cssProps;
+// export the configurable varPops:
+export { config, cssProps };
+// export default cssProps;
+
+
+
 Object.assign(keyframesHover, {
     from: {
         filter: [[
             cssProps.filter,
+            // getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
     },
     to: {
         filter: [[
             cssProps.filter,
-            cssProps.filterHover,
+            getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
     }
 });
@@ -142,83 +168,70 @@ Object.assign(keyframesLeave, {
 
 
 
-// convert cssProps => varProps:
-const collection = new JssVarCollection(
-    /*cssProps :*/ cssProps as { [index: string]: any },
-    /*config   :*/ { varPrefix: 'elm'}
-);
-const config   = collection.config;
-const varProps = collection.varProps as typeof cssProps;
-// export the configurable varPops:
-export { config, varProps as cssProps };
-// export default varProps;
-
-
-
-const stateEnabled            = (content: object) => ({
+export const stateEnabled            = (content: object) => ({
     '&.enable': { // .enable
         extend: [content]
     }
 });
-const stateNotEnabled         = (content: object) => ({
+export const stateNotEnabled         = (content: object) => ({
     '&:not(.enable)': { // not-.enable
         extend: [content]
     }
 });
-const stateDisabled           = (content: object) => ({
+export const stateDisabled           = (content: object) => ({
     '&:disabled,&.disabled,&.disable': { // :disabled or .disabled or .disable
         extend: [content]
     }
 });
-const stateNotDisabled        = (content: object) => ({
+export const stateNotDisabled        = (content: object) => ({
     '&:not(:disabled):not(.disabled):not(.disable)': { // not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
 });
-const stateEnabledDisabled    = (content: object) => ({
+export const stateEnabledDisabled    = (content: object) => ({
     '&.enable,&:disabled,&.disabled,&.disable': { // .enable or :disabled or .disabled or .disable
         extend: [content]
     }
 });
-const stateNotEnabledDisabled = (content: object) => ({
+export const stateNotEnabledDisabled = (content: object) => ({
     '&:not(.enable):not(:disabled):not(.disabled):not(.disable)': { // not-.enable and not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
 });
 
-const stateHover              = (content: object) => ({
+export const stateHover              = (content: object) => ({
     '&:hover,&:focus': { // hover or focus
         extend: [content]
     }
 });
-const stateNotHover           = (content: object) => ({
+export const stateNotHover           = (content: object) => ({
     '&:not(:hover):not(:focus)': { // not-hover and not-focus
         extend: [content]
     }
 });
-const stateLeave              = (content: object) =>
+export const stateLeave              = (content: object) =>
     stateNotHover({ // not-hover and not-focus and (leave or blur)
         extend:[{'&.leave,&.blur': {
             extend: [content]
         }}]
     });
-const stateNotLeave           = (content: object) => ({
+export const stateNotLeave           = (content: object) => ({
     '&:not(.leave):not(.blur)': { // not-leave and not-blur
         extend: [content]
     }
 });
-const stateHoverLeave         = (content: object) => ({
+export const stateHoverLeave         = (content: object) => ({
     '&:hover,&:focus,&.leave,&.blur': { // hover or focus or leave or blur
         extend: [content]
     }
 });
-const stateNotHoverLeave      = (content: object) => ({
+export const stateNotHoverLeave      = (content: object) => ({
     '&:not(:hover):not(:focus):not(.leave):not(.blur)': { // not-hover and not-focus and not-leave and not-blur
         extend: [content]
     }
 });
 
-const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
+export const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
     const varProps2: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(varProps)) {
         if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|Hover|Leave|Focus|Blur|Active|Passive|Enabled|Disabled|None)$|^(@)|backgGrad|anim/).test(key)) continue;
@@ -227,33 +240,28 @@ const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
     return varProps2;
 }
 
-const mixins = {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    filterValidProps,
-};
-export {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    filterValidProps,
-};
-export { mixins };
+
 
 const states = {
-    [vars.animHoverLeave]: varProps.animNone,
+    [vars.filterHoverLeave]             : cssProps.filterNone,
+    [vars.animHoverLeave]               : cssProps.animNone,
+
     anim: [
-        varProps.anim,
+        cssProps.anim,
         getVar(vars.animHoverLeave),
     ],
 
 
     extend:[
         stateNotDisabled({extend:[
+            stateHoverLeave({
+                [vars.filterHoverLeave] : cssProps.filterHover,
+            }),
             stateHover({
-                [vars.animHoverLeave]: varProps.animHover,
+                [vars.animHoverLeave]   : cssProps.animHover,
             }),
             stateLeave({
-                [vars.animHoverLeave]: varProps.animLeave,
+                [vars.animHoverLeave]   : cssProps.animLeave,
             }),
         ]}),
     ],
@@ -262,17 +270,17 @@ const states = {
 const styles = {
     main: {
         extend: [
-            filterValidProps(varProps),
+            filterValidProps(cssProps),
             states,
         ],
 
-        [vars.backgFn]: varProps.backg,
+        [vars.backgFn]: cssProps.backg,
         backg: getVar(vars.backgFn),
     },
     gradient: { '&:not(._)': { // force to win conflict with main
         [vars.backgFn]: [
-            varProps.backgGrad,
-            varProps.backg,
+            cssProps.backgGrad,
+            cssProps.backg,
         ],
     }},
 };
@@ -284,7 +292,7 @@ export function defineSizes(styles: object, handler: ((size: string, Size: strin
         (styles as any)[sizeProp] = handler(size, Size, sizeProp);
     }
 }
-const varProps2 = varProps as any;
+const varProps2 = cssProps as any;
 defineSizes(styles, (size, Size, sizeProp) => ({
     '--elm-fontSize'     : varProps2[`fontSize${Size}`],
     '--elm-paddingX'     : varProps2[`paddingX${Size}`],

@@ -4,6 +4,7 @@ import
 import logo from './logo.svg';
 import './App.css';
 import Element from './Element';
+import Indicator from './Indicator';
 import Control from './Control';
 import Button from './Button';
 import Icon from './Icon';
@@ -106,6 +107,7 @@ export default function App (props: any) {
 					Learn React
 				</a>
 				<Element theme={theme} enableGradient={enableGrad} size={size}></Element>
+				<Indicator theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}></Indicator>
 				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus}></Control>
 				<Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
@@ -136,9 +138,7 @@ export default function App (props: any) {
 				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>
 					An item
 				</ListGroup>
-				<p>
-					Active status: {active ? 'actived' : 'deactived'}
-				</p>
+				<hr style={{flexBasis: '100%'}} />
 				<label>
 					<input type='checkbox'
 						checked={enableGrad}
