@@ -178,7 +178,7 @@ export interface Props
     text?        : string
     children?    : React.ReactNode
 
-    onClick?     : React.MouseEventHandler<HTMLButtonElement>;
+    onClick?     : React.MouseEventHandler<HTMLButtonElement>
 }
 export default function Button(props: Props) {
     const styles         =          useStyles();
@@ -194,7 +194,7 @@ export default function Button(props: Props) {
     const stateLeave     = Elements.useStateLeave();
     const stateEnbDis    = Controls.useStateEnabledDisabled(props);
     const stateFocusBlur = Controls.useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = Controls.useStateActivePassive(props, stateEnbDis);
+    const stateActPass   = Controls.useStateActivePassive(props);
 
     
 

@@ -266,14 +266,17 @@ const stateNotActivePassive  = (content: object) => ({
     }
 });
 
-const stateNoAnimStartup  = () =>
-    Elements.stateNotEnabled/*Disabled*/({extend:[
-        Elements.stateNotHoverLeave({extend:[
-            stateNotFocusBlur({
-                animationDuration: [['0ms'], '!important'],
-            }),
-        ]}),
-    ]});
+const stateNoAnimStartup  = () => ({
+        '&:not(.enable):not(.disable):not(:active):not(.active):not(.passive)': {
+            extend:[
+                Elements.stateNotHoverLeave({extend:[
+                    stateNotFocusBlur({
+                        animationDuration: [['0ms'], '!important'],
+                    }),
+                ]}),
+            ],
+        },
+});
 
 const mixins = {
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
@@ -321,7 +324,7 @@ const states = {
             cursor: varProps.cursorDisabled,
         }),
         {
-            '&:disabled:not(.disabled)'  : {extend:[ // if ctrl was disabled at the first page load, disable first animation
+            '&:disabled:not(.disable)'  : {extend:[ // if ctrl was disabled at the first page load, disable first animation
                 stateNoAnimStartup(),
             ]},
         },
@@ -347,32 +350,32 @@ const states = {
             stateBlur({
                 [vars.animFocusBlur]           : varProps.animBlur,
             }),
-
-
-            stateActivePassive({
-                [vars.filterActivePassive]     : varProps.filterActive,
-            }),
-            stateActive({
-                [vars.animActivePassive]       : varProps.animActive,
-            }),
-            statePassive({
-                [vars.animActivePassive]       : varProps.animPassive,
-            }),
-            {
-                '&.active,&.actived': { // if activated programmatically (not by user input)
-                    anim: [
-                        Elements.cssProps.anim,
-                        getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
-                        getVar(vars.animHoverLeave),      // 2nd : cursor leaved
-                        getVar(vars.animFocusBlur),       // 3nd : ctrl lost focus
-                        getVar(vars.animEnabledDisabled), // 4th : ctrl disabled
-                    ],
-                },
-                '&.actived': {extend:[ // if ctrl was activated at the first page load, disable first animation
-                    stateNoAnimStartup(),
-                ]},
-            },
         ]}),
+
+
+        stateActivePassive({
+            [vars.filterActivePassive]     : varProps.filterActive,
+        }),
+        stateActive({
+            [vars.animActivePassive]       : varProps.animActive,
+        }),
+        statePassive({
+            [vars.animActivePassive]       : varProps.animPassive,
+        }),
+        {
+            '&.active,&.actived': { // if activated programmatically (not by user input)
+                anim: [
+                    Elements.cssProps.anim,
+                    getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
+                    getVar(vars.animHoverLeave),      // 2nd : cursor leaved
+                    getVar(vars.animFocusBlur),       // 3nd : ctrl lost focus
+                    getVar(vars.animEnabledDisabled), // 4th : ctrl disabled
+                ],
+            },
+            '&.actived': {extend:[ // if ctrl was activated at the first page load, disable first animation
+                stateNoAnimStartup(),
+            ]},
+        },
     ],
 };
 
@@ -435,7 +438,7 @@ export function useStateEnabledDisabled(props: Props) {
     return {
         enabled: enabled,
         disabled: !enabled,
-        class: (enabling? 'enabled' : (disabling ? 'disabled': null)),
+        class: (enabling? 'enable' : (disabling ? 'disable': null)),
         handleAnimationEnd : handleIdle,
     };
 }
@@ -471,7 +474,7 @@ export function useStateFocusBlur(props: Props, stateEnabledDisabled: {enabled:b
     };
 }
 
-export function useStateActivePassive(props: Props, stateEnabledDisabled: {enabled:boolean}) {
+export function useStateActivePassive(props: Props) {
     const defaultActived = false; // if [active] was not specified => the default value is active=false (released)
     const [actived,     setActived    ] = useState(props.active ?? defaultActived);
     const [activating,  setActivating ] = useState(false);
@@ -483,18 +486,16 @@ export function useStateActivePassive(props: Props, stateEnabledDisabled: {enabl
         if (actived !== newActive) {
             setActived(newActive);
 
-            if (stateEnabledDisabled.enabled) {
-                if (newActive) {
-                    setPassivating(false);
-                    setActivating(true);
-                }
-                else {
-                    setActivating(false);
-                    setPassivating(true);
-                }
+            if (newActive) {
+                setPassivating(false);
+                setActivating(true);
+            }
+            else {
+                setActivating(false);
+                setPassivating(true);
             }
         }
-    }, [actived, newActive, stateEnabledDisabled.enabled]);
+    }, [actived, newActive]);
 
     
     const handlePassivating = () => {
@@ -539,7 +540,7 @@ export default function Control(props: Props) {
     const stateLeave     = Elements.useStateLeave();
     const stateEnbDis    =          useStateEnabledDisabled(props);
     const stateFocusBlur =          useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   =          useStateActivePassive(props, stateEnbDis);
+    const stateActPass   =          useStateActivePassive(props);
 
     
 

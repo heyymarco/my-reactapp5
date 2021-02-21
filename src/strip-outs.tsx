@@ -61,8 +61,8 @@ export const list = {
     marginInlineEnd    : unset,
     paddingInlineStart : unset,
 
-    '>li': {
-        display        : 'inline',
+    '& >li': {
+        display        : unset,
         textAlign      : unset,
     }
 };

@@ -33,8 +33,18 @@ const themes = {
     dark      : Color('#212529') as (Color | string),
 };
 
-let transpLevel = 0.5;
-const transpColor = (color: Color) => color.alpha(transpLevel) as (Color | string)
+const page = {
+    backg     : basics.white,
+    foreg     : themes.dark,
+};
+
+export let pageTranspLevel = 0.8;
+const page2 = {
+    backgTransp : (page.backg as Color).alpha(pageTranspLevel) as (Color | string),
+};
+
+export let themeTranspLevel = 0.5;
+const transpColor = (color: Color) => color.alpha(themeTranspLevel) as (Color | string)
 const themesTransp = {
     primaryTransp   : transpColor(themes.primary   as Color),
     secondaryTransp : transpColor(themes.secondary as Color),
@@ -45,10 +55,6 @@ const themesTransp = {
     lightTransp     : transpColor(themes.light     as Color),
     darkTransp      : transpColor(themes.dark      as Color),
 };
-// const themesTransp = { };
-// for (const name in themes) {
-//     themesTransp[`${name}Transp`] = Color(themes[name]).alpha(transpLevel);
-// }
 
 const textColor = (color: Color) => (color.isLight() ? themes.dark : themes.light) as (Color | string);
 const themesText = {
@@ -62,14 +68,49 @@ const themesText = {
     darkText      : textColor(themes.dark      as Color),
 };
 
-const props2 = Object.assign({},
+export let themeThinLevel = 0.2;
+const thinTranspColor = (color: Color) => color.alpha(themeThinLevel) as (Color | string)
+const themesThin = {
+    primaryThin   : thinTranspColor(themes.primary   as Color),
+    secondaryThin : thinTranspColor(themes.secondary as Color),
+    successThin   : thinTranspColor(themes.success   as Color),
+    infoThin      : thinTranspColor(themes.info      as Color),
+    warningThin   : thinTranspColor(themes.warning   as Color),
+    dangerThin    : thinTranspColor(themes.danger    as Color),
+    lightThin     : thinTranspColor(themes.light     as Color),
+    darkThin      : thinTranspColor(themes.dark      as Color),
+};
+
+const contColor = (color: Color) => color.mix(page.foreg as Color, 0.8) as (Color | string);
+const themesCont = {
+    primaryCont   : contColor(themes.primary   as Color),
+    secondaryCont : contColor(themes.secondary as Color),
+    successCont   : contColor(themes.success   as Color),
+    infoCont      : contColor(themes.info      as Color),
+    warningCont   : contColor(themes.warning   as Color),
+    dangerCont    : contColor(themes.danger    as Color),
+    lightCont     : contColor(themes.light     as Color),
+    darkCont      : contColor(themes.dark      as Color),
+};
+
+const props4 = Object.assign({},
     basics,
     themes,
+    page,
+);
+const props3 = Object.assign({},
+    props4,
+    page2,
     themesTransp,
+);
+const props2 = Object.assign({},
+    props3,
+    themesText,
+    themesThin,
 );
 const props = Object.assign({},
     props2,
-    themesText,
+    themesCont,
 );
 
 

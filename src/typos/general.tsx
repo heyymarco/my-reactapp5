@@ -28,8 +28,8 @@ const basics = {
     lineHeightNm          : 1.50,
     lineHeightLg          : 2.00,
 
-    color                 : colors.dark  as string,
-    backg                 : colors.white as string,
+    color                 : colors.foreg as string,
+    backg                 : colors.backg as string,
 };
 
 const cssProps = Object.assign({},

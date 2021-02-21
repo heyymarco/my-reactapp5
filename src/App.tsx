@@ -9,6 +9,8 @@ import Button from './Button';
 import Icon from './Icon';
 import ButtonIcon from './ButtonIcon';
 import Container from './Container';
+import ListGroup from './ListGroup';
+import ListGroupItem from './ListGroupItem';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -56,13 +58,18 @@ const jss = createJss().setup({plugins:[
 ]});
 
 export default function App (props: any) {
-	const [enabled, setEnabled] = useState(true);
-	const [active, setActive] = useState(false);
-	const [focus, setFocus] = useState(false);
-	const [size, setSize] = useState<'sm'|'lg'|undefined>(undefined);
-	const [theme, setTheme] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
-	const [btnStyle, setBtnStyle] = useState<'outline'|'link'|'outlineLink'|undefined>('outline');
+	const [enableGrad, setEnableGrad ] = useState(false);
+	const [enabled,    setEnabled    ] = useState(true);
+	const [active, 	   setActive     ] = useState(false);
+	const [focus, 	   setFocus      ] = useState(false);
+	const [size, 	   setSize       ] = useState<'sm'|'lg'|undefined>(undefined);
+	const [theme, 	   setTheme      ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
+	const [btnStyle,   setBtnStyle   ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
 
+
+	const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setEnableGrad(e.target.checked);
+	}
 	const handleChangeEnabled = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnabled(e.target.checked);
 	}
@@ -82,6 +89,7 @@ export default function App (props: any) {
 		setBtnStyle((e.target.value || undefined) as ('outline'|'link'|'outlineLink'|undefined));
 	}
 
+
 	return(<JssProvider jss={jss}><ThemeProvider theme={themeX}>
 		<div className='App'>
 			<Container className="App-header">
@@ -97,22 +105,47 @@ export default function App (props: any) {
 				>
 					Learn React
 				</a>
-				<Element theme={theme} enableGradient={true} size={size}></Element>
-				<Control theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus}></Control>
-				<Button  theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+				<Element theme={theme} enableGradient={enableGrad} size={size}></Element>
+				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus}></Control>
+				<Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
 				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
-				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
 					<span>hey</span>
 				</ButtonIcon>
-				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} btnStyle={btnStyle}>
+				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} btnStyle={btnStyle}>
 					<span>hey</span>
 				</ButtonIcon>
-				<ButtonIcon icon="instagram" theme={theme} enableGradient={true} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+				<ButtonIcon icon="instagram" theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
 				</ButtonIcon>
+				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>{[
+					'An item',
+					'A second item',
+					<ListGroupItem key={2} enabled={enabled} active={active}>A third item</ListGroupItem>,
+					'A fourth item',
+					<Button key={123}  theme='none' size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>,
+					'A fifth item',
+					<ListGroupItem key={99} enabled={enabled} active={active}>
+						<Button  theme='none' size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+					</ListGroupItem>,
+					'A sixth item',
+					<ListGroupItem key={5} enabled={enabled} active={active}>A seventh item</ListGroupItem>,
+					'A eighth item',
+				]}
+				</ListGroup>
+				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>
+					An item
+				</ListGroup>
 				<p>
 					Active status: {active ? 'actived' : 'deactived'}
 				</p>
+				<label>
+					<input type='checkbox'
+						checked={enableGrad}
+						onChange={handleChangeEnableGrad}
+					/>
+					enable gradient
+				</label>
 				<label>
 					<input type='checkbox'
 						checked={enabled}
@@ -164,7 +197,7 @@ export default function App (props: any) {
 				<p>
 					Theme:
 					{
-						[undefined,'primary','secondary','success','info','warning','danger','light'].map(t =>
+						[undefined,'primary','secondary','success','info','warning','danger','light','dark'].map(t =>
 							<label key={t ?? ''}>
 								<input type='radio'
 									value={t}

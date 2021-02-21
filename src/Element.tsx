@@ -67,6 +67,9 @@ const getVar = (name: string) => `var(${name})`;
 export const vars = {
     animHoverLeave : '--elm-animHoverLeave',
     backgFn        : '--elm-backgFn',
+
+    backg          : '--elm-backg',
+    color          : '--elm-color',
 };
 
 // define default cssProps' value to be stored into css vars:
@@ -153,32 +156,32 @@ export { config, varProps as cssProps };
 
 
 const stateEnabled            = (content: object) => ({
-    '&.enabled': { // .enabled
+    '&.enable': { // .enable
         extend: [content]
     }
 });
 const stateNotEnabled         = (content: object) => ({
-    '&:not(.enabled)': { // not-.enabled
+    '&:not(.enable)': { // not-.enable
         extend: [content]
     }
 });
 const stateDisabled           = (content: object) => ({
-    '&:disabled,&.disabled': { // :disabled or .disabled
+    '&:disabled,&.disabled,&.disable': { // :disabled or .disabled or .disable
         extend: [content]
     }
 });
 const stateNotDisabled        = (content: object) => ({
-    '&:not(:disabled):not(.disabled)': { // not-:disabled and not-.disabled
+    '&:not(:disabled):not(.disabled):not(.disable)': { // not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
 });
 const stateEnabledDisabled    = (content: object) => ({
-    '&.enabled,&:disabled,&.disabled': { // .enabled or :disabled or .disabled
+    '&.enable,&:disabled,&.disabled,&.disable': { // .enable or :disabled or .disabled or .disable
         extend: [content]
     }
 });
 const stateNotEnabledDisabled = (content: object) => ({
-    '&:not(.enabled):not(:disabled):not(.disabled)': { // not-.enabled and not-:disabled and not-.disabled
+    '&:not(.enable):not(:disabled):not(.disabled):not(.disable)': { // not-.enable and not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
 });
@@ -218,7 +221,7 @@ const stateNotHoverLeave      = (content: object) => ({
 const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
     const varProps2: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(varProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|Hover|Leave|Focus|Blur|Active|Passive|Enabled|Disabled|None)$|^(@)|backgGrad/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|Hover|Leave|Focus|Blur|Active|Passive|Enabled|Disabled|None)$|^(@)|backgGrad|anim/).test(key)) continue;
         varProps2[key] = value;
     }
     return varProps2;
@@ -297,8 +300,8 @@ export function defineThemes(styles: object, handler: ((theme: string, Theme: st
     }
 }
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    '--elm-backg': themeColor,
-    '--elm-color': (colors as any)[`${theme}Text`],
+    [vars.backg]: themeColor,
+    [vars.color]: (colors as any)[`${theme}Text`],
 }));
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg'|'gradient', string>);
