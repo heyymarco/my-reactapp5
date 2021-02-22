@@ -4,13 +4,15 @@ import
 
 import
     * as Elements          from './Element';
+import
+    * as Indicators        from './Indicator';
 import {
-    stateEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled,
     filterValidProps,
 }                          from './Element';
 import
     * as Controls          from './Control';
 import {
+    stateEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled,
     stateActive, statePassive, stateActivePassive,
 }
                            from './Control';
@@ -49,15 +51,18 @@ export interface CssProps {
 
 // css vars:
 const getVar = (name: string) => `var(${name})`;
-export const vars = {
+export const vars = Object.assign({}, Indicators.vars, {
+    backgActiveFn      : '--lg-backgActiveFn',
+    backgActive        : '--lg-backgActive',
+    colorActive        : '--lg-colorActive',
+
+
+    // anim props:
+
     backgActivePassive : '--lg-backgActivePassive',
     colorActivePassive : '--lg-colorActivePassive',
     animActivePassive  : '--lg-animActivePassive',
-
-    backgActive        : '--lg-backgActive',
-    backgActiveFn      : '--lg-backgActiveFn',
-    colorActive        : '--lg-colorActive',
-};
+});
 
 // define default cssProps' value to be stored into css vars:
 // re-defined later, we need to construct varProps first
@@ -65,7 +70,9 @@ export const vars = {
 // const keyframesDisabled = { from: undefined, to: undefined };
 const keyframesActive   = { from: undefined, to: undefined };
 const keyframesPassive  = { from: undefined, to: undefined };
-const cssProps: CssProps = {
+const ecssProps = Elements.cssProps;
+const icssProps = Indicators.cssProps;
+const _cssProps: CssProps = {
     // '@keyframes enabled'  : keyframesEnabled,
     // '@keyframes disabled' : keyframesDisabled,
     '@keyframes active'   : keyframesActive,
@@ -118,51 +125,47 @@ Object.assign(keyframesPassive, {
 
 
 
-// convert cssProps => varProps:
+// convert _cssProps => varProps => cssProps:
 const collection = new JssVarCollection(
-    /*cssProps :*/ cssProps as { [index: string]: any },
+    /*cssProps :*/ _cssProps as { [index: string]: any },
     /*config   :*/ { varPrefix: 'lg'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as typeof cssProps;
+const cssProps = collection.varProps as typeof _cssProps;
 // export the configurable varPops:
-export { config, varProps as cssProps };
-// export default varProps;
+export { config, cssProps };
+// export default cssProps;
 
 
 
-const cvars  = Controls.vars;
-const evars  = Elements.vars;
-const eprops = Elements.cssProps;
-const cprops = Controls.cssProps;
 const states = {
-    [cvars.filterEnabledDisabled]  : eprops.filterNone,
-    [cvars.filterHoverLeave]       : eprops.filterNone,
-    [cvars.filterActivePassive]    : eprops.filterNone,
-    [vars.backgActivePassive]      : getVar(evars.backgFn),
-    [vars.colorActivePassive]      : getVar(evars.color),
+    [vars.filterEnabledDisabled]   : ecssProps.filterNone,
+    [vars.filterHoverLeave]        : ecssProps.filterNone,
+    [vars.filterActivePassive]     : ecssProps.filterNone,
+    [vars.backgActivePassive]      : getVar(vars.backgFn),
+    [vars.colorActivePassive]      : ecssProps.color,
 
-    [cvars.animEnabledDisabled]    : eprops.animNone,
-    [vars.animActivePassive]       : eprops.animNone,
+    [vars.animEnabledDisabled]     : ecssProps.animNone,
+    [vars.animActivePassive]       : ecssProps.animNone,
 
     '& >*': {
         anim: [
-            eprops.anim,
-            getVar(cvars.animEnabledDisabled), // 1st : ctrl must be enabled
-            getVar(vars.animActivePassive),    // 4th : ctrl got pressed
+            ecssProps.anim,
+            getVar(vars.animEnabledDisabled), // 1st : ctrl must be enabled
+            getVar(vars.animActivePassive),   // 4th : ctrl got pressed
         ],
     },
 
 
     extend:[
         stateEnabledDisabled({
-            [cvars.filterEnabledDisabled] : cprops.filterDisabled,
+            [vars.filterEnabledDisabled] : icssProps.filterDisabled,
         }),
         stateEnabled({
-            [cvars.animEnabledDisabled]   : cprops.animEnabled,
+            [vars.animEnabledDisabled]   : icssProps.animEnabled,
         }),
         stateDisabled({
-            [cvars.animEnabledDisabled]   : cprops.animDisabled,
+            [vars.animEnabledDisabled]   : icssProps.animDisabled,
         }),
         {
             '&.disabled:not(.disable)'  : {extend:[ // if ctrl was disabled at the first page load, disable first animation
@@ -177,18 +180,18 @@ const states = {
                 [vars.colorActivePassive]     : getVar(vars.colorActive),
             }),
             stateActive({
-                [vars.animActivePassive]      : varProps.animActive,
+                [vars.animActivePassive]      : cssProps.animActive,
             }),
             statePassive({
-                [vars.animActivePassive]      : varProps.animPassive,
+                [vars.animActivePassive]      : cssProps.animPassive,
             }),
             {
                 '&.active,&.actived': { // if activated programmatically (not by user input)
                     '& >*': {
                         anim: [
-                            eprops.anim,
-                            getVar(vars.animActivePassive),    // 1st : ctrl already pressed, then released
-                            getVar(cvars.animEnabledDisabled), // 4th : ctrl disabled
+                            ecssProps.anim,
+                            getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
+                            getVar(vars.animEnabledDisabled), // 4th : ctrl disabled
                         ],
                     },
                 },
@@ -211,10 +214,10 @@ const styles = {
         flexDirection : 'column',
 
 
-        [evars.backgFn]      : [eprops.backg],           // default background
+        [vars.backgFn]       : [ecssProps.backg],           // default background
         [vars.backgActiveFn] : getVar(vars.backgActive), // active  background
 
-        borderRadius         : eprops.borderRadius,
+        borderRadius         : ecssProps.borderRadius,
 
 
         '& >*': {
@@ -238,18 +241,18 @@ const styles = {
                 border.radius.bottom('inherit'),
             ]},
 
-            border: eprops.border,
+            border: ecssProps.border,
 
 
             '& >*': {
                 extend: [
                     filterValidProps(Elements.cssProps),
-                    filterValidProps(varProps),
+                    filterValidProps(cssProps),
                 ],
 
                 border       : undefined,
                 borderRadius : 0,
-                backg        : getVar(evars.backgFn),
+                backg        : getVar(vars.backgFn),
     
     
                 display        : 'block',
@@ -258,26 +261,31 @@ const styles = {
         },
     },
     gradient: { '&:not(._)': { // force to win conflict with main
-        [evars.backgFn]: [      // default background with gradient
-            eprops.backgGrad,
-            eprops.backg,
+        [vars.backgFn]: [      // default background with gradient
+            ecssProps.backgGrad,
+            ecssProps.backg,
         ],
         [vars.backgActiveFn]: [ // active  background with gradient
-            eprops.backgGrad,
+            ecssProps.backgGrad,
             getVar(vars.backgActive),
         ],
     }},
 };
 Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    [evars.backg] : (colors as any)[`${theme}Thin`],
-    [evars.color] : (colors as any)[`${theme}Cont`],
+    // overwrite the backg & color props
+    // we ignore the backg & color if the theme applied
 
-    [vars.backgActive]    : themeColor,
-    [vars.colorActive]    : (colors as any)[`${theme}Text`],
+    '--elm-backg' : (colors as any)[`${theme}Thin`],
+    '--elm-color' : (colors as any)[`${theme}Cont`],
+
+
+    // customize the backg & color at active state:
+    [vars.backgActive] : themeColor,
+    [vars.colorActive] : (colors as any)[`${theme}Text`],
 }));
 
 const useStyles = createUseStyles(styles);
-export { styles, useStyles };
+export { states, styles, useStyles };
 
 
 

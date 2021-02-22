@@ -131,7 +131,7 @@ export default function App (props: any) {
 						<Button  theme='none' size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 					</ListGroupItem>,
 					'A sixth item',
-					<ListGroupItem key={5} enabled={enabled} active={active}>A seventh item</ListGroupItem>,
+					<ListGroupItem key={55} enabled={enabled} active={active}>A seventh item</ListGroupItem>,
 					'A eighth item',
 				]}
 				</ListGroup>

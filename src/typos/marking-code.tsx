@@ -27,10 +27,10 @@ const cssProps: CssProps = {
     color             : colors.pink as string,
     backg             : none,
     
-    paddingX          : none,
-    paddingY          : none,
+    paddingX          : 0,
+    paddingY          : 0,
     border            : none,
-    borderRadius      : none,
+    borderRadius      : 0,
 };
 
 

@@ -7,6 +7,18 @@ import {
 }                          from './Element';
 import
     * as Controls          from './Control';
+    import {
+        stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+        stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+
+        stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+        stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+
+        defineSizes, defineThemes,
+
+        useStateEnabledDisabled, useStateActivePassive,
+        useStateLeave, useStateFocusBlur,
+    }                      from './Control';
 import
     * as border            from './borders';
 import spacers             from './spacers';
@@ -14,6 +26,21 @@ import spacers             from './spacers';
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
 import { pascalCase }      from 'pascal-case';
+
+
+
+export {
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+
+    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+
+    defineSizes, defineThemes,
+
+    useStateEnabledDisabled, useStateActivePassive,
+    useStateLeave, useStateFocusBlur,
+};
 
 
 
@@ -36,8 +63,18 @@ const none    = 'none';
 const center  = 'center';
 const middle  = 'middle';
 
+// internal css vars:
+const getVar = (name: string) => `var(${name})`;
+export const vars = Object.assign({}, Controls.vars, {
+    /**
+     * a custom css props for manipulating background(s) at outlined state.
+     */
+    backgOlFn : '--btn-backgOlFn',
+});
+
+const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
-const cssProps: CssProps = {
+const _cssProps: CssProps = {
     orientation : 'row',
     whiteSpace  : 'normal',
 
@@ -51,38 +88,38 @@ const cssProps: CssProps = {
 
 
 
-// convert cssProps => varProps:
+// convert _cssProps => varProps => cssProps:
 const collection = new JssVarCollection(
-    /*cssProps :*/ cssProps as { [index: string]: any },
+    /*cssProps :*/ _cssProps as { [index: string]: any },
     /*config   :*/ { varPrefix: 'btn'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as typeof cssProps;
+const cssProps = collection.varProps as typeof _cssProps;
 // export the configurable varPops:
-export { config, varProps as cssProps };
-// export default varProps;
+export { config, cssProps };
+// export default cssProps;
 
 
 
-const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
-    const varProps2: { [key: string]: any } = { };
-    for (const [key, value] of Object.entries(baseFilterValidProps(varProps))) {
+export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
+    const cssPropsCopy: { [key: string]: any } = { };
+    for (const [key, value] of Object.entries(Controls.filterValidProps(cssProps))) {
         if ((/^(orientation)$/).test(key)) continue;
-        varProps2[key] = value;
+        cssPropsCopy[key] = value;
     }
-    return varProps2;
+    return cssPropsCopy;
 }
 
 const styles = {
     main: {
         extend: [
             Controls.styles.main,
-            filterValidProps(varProps),
+            filterValidProps(cssProps),
         ],
         
         // flex settings:
         display        : 'inline-flex',
-        flexDirection  : varProps.orientation,
+        flexDirection  : cssProps.orientation,
         justifyContent : center,
         alignItems     : center,
 
@@ -91,22 +128,51 @@ const styles = {
         verticalAlign  : middle,
 
         userSelect     : none, // disable selecting button's text
+
+
+
+        // we have 1 custom css props [backgOlFn]
+        // set the default value of it:
+
+        // a custom css props for manipulating background(s) at outlined state:
+        [vars.backgOlFn]: 'transparent',    // set default value
+        // backg: getVar(vars.backgOlFn),   // not apply yet
     },
+    gradient: { '&:not(._)': { // force to win conflict with main
+        extend: [
+            // copy the themes from Element:
+            Elements.styles.gradient,
+        ],
+
+        // customize the backg at outlined state:
+        [vars.backgOlFn]: ecssProps.backgGrad,
+    }},
     btnOutline: {
         extend:[
             Controls.stateNotActive({
                 '&:not(:hover):not(:focus), &:disabled,&.disabled': {
-                    color       : Elements.cssProps.backg,
-                    backg       : 'transparent',
-                    borderColor : Elements.cssProps.backg,
+                    // apply the outlined-backg:
+                    backg          : getVar(vars.backgOlFn),
+
+                    // customize the text-color (foreground):
+                    [vars.colorFn] : ecssProps.backg,
+
+                    // set border color = text-color:
+                    borderColor    : getVar(vars.colorFn),
                 },
             }),
         ],
     },
     btnLink: { '&:not(._)': { // force to win conflict with main
-        color          : Elements.cssProps.backg,
-        backg          : 'transparent',
+        // apply the outlined-backg:
+        backg          : getVar(vars.backgOlFn),
+
+        // customize the text-color (foreground):
+        [vars.colorFn] : ecssProps.backg,
+
+        // hide the border:
         borderColor    : 'transparent',
+
 
 
         // link properties:
@@ -117,9 +183,15 @@ const styles = {
         borderRadius   : border.radiuses.sm,
     }},
     btnOutlineLink: { '&:not(._)': { // force to win conflict with main
-        color          : Elements.cssProps.backg,
-        backg          : 'transparent',
-        borderColor    : Elements.cssProps.backg,
+        // apply the outlined-backg:
+        backg          : getVar(vars.backgOlFn),
+
+        // customize the text-color (foreground):
+        [vars.colorFn] : ecssProps.backg,
+
+        // set border color = text-color:
+        borderColor    : getVar(vars.colorFn),
+
 
 
         // link properties:
@@ -131,16 +203,21 @@ const styles = {
     }},
 };
 
-const varProps2 = varProps as any;
+const cssPropsAny = cssProps as any;
 Elements.defineSizes(styles, (size, Size, sizeProp) => ({
     extend: [
+        // copy the size specific props from Element:
         (Elements.styles as any)[sizeProp],
     ],
-    '--btn-gapX' : varProps2[`gapX${Size}`],
-    '--btn-gapY' : varProps2[`gapY${Size}`],
+
+
+    // overwrite the props with the props{Size}:
+
+    '--btn-gapX' : cssPropsAny[`gapX${Size}`],
+    '--btn-gapY' : cssPropsAny[`gapY${Size}`],
 }));
 
-const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', string>);
+const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 const useStyles = createUseStyles(styles2);
 export { styles2 as styles, useStyles };
 
@@ -182,19 +259,18 @@ export interface Props
 }
 export default function Button(props: Props) {
     const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
     const ctrlStyles     = Controls.useStyles();
 
     const variSize       = Elements.useVariantSize(props, styles);
     const variThemeDef   =          useVariantThemeDefault(props);
     const variTheme      = Elements.useVariantTheme(props, ctrlStyles, variThemeDef);
-    const variGradient   = Elements.useVariantGradient(props, elmStyles);
+    const variGradient   = Elements.useVariantGradient(props, styles);
     const variButton     =          useVariantButton(props, styles);
 
-    const stateLeave     = Elements.useStateLeave();
-    const stateEnbDis    = Controls.useStateEnabledDisabled(props);
-    const stateFocusBlur = Controls.useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = Controls.useStateActivePassive(props);
+    const stateEnbDis    = useStateEnabledDisabled(props);
+    const stateLeave     = useStateLeave(stateEnbDis);
+    const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
+    const stateActPass   = useStateActivePassive(props);
 
     
 
@@ -207,8 +283,8 @@ export default function Button(props: Props) {
                 variGradient.class,
                 variButton.class,
 
-                stateLeave.class,
                 stateEnbDis.class,
+                stateLeave.class,
                 stateFocusBlur.class,
                 stateActPass.class,
             ].join(' ')}
@@ -220,12 +296,12 @@ export default function Button(props: Props) {
             onFocus={stateFocusBlur.handleFocus}
             onBlur={stateFocusBlur.handleBlur}
             onMouseDown={stateActPass.handleMouseDown}
-            onMouseUp={stateActPass.handleMouseUp}
             onKeyDown={stateActPass.handleKeyDown}
+            onMouseUp={stateActPass.handleMouseUp}
             onKeyUp={stateActPass.handleKeyUp}
             onAnimationEnd={() => {
-                stateLeave.handleAnimationEnd();
                 stateEnbDis.handleAnimationEnd();
+                stateLeave.handleAnimationEnd();
                 stateFocusBlur.handleAnimationEnd();
                 stateActPass.handleAnimationEnd();
             }}

@@ -3,18 +3,30 @@ import
     useState,
     useEffect }            from 'react';
 
-import
-    * as Elements          from './Element';
+import * as Elements       from './Element';
+import * as Indicators     from './Indicator';
 import {
-    stateEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled,
-    stateHover, stateLeave, stateHoverLeave,
-    filterValidProps,
-}                          from './Element';
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+
+    defineSizes, defineThemes,
+
+    useStateEnabledDisabled, useStateActivePassive,
+}                          from './Indicator';
 import colors              from './colors';
 import stipOuts            from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
+
+
+
+export {
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+
+    defineSizes, defineThemes,
+
+    useStateEnabledDisabled, useStateActivePassive,
+};
 
 
 
@@ -27,26 +39,16 @@ export interface CssProps {
 
     boxShadowFocus        : (number|string)[][]
 
-    filterDisabled        : string | string[][]
-    filterHover           : string | string[][]//TODO: del
-    filterActive          : string | string[][]
+    filterHover           : string | string[][]
 
-    '@keyframes enabled'  : object
-    '@keyframes disabled' : object
-    '@keyframes hover'    : object//TODO: del
-    '@keyframes leave'    : object//TODO: del
+    '@keyframes hover'    : object
+    '@keyframes leave'    : object
     '@keyframes focus'    : object
     '@keyframes blur'     : object
-    '@keyframes active'   : object
-    '@keyframes passive'  : object
-    animEnabled           : string | (string | object)[][]
-    animDisabled          : string | (string | object)[][]
-    animHover             : string | (string | object)[][]//TODO: del
-    animLeave             : string | (string | object)[][]//TODO: del
+    animHover             : string | (string | object)[][]
+    animLeave             : string | (string | object)[][]
     animFocus             : string | (string | object)[][]
     animBlur              : string | (string | object)[][]
-    animActive            : string | (string | object)[][]
-    animPassive           : string | (string | object)[][]
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -54,101 +56,52 @@ export interface CssProps {
 
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
-export const vars = {
-    boxShadowFocusFn      : '--ctrl-boxShadowFocusFn',
+export const vars = Object.assign({}, Indicators.vars, {
+    /**
+     * a custom css props for manipulating a box-shadow at focused state.
+     */
+    boxShadowFocusFn    : '--ctrl-boxShadowFocusFn',
 
     
     // anim props:
 
-    filterEnabledDisabled : '--ctrl-filterEnabledDisabled',
-    animEnabledDisabled   : '--ctrl-animEnabledDisabled',
-
-    filterHoverLeave      : '--ctrl-filterHoverLeave',//TODO:del
-    animHoverLeave        : '--ctrl-animHoverLeave',//TODO:del
+    // filterHoverLeave : '--ctrl-filterHoverLeave', // already defined in Indicator
+    animHoverLeave      : '--ctrl-animHoverLeave',
     
-    animFocusBlur         : '--ctrl-animFocusBlur',
-    boxShadowFocusBlur    : '--ctrl-boxShadowFocusBlur',
+    boxShadowFocusBlur  : '--ctrl-boxShadowFocusBlur',
+    animFocusBlur       : '--ctrl-animFocusBlur',
+});
 
-    filterActivePassive   : '--ctrl-filterActivePassive',
-    animActivePassive     : '--ctrl-animActivePassive',
-};
-
-// define default cssProps' value to be stored into css vars:
 // re-defined later, we need to construct varProps first
-const keyframesEnabled  = { from: undefined, to: undefined };
-const keyframesDisabled = { from: undefined, to: undefined };
-const keyframesHover    = { from: undefined, to: undefined };//TODO:del
-const keyframesLeave    = { from: undefined, to: undefined };//TODO:del
+const keyframesHover    = { from: undefined, to: undefined };
+const keyframesLeave    = { from: undefined, to: undefined };
 const keyframesFocus    = { from: undefined, to: undefined };
 const keyframesBlur     = { from: undefined, to: undefined };
-const keyframesActive   = { from: undefined, to: undefined };
-const keyframesPassive  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
+const icssProps = Indicators.cssProps;
+// define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    boxShadowFocus        : [[0, 0, 0, '0.2rem']],
-
     cursor                : 'pointer',
     cursorDisabled        : 'not-allowed',
 
-    filterDisabled        : [['grayscale(50%)',  'opacity(50%)'  ]],
-    filterHover           : ecssProps.filterHover,//TODO: del
-    filterActive          : [['brightness(65%)', 'contrast(150%)']],
 
-    '@keyframes enabled'  : keyframesEnabled,
-    '@keyframes disabled' : keyframesDisabled,
-    '@keyframes hover'    : keyframesHover,//TODO: del
-    '@keyframes leave'    : keyframesLeave,//TODO: del
+    // anim props:
+    
+    boxShadowFocus        : [[0, 0, 0, '0.2rem']],
+
+    filterHover           : [['brightness(85%)']],
+
+    '@keyframes hover'    : keyframesHover,
+    '@keyframes leave'    : keyframesLeave,
     '@keyframes focus'    : keyframesFocus,
     '@keyframes blur'     : keyframesBlur,
-    '@keyframes active'   : keyframesActive,
-    '@keyframes passive'  : keyframesPassive,
-    animEnabled           : [['300ms', 'ease-out', 'both', keyframesEnabled ]],
-    animDisabled          : [['300ms', 'ease-out', 'both', keyframesDisabled]],
-    animHover             : [['150ms', 'ease-out', 'both', keyframesHover   ]],//TODO: del
-    animLeave             : [['300ms', 'ease-out', 'both', keyframesLeave   ]],//TODO: del
+    animHover             : [['150ms', 'ease-out', 'both', keyframesHover   ]],
+    animLeave             : [['300ms', 'ease-out', 'both', keyframesLeave   ]],
     animFocus             : [['150ms', 'ease-out', 'both', keyframesFocus   ]],
     animBlur              : [['300ms', 'ease-out', 'both', keyframesBlur    ]],
-    animActive            : [['150ms', 'ease-out', 'both', keyframesActive  ]],
-    animPassive           : [['300ms', 'ease-out', 'both', keyframesPassive ]],
 };
 
 
-
-// convert _cssProps => varProps => cssProps:
-const collection = new JssVarCollection(
-    /*cssProps :*/ _cssProps as { [index: string]: any },
-    /*config   :*/ { varPrefix: 'ctrl'}
-);
-const config   = collection.config;
-const cssProps = collection.varProps as typeof _cssProps;
-// export the configurable varPops:
-export { config, cssProps };
-// export default cssProps;
-
-
-
-Object.assign(keyframesDisabled, {
-    from: {
-        filter: [[
-            ecssProps.filter,
-            getVar(vars.filterActivePassive),
-            getVar(vars.filterHoverLeave), // first priority, but now become the second priority
-            // getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
-        ]],
-    },
-    to: {
-        filter: [[
-            ecssProps.filter,
-            getVar(vars.filterActivePassive),
-            getVar(vars.filterHoverLeave), // first priority, but now become the second priority
-            getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
-        ]],
-    }
-});
-Object.assign(keyframesEnabled, {
-    from : keyframesDisabled.to,
-    to   : keyframesDisabled.from
-});
 
 Object.assign(keyframesHover, {
     from: {
@@ -192,30 +145,52 @@ Object.assign(keyframesBlur, {
     to   : keyframesFocus.from
 });
 
-Object.assign(keyframesActive, {
-    from: {
-        filter: [[
-            ecssProps.filter,
-            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
-            // getVar(vars.filterActivePassive),
-            getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
-        ]],
-    },
-    to: {
-        filter: [[
-            ecssProps.filter,
-            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
-            getVar(vars.filterActivePassive),
-            getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
-        ]],
+
+
+// convert _cssProps => varProps => cssProps:
+const collection = new JssVarCollection(
+    /*cssProps :*/ _cssProps as { [index: string]: any },
+    /*config   :*/ { varPrefix: 'ctrl'}
+);
+const config   = collection.config;
+const cssProps = collection.varProps as typeof _cssProps;
+// export the configurable varPops:
+export { config, cssProps };
+// export default cssProps;
+
+
+
+export const stateHover              = (content: object) => ({
+    '&:hover,&:focus': { // hover or focus
+        extend: [content]
     }
 });
-Object.assign(keyframesPassive, {
-    from : keyframesActive.to,
-    to   : keyframesActive.from
+export const stateNotHover           = (content: object) => ({
+    '&:not(:hover):not(:focus)': { // not-hover and not-focus
+        extend: [content]
+    }
 });
-
-
+export const stateLeave              = (content: object) =>
+    stateNotHover({ // not-hover and not-focus and (leave or blur)
+        extend:[{'&.leave,&.blur': {
+            extend: [content]
+        }}]
+    });
+export const stateNotLeave           = (content: object) => ({
+    '&:not(.leave):not(.blur)': { // not-leave and not-blur
+        extend: [content]
+    }
+});
+export const stateHoverLeave         = (content: object) => ({
+    '&:hover,&:focus,&.leave,&.blur': { // hover or focus or leave or blur
+        extend: [content]
+    }
+});
+export const stateNotHoverLeave      = (content: object) => ({
+    '&:not(:hover):not(:focus):not(.leave):not(.blur)': { // not-hover and not-focus and not-leave and not-blur
+        extend: [content]
+    }
+});
 
 export const stateFocus             = (content: object) => ({
     '&:focus,&.focus': {
@@ -248,6 +223,7 @@ export const stateNotFocusBlur      = (content: object) => ({
     }
 });
 
+// override base: pseudo + non-pseudo active
 export const stateActive            = (content: object) => ({
     '&:active,&.active,&.actived': {
         extend: [content]
@@ -278,129 +254,176 @@ export const stateNotActivePassive  = (content: object) => ({
         extend: [content]
     }
 });
-
-export const stateNoAnimStartup  = () => ({
-    '&:not(.enable):not(.disable):not(:active):not(.active):not(.passive)': {
-        extend:[
-            Elements.stateNotHoverLeave({extend:[
-                stateNotFocusBlur({
-                    animationDuration: [['0ms'], '!important'],
-                }),
-            ]}),
-        ],
-    },
+export const stateNotActivatingPassivating  = (content: object) => ({
+    '&:not(:active):not(.active):not(.passive)': {
+        extend: [content]
+    }
 });
 
+// override base: pseudo + non-pseudo active
+export const stateNoAnimStartup     = () =>
+    stateNotEnablingDisabling(
+        stateNotActivatingPassivating(
+            stateNotHoverLeave(
+                stateNotFocusBlur({
+                    animationDuration: [['0ms'], '!important'],
+                })
+            )
+        )
+    );
 
+
+
+export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
+    const cssPropsCopy: { [key: string]: any } = { };
+    for (const [key, value] of Object.entries(Indicators.filterValidProps(cssProps))) {
+        if ((/(Hover|Leave|Focus|Blur)$/).test(key)) continue;
+        cssPropsCopy[key] = value;
+    }
+    return cssPropsCopy;
+}
 
 const states = {
-    [vars.filterEnabledDisabled]   : ecssProps.filterNone,
-    [vars.animEnabledDisabled]     : ecssProps.animNone,
-
-    [vars.filterHoverLeave]        : ecssProps.filterNone,
-    [vars.animHoverLeave]          : ecssProps.animNone,
-
-    [Elements.vars.animHoverLeave] : undefined, // delete
-    [vars.boxShadowFocusBlur]      : [[0, 0, 'transparent']],
-    [vars.animFocusBlur]           : ecssProps.animNone,
-
-    [vars.filterActivePassive]     : ecssProps.filterNone,
-    [vars.animActivePassive]       : ecssProps.animNone,
-
-    anim: [
+    // customize the anim:
+    [vars.animFn]: [
         ecssProps.anim,
         getVar(vars.animEnabledDisabled), // 1st : ctrl must be enabled
         getVar(vars.animHoverLeave),      // 2nd : cursor hovered over ctrl
-        getVar(vars.animFocusBlur),       // 3rd : ctrl got focused
-        getVar(vars.animActivePassive),   // 4th : ctrl got pressed
+        getVar(vars.animFocusBlur),       // 3rd : ctrl got focused (can interrupt hover/leave)
+        getVar(vars.animActivePassive),   // 4th : ctrl got pressed (can interrupt focus/blur)
     ],
 
 
+
+    // all initial states are none:
+
+    [vars.filterEnabledDisabled] : ecssProps.filterNone,
+    [vars.animEnabledDisabled]   : ecssProps.animNone,
+
+    [vars.filterHoverLeave]      : ecssProps.filterNone,
+    [vars.animHoverLeave]        : ecssProps.animNone,
+
+    [vars.boxShadowFocusBlur]    : ecssProps.boxShadowNone,
+    [vars.animFocusBlur]         : ecssProps.animNone,
+
+    [vars.filterActivePassive]   : ecssProps.filterNone,
+    [vars.animActivePassive]     : ecssProps.animNone,
+
+    // specific states:
     extend:[
         stateEnabledDisabled({
-            [vars.filterEnabledDisabled]       : cssProps.filterDisabled,
+            [vars.filterEnabledDisabled]          : icssProps.filterDisabled,
         }),
         stateEnabled({
-            [vars.animEnabledDisabled]         : cssProps.animEnabled,
+            [vars.animEnabledDisabled]            : icssProps.animEnabled,
         }),
         stateDisabled({
-            [vars.animEnabledDisabled]         : cssProps.animDisabled,
+            [vars.animEnabledDisabled]            : icssProps.animDisabled,
             cursor: cssProps.cursorDisabled,
         }),
         {
-            '&:disabled:not(.disable)'  : {extend:[ // if ctrl was disabled at the first page load, disable first animation
+            '&:disabled:not(.disable),&.disabled': // if ctrl was disabled programatically, disable first animation
                 stateNoAnimStartup(),
-            ]},
         },
 
 
         stateNotDisabled({extend:[
             stateHoverLeave({
-                [vars.filterHoverLeave]        : cssProps.filterHover,
+                [vars.filterHoverLeave]           : cssProps.filterHover,
             }),
             stateHover({
-                [Elements.vars.animHoverLeave] : undefined, // delete
-                [vars.animHoverLeave]          : cssProps.animHover,
+                [vars.animHoverLeave]             : cssProps.animHover,
             }),
             stateLeave({
-                [Elements.vars.animHoverLeave] : undefined, // delete
-                [vars.animHoverLeave]          : cssProps.animLeave,
+                [vars.animHoverLeave]             : cssProps.animLeave,
             }),
 
 
             stateFocusBlur({
-                [vars.boxShadowFocusBlur]      : getVar(vars.boxShadowFocusFn),
+                [vars.boxShadowFocusBlur]         : getVar(vars.boxShadowFocusFn),
             }),
             stateFocus({
-                [vars.animFocusBlur]           : cssProps.animFocus,
+                [vars.animFocusBlur]              : cssProps.animFocus,
             }),
             stateBlur({
-                [vars.animFocusBlur]           : cssProps.animBlur,
+                [vars.animFocusBlur]              : cssProps.animBlur,
             }),
         ]}),
 
 
         stateActivePassive({
-            [vars.filterActivePassive]     : cssProps.filterActive,
+            [vars.filterActivePassive]            : icssProps.filterActive,
         }),
         stateActive({
-            [vars.animActivePassive]       : cssProps.animActive,
+            [vars.animActivePassive]              : icssProps.animActive,
         }),
         statePassive({
-            [vars.animActivePassive]       : cssProps.animPassive,
+            [vars.animActivePassive]              : icssProps.animPassive,
         }),
         {
             '&.active,&.actived': { // if activated programmatically (not by user input)
-                anim: [
+                // customize the anim:
+                [vars.animFn]: [
                     ecssProps.anim,
-                    getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
+                    getVar(vars.animActivePassive),   // 1st : ctrl already pressed, move to the least priority
                     getVar(vars.animHoverLeave),      // 2nd : cursor leaved
-                    getVar(vars.animFocusBlur),       // 3nd : ctrl lost focus
-                    getVar(vars.animEnabledDisabled), // 4th : ctrl disabled
+                    getVar(vars.animFocusBlur),       // 3rd : ctrl lost focus (can interrupt hover/leave)
+                    getVar(vars.animEnabledDisabled), // 4th : ctrl enabled/disabled (can interrupt focus/blur)
                 ],
+
+                '&:disabled:not(.disable),&.disabled': { // if ctrl was disabled programatically
+                    // customize the anim:
+                    [vars.animFn]: [
+                        ecssProps.anim,
+                        getVar(vars.animEnabledDisabled), // 1st : ctrl already disabled, move to the least priority
+                        getVar(vars.animHoverLeave),      // 2nd : cursor leaved, should not happened, move to low priority
+                        getVar(vars.animFocusBlur),       // 3rd : ctrl lost focus, might happened programaticaly, move to low priority (can interrupt hover/leave)
+                        getVar(vars.animActivePassive),   // 4th : ctrl deactivated programatically, move to moderate priority (can interrupt focus/blur)
+                    ],
+                },
             },
-            '&.actived': {extend:[ // if ctrl was activated at the first page load, disable first animation
+            '&.actived': {extend:[ // if ctrl was activated programatically, disable the animation
                 stateNoAnimStartup(),
             ]},
         },
+        stateDisabled({ '&:active:not(.active):not(.actived)': { // if disabled => cannot be activated by mouse/keyboard (but can be activated programatically)
+            [vars.filterActivePassive]            : ecssProps.filterNone,
+            [vars.animActivePassive]              : ecssProps.animNone,
+        }}),
     ],
 };
 
 const styles = {
     main: {
         extend: [
-            stipOuts.control,
-            Elements.styles.main,
-            filterValidProps(cssProps),
-            states,
+            stipOuts.control,           // clear browser's default styles
+            Elements.styles.main,       // copy styles from Element, including Element's cssProps & Element's states. NOT copy from Indicator because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
+            filterValidProps(cssProps), // apply our filtered cssProps
+            states,                     // apply our states
         ],
+
+
+
+        // we have 1 custom css props [backgOlFn]
+        // set the default value of it:
+
+        // a custom css props for manipulating a box-shadow at focused state:
+        // [vars.boxShadowFocusFn]: [[ // set default value
+        //     cssProps.boxShadowFocus,
+        //     'rgba(128, 128, 128, 0.5)',
+        // ]],
+        // boxShadow: getVar(vars.boxShadowFocusFn), // not apply yet
     },
 };
 
-Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
+defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     extend: [
+        // copy the themes from Element:
         (Elements.styles as any)[themeProp],
     ],
+
+
+    // customize the box-shadow at focused state:
     [vars.boxShadowFocusFn]: [[
         cssProps.boxShadowFocus,
         (colors as any)[`${theme}Transp`],
@@ -412,129 +435,108 @@ export { states, styles, useStyles };
 
 
 
-export function useStateEnabledDisabled(props: Props) {
-    const defaultEnabled = true; // if [enabled] was not specified => the default value is enabled=true
-    const [enabled,   setEnabled  ] = useState(props.enabled ?? defaultEnabled);
-    const [enabling,  setEnabling ] = useState(false);
-    const [disabling, setDisabling] = useState(false);
+export function useStateLeave(stateEnabledDisabled: {enabled:boolean}) {
+    const [hasHover, setHasHover] = useState(false);
+    const [leaving,  setLeaving ] = useState(false);
 
-    
-    const newEnabled = props.enabled ?? defaultEnabled;
+
     useEffect(() => {
-        if (enabled !== newEnabled) {
-            setEnabled(newEnabled);
+        if (hasHover && (!stateEnabledDisabled.enabled)) {
+            // loosing hover because of the control has been disabled
 
-            if (newEnabled) {
-                setDisabling(false);
-                setEnabling(true);
-            }
-            else {
-                setEnabling(false);
-                setDisabling(true);
-            }
-        }
-    }, [enabled, newEnabled]);
-
+            setHasHover(false); // mark has leave
+            setLeaving(true);   // start leaving anim
+        } // if
+    }, [hasHover, stateEnabledDisabled.enabled]);
     
+
+    const handleHover = () => {
+        if (hasHover) return; // already has hover => action is not required
+
+        if (leaving) setLeaving(false); // stop leaving anim
+        setHasHover(true);              // mark has hover
+    }
+    const handleLeaving = () => {
+        if (leaving) return; // already being leaving => action is not required
+
+        if (hasHover) setHasHover(false); // mark has leave
+        setLeaving(true);                 // start leaving anim
+    }
     const handleIdle = () => {
         // clean up expired animations
 
-        if (enabling)  setEnabling(false);
-        if (disabling) setDisabling(false);
+        if (leaving) setLeaving(false);
     }
     return {
-        enabled: enabled,
-        disabled: !enabled,
-        class: (enabling? 'enable' : (disabling ? 'disable': null)),
+        class: leaving ? 'leave': null,
+        handleMouseEnter   : handleHover,
+        handleMouseLeave   : handleLeaving,
         handleAnimationEnd : handleIdle,
     };
 }
 
 export function useStateFocusBlur(props: Props, stateEnabledDisabled: {enabled:boolean}) {
     const defaultManualFocused = false; // if [focus] was not specified => the default value is focus=false
-    const [focused,  setFocused ] = useState(props.focus ?? defaultManualFocused);
+    const [focused,  setFocused ] = useState((props.focus ?? defaultManualFocused) && stateEnabledDisabled.enabled);
+    const [hasFocus, setHasFocus] = useState(false);
     const [blurring, setBlurring] = useState(false);
 
-    const newFocus = props.focus ?? defaultManualFocused;
+
+    const newFocus = (props.focus ?? defaultManualFocused) && stateEnabledDisabled.enabled;
     useEffect(() => {
         if (focused !== newFocus) {
             setFocused(newFocus);
 
-            if (newFocus) {
-                setBlurring(false);
+            if (newFocus) { // has got focus
+                setBlurring(false); // stop blurring anim
+                setHasFocus(true);  // mark has focus
             }
-            else {
-                if (stateEnabledDisabled.enabled) {
-                    setBlurring(true);
-                }
-            }
+            else { // has lost focus
+                setHasFocus(false); // mark has blur
+                setBlurring(true);  // start blurring anim
+            } // if
         }
-    }, [focused, newFocus, stateEnabledDisabled.enabled]);
+        else if (hasFocus && (!stateEnabledDisabled.enabled)) {
+            // loosing focus because of the control has been disabled
 
-    const handleBlurring = () => { if (!blurring) setBlurring(true);  }
-    const handleIdle     = () => { if (blurring)  setBlurring(false); }
-    return {
-        class: (!blurring) ? (focused ? 'focus' : null) : (blurring ? 'blur': null),
-        handleFocus        : handleIdle,
-        handleBlur         : handleBlurring,
-        handleAnimationEnd : handleIdle,
-    };
-}
+            setHasFocus(false); // mark has blur
+            setBlurring(true);  // start blurring anim
+        } // if
+    }, [focused, newFocus, hasFocus, stateEnabledDisabled.enabled]);
 
-export function useStateActivePassive(props: Props) {
-    const defaultActived = false; // if [active] was not specified => the default value is active=false (released)
-    const [actived,     setActived    ] = useState(props.active ?? defaultActived);
-    const [activating,  setActivating ] = useState(false);
-    const [passivating, setPassivating] = useState(false);
 
-    
-    const newActive = props.active ?? defaultActived;
-    useEffect(() => {
-        if (actived !== newActive) {
-            setActived(newActive);
+    const handleFocus = () => {
+        if (focused) return; // already beed focused programatically => cannot be blurred by mouse/keyboard
+        if (hasFocus) return; // already has focus => action is not required
 
-            if (newActive) {
-                setPassivating(false);
-                setActivating(true);
-            }
-            else {
-                setActivating(false);
-                setPassivating(true);
-            }
-        }
-    }, [actived, newActive]);
+        if (blurring) setBlurring(false); // stop blurring anim
+        setHasFocus(true);                // mark has focus
+    }
+    const handleBlurring = () => {
+        if (focused) return; // already beed focused programatically => cannot be blurred by mouse/keyboard
+        if (blurring) return; // already being blurring => action is not required
 
-    
-    const handlePassivating = () => {
-        if (passivating) return; // already being deactivating => action is not required
-        if (actived) return; // already beed actived programatically => cannot be released by mouse/keyboard
-
-        if (activating)  setActivating(false);
-        setPassivating(true);
+        if (hasFocus) setHasFocus(false); // mark has blur
+        setBlurring(true);                // start blurring anim
     }
     const handleIdle = () => {
         // clean up expired animations
 
-        if (activating)  setActivating(false);
-        if (passivating) setPassivating(false);
+        if (blurring) setBlurring(false);
     }
     return {
-        class: (!activating && !passivating) ? (actived ? 'actived' : null) : (activating? 'active' : (passivating ? 'passive': null)),
-        handleMouseDown    : handleIdle,
-        handleKeyDown      : handleIdle,
-        handleMouseUp      : handlePassivating,
-        handleKeyUp        : handlePassivating,
+        class: blurring ? 'blur' : ((focused && stateEnabledDisabled.enabled) ? 'focus' : null),
+        handleFocus        : handleFocus,
+        handleBlur         : handleBlurring,
         handleAnimationEnd : handleIdle,
     };
 }
 
 export interface Props
     extends
-        Elements.Props
+        Indicators.Props
 {
     focus?:   boolean
-    active?:  boolean
-    enabled?: boolean
 }
 export default function Control(props: Props) {
     const styles         =          useStyles();
@@ -544,10 +546,10 @@ export default function Control(props: Props) {
     const variTheme      = Elements.useVariantTheme(props, styles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
-    const stateLeave     = Elements.useStateLeave();
-    const stateEnbDis    =          useStateEnabledDisabled(props);
-    const stateFocusBlur =          useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   =          useStateActivePassive(props);
+    const stateEnbDis    = useStateEnabledDisabled(props);
+    const stateLeave     = useStateLeave(stateEnbDis);
+    const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
+    const stateActPass   = useStateActivePassive(props);
 
     
 
@@ -559,8 +561,8 @@ export default function Control(props: Props) {
                 variTheme.class,
                 variGradient.class,
 
-                stateLeave.class,
                 stateEnbDis.class,
+                stateLeave.class,
                 stateFocusBlur.class,
                 stateActPass.class,
             ].join(' ')}
@@ -572,17 +574,17 @@ export default function Control(props: Props) {
             onFocus={stateFocusBlur.handleFocus}
             onBlur={stateFocusBlur.handleBlur}
             onMouseDown={stateActPass.handleMouseDown}
-            onMouseUp={stateActPass.handleMouseUp}
             onKeyDown={stateActPass.handleKeyDown}
+            onMouseUp={stateActPass.handleMouseUp}
             onKeyUp={stateActPass.handleKeyUp}
             onAnimationEnd={() => {
-                stateLeave.handleAnimationEnd();
                 stateEnbDis.handleAnimationEnd();
+                stateLeave.handleAnimationEnd();
                 stateFocusBlur.handleAnimationEnd();
                 stateActPass.handleAnimationEnd();
             }}
         >
-            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Element'}
+            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Control'}
         </button>
     );
 }

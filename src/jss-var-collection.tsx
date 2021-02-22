@@ -19,6 +19,8 @@ import jssPluginExpand           from 'jss-plugin-expand';
 // import jssPluginPropsSort        from 'jss-plugin-props-sort';
 import jssPluginNormalizeShorthands from './jss-plugin-normalize-shorthands';
 
+import deepEquals                from 'deep-equal';
+
 
 
 let customJssCache: Jss.Jss | null = null;
@@ -155,7 +157,8 @@ export default class JssVarCollection<TProp> {
         
         const keyframes: Dictionary<object> = {};
         const replaceDuplicates = <TSrc, TRef>(srcProps: TSrc, refProps: TRef, propRename?: ((name: string) => string)) => {
-            if (!propRename) propRename = (name) => name; // if no custom renamer => set default handler
+            const propRenameDefault = (name: string) => name;
+            if (!propRename) propRename = propRenameDefault; // if no custom renamer => set default handler
             let globalModified = false; // a flag determines the outProps is different than srcProps
             const outProps: Dictionary<CSSValueComp> = {}; // an object for storing unmodified & modified properties from srcProps
 
@@ -177,7 +180,7 @@ export default class JssVarCollection<TProp> {
                     if (!isCombinable(prevValue)) continue; // skip uncombinable prop
 
 
-                    if (value === prevValue) {
+                    if ((value === prevValue) || deepEquals(value, prevValue, {strict: true})) {
                         return `var(${this.getVarName(prevName)})`;
                     }
                 } // for // searching for duplicates
@@ -237,7 +240,7 @@ export default class JssVarCollection<TProp> {
                         }
 
 
-                        if ((!modified) && (!Array.isArray(arrItem)) && (typeof(arrItem) !== 'string')) {
+                        if ((!modified) && (!Array.isArray(arrItem)) && (typeof(arrItem) !== 'string') && (typeof(arrItem) !== 'number')) {
                             arr[index] = this._toString(arrItem);
 
                             modified = true;
@@ -269,6 +272,9 @@ export default class JssVarCollection<TProp> {
                         // do not modify array => the array was already investigated & maybe transformed
                         if (Array.isArray(value)) return (value as (CssValue[] | CssValue[][]));
 
+                        if (typeof(value) === 'string') return value;
+                        if (typeof(value) === 'number') return value;
+
 
                         modified = true;
                         return this._toString(value);
@@ -278,7 +284,9 @@ export default class JssVarCollection<TProp> {
             } // for // walk each props in srcProps
 
 
-            return globalModified ? outProps : undefined;
+            if (globalModified || (propRename !== propRenameDefault)) return outProps;
+
+            return null; // null means no modification
         }
         const cssProps = this._cssProps;
         this._valProps = replaceDuplicates(cssProps, cssProps, (name) => this.getVarName(name)) ?? (cssProps as unknown as Dictionary<CSSValueComp>);

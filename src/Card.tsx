@@ -72,7 +72,7 @@ const styles = {
 
         borderRadius  : Elements.cssProps.borderRadius,
 
-        [Elements.vars.backgFn]: [Elements.cssProps.backg],
+        // [Elements.vars.backgFn]: [Elements.cssProps.backg],
 
 
 
@@ -107,11 +107,11 @@ const styles = {
     },
 };
 Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    [Elements.vars.backg]: [
-        varProps.backgOverPassive,
-        themeColor,
-    ],
-    [Elements.vars.color]: (colors as any)[`${theme}Cont`],
+    // [Elements.vars.backg]: [
+    //     varProps.backgOverPassive,
+    //     themeColor,
+    // ],
+    // [Elements.vars.color]: (colors as any)[`${theme}Cont`],
 }));
 
 const useStyles = createUseStyles(styles);

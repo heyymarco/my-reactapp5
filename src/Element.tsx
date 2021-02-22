@@ -1,6 +1,4 @@
-import
-    React,
-    { useState }           from 'react';
+import React               from 'react';
 
 import
     colors,
@@ -46,19 +44,15 @@ export interface CssProps
 
     transition         : string | string[][]
 
+    boxShadowNone      : (number|string)[][]
     boxShadow          : (number|string)[][]
 
     filterNone         : 'brightness(100%)'
     filter             : string | string[][]
-    filterHover        : string | string[][]
 
     '@keyframes none'  : { }
-    '@keyframes hover' : object
-    '@keyframes leave' : object
     animNone           : string | (string | object)[][]
     anim               : string | (string | object)[][]
-    animHover          : string | (string | object)[][]
-    animLeave          : string | (string | object)[][]
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -67,22 +61,25 @@ const inherit = 'inherit';
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
 export const vars = {
-    backgFn          : '--elm-backgFn',
-    backg            : '--elm-backg',
-    color            : '--elm-color',
+    /**
+     * a custom css props for manipulating foreground.
+     */
+    colorFn : '--elm-colorFn',
 
+    /**
+     * a custom css props for manipulating background(s).
+     */
+    backgFn : '--elm-backgFn',
 
-    // anim props:
-
-    filterHoverLeave : '--elm-filterHoverLeave',
-    animHoverLeave   : '--elm-animHoverLeave',
+    /**
+     * custom css props for manipulating animation(s).
+     */
+    animFn  : '--elm-animFn',
 };
 
-// define default cssProps' value to be stored into css vars:
 // re-defined later, we need to construct varProps first
 const keyframesNone  = { };
-const keyframesHover = { from: undefined, to: undefined };
-const keyframesLeave = { from: undefined, to: undefined };
+// define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     fontSize          : typos.fontSizeNm,
     fontSizeSm        : [['calc((', typos.fontSizeSm, '+', typos.fontSizeNm, ')/2)']],
@@ -117,19 +114,15 @@ const _cssProps: CssProps = {
         ['border'    , '300ms', 'ease-out'],
     ],
 
+    boxShadowNone     : [[0, 0, 'transparent']],
     boxShadow         : [[0, 0, 'transparent']],
 
     filterNone        : 'brightness(100%)',
     filter            : 'brightness(100%)',
-    filterHover       : 'brightness(85%)',
 
     '@keyframes none' : keyframesNone,
-    '@keyframes hover': keyframesHover,
-    '@keyframes leave': keyframesLeave,
     animNone          : [[keyframesNone]],
     anim              : [[keyframesNone]],
-    animHover         : [['150ms', 'ease-out', 'both', keyframesHover]],
-    animLeave         : [['300ms', 'ease-out', 'both', keyframesLeave]],
 };
 
 
@@ -147,137 +140,43 @@ export { config, cssProps };
 
 
 
-Object.assign(keyframesHover, {
-    from: {
-        filter: [[
-            cssProps.filter,
-            // getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
-        ]],
-    },
-    to: {
-        filter: [[
-            cssProps.filter,
-            getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
-        ]],
+export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
+    const cssPropsCopy: { [key: string]: any } = { };
+    for (const [key, value] of Object.entries(cssProps)) {
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None)$|^(@)|backgGrad|anim/).test(key)) continue;
+        cssPropsCopy[key] = value;
     }
-});
-Object.assign(keyframesLeave, {
-    from : keyframesHover.to,
-    to   : keyframesHover.from
-});
-
-
-
-export const stateEnabled            = (content: object) => ({
-    '&.enable': { // .enable
-        extend: [content]
-    }
-});
-export const stateNotEnabled         = (content: object) => ({
-    '&:not(.enable)': { // not-.enable
-        extend: [content]
-    }
-});
-export const stateDisabled           = (content: object) => ({
-    '&:disabled,&.disabled,&.disable': { // :disabled or .disabled or .disable
-        extend: [content]
-    }
-});
-export const stateNotDisabled        = (content: object) => ({
-    '&:not(:disabled):not(.disabled):not(.disable)': { // not-:disabled and not-.disabled and not-.disable
-        extend: [content]
-    }
-});
-export const stateEnabledDisabled    = (content: object) => ({
-    '&.enable,&:disabled,&.disabled,&.disable': { // .enable or :disabled or .disabled or .disable
-        extend: [content]
-    }
-});
-export const stateNotEnabledDisabled = (content: object) => ({
-    '&:not(.enable):not(:disabled):not(.disabled):not(.disable)': { // not-.enable and not-:disabled and not-.disabled and not-.disable
-        extend: [content]
-    }
-});
-
-export const stateHover              = (content: object) => ({
-    '&:hover,&:focus': { // hover or focus
-        extend: [content]
-    }
-});
-export const stateNotHover           = (content: object) => ({
-    '&:not(:hover):not(:focus)': { // not-hover and not-focus
-        extend: [content]
-    }
-});
-export const stateLeave              = (content: object) =>
-    stateNotHover({ // not-hover and not-focus and (leave or blur)
-        extend:[{'&.leave,&.blur': {
-            extend: [content]
-        }}]
-    });
-export const stateNotLeave           = (content: object) => ({
-    '&:not(.leave):not(.blur)': { // not-leave and not-blur
-        extend: [content]
-    }
-});
-export const stateHoverLeave         = (content: object) => ({
-    '&:hover,&:focus,&.leave,&.blur': { // hover or focus or leave or blur
-        extend: [content]
-    }
-});
-export const stateNotHoverLeave      = (content: object) => ({
-    '&:not(:hover):not(:focus):not(.leave):not(.blur)': { // not-hover and not-focus and not-leave and not-blur
-        extend: [content]
-    }
-});
-
-export const filterValidProps = <TVarProps,>(varProps: TVarProps) => {
-    const varProps2: { [key: string]: any } = { };
-    for (const [key, value] of Object.entries(varProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|Hover|Leave|Focus|Blur|Active|Passive|Enabled|Disabled|None)$|^(@)|backgGrad|anim/).test(key)) continue;
-        varProps2[key] = value;
-    }
-    return varProps2;
+    return cssPropsCopy;
 }
 
-
-
-const states = {
-    [vars.filterHoverLeave]             : cssProps.filterNone,
-    [vars.animHoverLeave]               : cssProps.animNone,
-
-    anim: [
-        cssProps.anim,
-        getVar(vars.animHoverLeave),
-    ],
-
-
-    extend:[
-        stateNotDisabled({extend:[
-            stateHoverLeave({
-                [vars.filterHoverLeave] : cssProps.filterHover,
-            }),
-            stateHover({
-                [vars.animHoverLeave]   : cssProps.animHover,
-            }),
-            stateLeave({
-                [vars.animHoverLeave]   : cssProps.animLeave,
-            }),
-        ]}),
-    ],
-};
+const states = { };
 
 const styles = {
     main: {
         extend: [
-            filterValidProps(cssProps),
-            states,
+            filterValidProps(cssProps), // apply our filtered cssProps
+            states,                     // apply our states
         ],
 
-        [vars.backgFn]: cssProps.backg,
-        backg: getVar(vars.backgFn),
+
+
+        // we have 3 custom css props [colorFn, backgFn, animFn]
+        // set the default value of them:
+
+        // a custom css props for manipulating foreground:
+        [vars.colorFn]: cssProps.color, // set default value
+        color: getVar(vars.colorFn),    // apply prop
+
+        // a custom css props for manipulating background(s):
+        [vars.backgFn]: cssProps.backg, // set default value
+        backg: getVar(vars.backgFn),    // apply prop
+
+        // a custom css props for manipulating animation(s):
+        [vars.animFn]: cssProps.anim,   // set default value
+        anim: getVar(vars.animFn),      // apply prop
     },
     gradient: { '&:not(._)': { // force to win conflict with main
+        // customize the backg:
         [vars.backgFn]: [
             cssProps.backgGrad,
             cssProps.backg,
@@ -292,12 +191,14 @@ export function defineSizes(styles: object, handler: ((size: string, Size: strin
         (styles as any)[sizeProp] = handler(size, Size, sizeProp);
     }
 }
-const varProps2 = cssProps as any;
+const cssPropsAny = cssProps as any;
 defineSizes(styles, (size, Size, sizeProp) => ({
-    '--elm-fontSize'     : varProps2[`fontSize${Size}`],
-    '--elm-paddingX'     : varProps2[`paddingX${Size}`],
-    '--elm-paddingY'     : varProps2[`paddingY${Size}`],
-    '--elm-borderRadius' : varProps2[`borderRadius${Size}`],
+    // overwrite the props with the props{Size}:
+
+    '--elm-fontSize'     : cssPropsAny[`fontSize${Size}`],
+    '--elm-paddingX'     : cssPropsAny[`paddingX${Size}`],
+    '--elm-paddingY'     : cssPropsAny[`paddingY${Size}`],
+    '--elm-borderRadius' : cssPropsAny[`borderRadius${Size}`],
 }));
 
 export function defineThemes(styles: object, handler: ((theme: string, Theme: string, themeProp: string, themeColor: string) => object)) {
@@ -308,11 +209,14 @@ export function defineThemes(styles: object, handler: ((theme: string, Theme: st
     }
 }
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    [vars.backg]: themeColor,
-    [vars.color]: (colors as any)[`${theme}Text`],
+    // overwrite the backg & color props
+    // we ignore the backg & color if the theme applied
+
+    '--elm-backg' : themeColor,
+    '--elm-color' : (colors as any)[`${theme}Text`],
 }));
 
-const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg'|'gradient', string>);
+const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 const useStyles = createUseStyles(styles2);
 export { states, styles2 as styles, useStyles };
 
@@ -346,19 +250,6 @@ export function useVariantGradient(props: VariantGradient, styles: Record<'gradi
     };
 }
 
-export function useStateLeave() {
-    const [leaving, setLeaving] = useState(false);
-
-    const handleLeaving = () => { if (!leaving) setLeaving(true);  }
-    const handleIdle    = () => { if (leaving)  setLeaving(false); }
-    return {
-        class: leaving ? 'leave': null,
-        handleMouseEnter   : handleIdle,
-        handleMouseLeave   : handleLeaving,
-        handleAnimationEnd : handleIdle,
-    };
-}
-
 export interface Props
     extends
         VariantSize,
@@ -373,8 +264,6 @@ export default function Element(props: Props) {
     const variTheme    = useVariantTheme(props, styles);
     const variGradient = useVariantGradient(props, styles);
 
-    const stateLeave   = useStateLeave();
-
 
 
     return (
@@ -384,13 +273,7 @@ export default function Element(props: Props) {
                 variSize.class,
                 variTheme.class,
                 variGradient.class,
-
-                stateLeave.class,
             ].join(' ')}
-        
-            onMouseEnter={stateLeave.handleMouseEnter}
-            onMouseLeave={stateLeave.handleMouseLeave}
-            onAnimationEnd={stateLeave.handleAnimationEnd}
         >
             {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Element'}
         </div>

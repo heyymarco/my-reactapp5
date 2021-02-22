@@ -24,7 +24,7 @@ const cssProps: CssProps = {
     fontSize5         : [['calc(', 3.0, '*', gens.fontSize, ')']],
     fontSize6         : [['calc(', 2.5, '*', gens.fontSize, ')']],
 
-    fontSize          : heads.fontSize,
+    fontSize          : undefined as unknown as string,
     fontFamily        : heads.fontFamily,
     fontWeight        : 300,
     fontStyle         : heads.fontStyle,

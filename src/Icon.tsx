@@ -54,7 +54,7 @@ const basics = {
     sizeNm     : '24px',
 };
 
-const cssProps: CssProps = Object.assign({},
+const _cssProps: CssProps = Object.assign({},
     basics,
     {
         size   :  basics.sizeNm,
@@ -94,16 +94,16 @@ const config = {
 
 
 
-// convert cssProps => varProps:
+// convert _cssProps => varProps => cssProps:
 const collection = new JssVarCollection(
-    /*cssProps :*/ cssProps as { [index: string]: any },
+    /*cssProps :*/ _cssProps as { [index: string]: any },
     /*config   :*/ config   as { [index: string]: any }
 );
 const config2  = collection.config   as unknown as typeof config;
-const varProps = collection.varProps as typeof cssProps;
+const cssProps = collection.varProps as typeof _cssProps;
 // export the configurable varPops:
-export { config2 as config, varProps as cssProps };
-// export default varProps;
+export { config2 as config, cssProps };
+// export default cssProps;
 
 
 
@@ -116,14 +116,14 @@ const customFont = {
 const styles = {
     main: {
         extend: [
-            Elements.filterValidProps(varProps),
+            Elements.filterValidProps(cssProps),
         ],
 
         display       : 'inline-block',
         verticalAlign : 'middle',
 
         size          : undefined, // delete
-        height        : varProps.size,
+        height        : cssProps.size,
         width         : 'min-content',
 
         userSelect    : none, // disable selecting icon's text
@@ -138,11 +138,11 @@ const styles = {
             customFont,
         ],
 
-        fontSize      : varProps.size,
+        fontSize      : cssProps.size,
         overflowY     : 'hidden', // hide the pseudo-inherited underline
 
         backg         : 'transparent',
-        color         : varProps.color,
+        color         : cssProps.color,
 
         lineHeight    : 1,
         textTransform : none,
@@ -164,7 +164,7 @@ const styles = {
         fontFeatureSettings: 'liga',
     },
     img: {
-        backg         : varProps.color,
+        backg         : cssProps.color,
 
         maskImage     : 'var(--ico-img)',
         maskSize      : 'contain',
@@ -183,18 +183,24 @@ const styles = {
     }
 };
 
-const varProps2 = varProps as any;
+const varPropsAny = cssProps as any;
 Elements.defineSizes(styles, (size, Size, sizeProp) => ({
-    '--ico-size': (size === '1em') ? '1em' : varProps2[`size${Size}`],
+    // overwrite the props with the props{Size}:
+
+    '--ico-size': (size === '1em') ? '1em' : varPropsAny[`size${Size}`],
 }), ['sm', 'nm', 'md', 'lg', '1em']);
 
 Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
+    // overwrite the color prop
+    // we ignore the color prop if the theme applied
+
     '--ico-color': themeColor,
 }));
 
-const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeNm'|'sizeMd'|'sizeLg'|'size1em', string>);
+const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeNm'|'sizeMd'|'sizeLg'|'size1em', object>);
 const useStyles = createUseStyles(styles2);
 export { styles2 as styles, useStyles };
+
 
 
 export interface Props
