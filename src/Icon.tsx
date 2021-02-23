@@ -1,6 +1,7 @@
 import
-    React,
-    { useMemo }            from 'react';
+    React, {
+    useMemo
+}                          from 'react';
 
 import
     * as Elements          from './Element';

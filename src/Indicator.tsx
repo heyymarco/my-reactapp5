@@ -55,10 +55,10 @@ export const vars = Object.assign({}, Elements.vars, {
 });
 
 // re-defined later, we need to construct varProps first
-const keyframesEnabled  = { from: undefined, to: undefined };
-const keyframesDisabled = { from: undefined, to: undefined };
-const keyframesActive   = { from: undefined, to: undefined };
-const keyframesPassive  = { from: undefined, to: undefined };
+export const keyframesEnabled  = { from: undefined, to: undefined };
+export const keyframesDisabled = { from: undefined, to: undefined };
+export const keyframesActive   = { from: undefined, to: undefined };
+export const keyframesPassive  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {

@@ -74,10 +74,10 @@ export const vars = Object.assign({}, Indicators.vars, {
 });
 
 // re-defined later, we need to construct varProps first
-const keyframesHover    = { from: undefined, to: undefined };
-const keyframesLeave    = { from: undefined, to: undefined };
-const keyframesFocus    = { from: undefined, to: undefined };
-const keyframesBlur     = { from: undefined, to: undefined };
+export const keyframesHover    = { from: undefined, to: undefined };
+export const keyframesLeave    = { from: undefined, to: undefined };
+export const keyframesFocus    = { from: undefined, to: undefined };
+export const keyframesBlur     = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 const icssProps = Indicators.cssProps;
 // define default cssProps' value to be stored into css vars:
@@ -408,6 +408,7 @@ const styles = {
         // we have 1 custom css props [backgOlFn]
         // set the default value of it:
 
+        // TODO: activate this code:
         // a custom css props for manipulating a box-shadow at focused state:
         // [vars.boxShadowFocusFn]: [[ // set default value
         //     cssProps.boxShadowFocus,

@@ -212,8 +212,8 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     // overwrite the backg & color props
     // we ignore the backg & color if the theme applied
 
-    '--elm-backg' : themeColor,
     '--elm-color' : (colors as any)[`${theme}Text`],
+    '--elm-backg' : themeColor,
 }));
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
@@ -234,7 +234,7 @@ export function useVariantSize(props: VariantSize, styles: Record<string, string
 export interface VariantTheme {
     theme?: string
 }
-export function useVariantTheme(props: VariantTheme, styles: Record<string, string>, themeDefault?: () => string) {
+export function useVariantTheme(props: VariantTheme, styles: Record<string, string>, themeDefault?: () => (string|undefined)) {
     const theme = props.theme ?? themeDefault?.();
     return {
         class: theme ? (styles as any)[`theme${pascalCase(theme)}`] : null,

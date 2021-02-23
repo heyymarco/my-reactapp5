@@ -1,26 +1,20 @@
 import React               from 'react';
 
-import
-    * as Elements          from './Element';
+import * as Elements       from './Element';
+import * as Controls       from './Control';
 import {
-    filterValidProps as baseFilterValidProps,
-}                          from './Element';
-import
-    * as Controls          from './Control';
-    import {
-        stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
-        stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateNoAnimStartup,
 
-        stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-        stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    defineSizes, defineThemes,
 
-        defineSizes, defineThemes,
-
-        useStateEnabledDisabled, useStateActivePassive,
-        useStateLeave, useStateFocusBlur,
-    }                      from './Control';
-import
-    * as border            from './borders';
+    useStateEnabledDisabled, useStateActivePassive,
+    useStateLeave, useStateFocusBlur,
+}                          from './Control';
+import * as border         from './borders';
 import spacers             from './spacers';
 
 import { createUseStyles } from 'react-jss';
@@ -32,9 +26,9 @@ import { pascalCase }      from 'pascal-case';
 export {
     stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateNoAnimStartup,
 
     defineSizes, defineThemes,
 
@@ -48,7 +42,7 @@ type Orientation = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 type WhiteSpace  = 'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces';
 export interface CssProps {
     orientation : Orientation | string
-    whiteSpace  : WhiteSpace | string
+    whiteSpace  : WhiteSpace  | string
 
     gapX        : string | number | (string|number)[][]
     gapY        : string | number | (string|number)[][]
@@ -113,8 +107,8 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
 const styles = {
     main: {
         extend: [
-            Controls.styles.main,
-            filterValidProps(cssProps),
+            Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
+            filterValidProps(cssProps), // apply our filtered cssProps
         ],
         
         // flex settings:
@@ -147,9 +141,9 @@ const styles = {
         // customize the backg at outlined state:
         [vars.backgOlFn]: ecssProps.backgGrad,
     }},
-    btnOutline: {
+    btnOutline: { // already have specific rule :not-active => always win conflict with main
         extend:[
-            Controls.stateNotActive({
+            stateNotActive({
                 '&:not(:hover):not(:focus), &:disabled,&.disabled': {
                     // apply the outlined-backg:
                     backg          : getVar(vars.backgOlFn),
@@ -204,7 +198,7 @@ const styles = {
 };
 
 const cssPropsAny = cssProps as any;
-Elements.defineSizes(styles, (size, Size, sizeProp) => ({
+defineSizes(styles, (size, Size, sizeProp) => ({
     extend: [
         // copy the size specific props from Element:
         (Elements.styles as any)[sizeProp],
@@ -232,7 +226,8 @@ export function useVariantButton(props: VariantButton, styles: Record<string, st
         class: props.btnStyle ? (styles as any)[`btn${pascalCase(props.btnStyle)}`] : null,
     };
 }
-export const themeDefaults: {[theme: string]: string} = {
+
+export const themeDefaults: {[btnStyle: string]: (string|undefined)} = {
     default     : 'secondary',
     outline     : 'secondary',
     link        : 'primary',

@@ -1,45 +1,53 @@
-import
-    React,
-    { useContext }         from 'react';
+import React               from 'react';
 
-import
-    * as Elements          from './Element';
-import
-    * as Indicators        from './Indicator';
+import * as Elements       from './Element';
+import * as Indicators     from './Indicator';
 import {
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateNoAnimStartup,
+
     filterValidProps,
-}                          from './Element';
-import
-    * as Controls          from './Control';
-import {
-    stateEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled,
-    stateActive, statePassive, stateActivePassive,
-}
-                           from './Control';
-import
-    * as border            from './borders';
-import spacers             from './spacers';
-import
-    colors,
-    * as color             from './colors';
+
+    defineSizes, defineThemes,
+
+    useStateEnabledDisabled, useStateActivePassive,
+}                          from './Indicator';
+import * as border         from './borders';
+import colors              from './colors';
 import stipOuts            from './strip-outs';
 import ListGroupItem       from './ListGroupItem';
-import type * as ListGroupItems from './ListGroupItem';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
-import { pascalCase }      from 'pascal-case';
 
 
 
+export {
+    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateNoAnimStartup,
+
+    filterValidProps,
+
+    defineSizes, defineThemes,
+
+    useStateEnabledDisabled, useStateActivePassive,
+};
+
+
+
+type Orientation = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 export interface CssProps {
-    // '@keyframes enabled'  : object
-    // '@keyframes disabled' : object
+    orientation : Orientation | string
+
+
+    // anim props:
+
+    filterActive          : string | string[][]
+
     '@keyframes active'   : object
     '@keyframes passive'  : object
-
-    // animEnabled           : string | (string | object)[][]
-    // animDisabled          : string | (string | object)[][]
     animActive            : string | (string | object)[][]
     animPassive           : string | (string | object)[][]
 }
@@ -49,74 +57,72 @@ export interface CssProps {
 // const center  = 'center';
 // const middle  = 'middle';
 
-// css vars:
+// internal css vars:
 const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Indicators.vars, {
-    backgActiveFn      : '--lg-backgActiveFn',
-    backgActive        : '--lg-backgActive',
+    /**
+     * defines the foreground color at active state.
+     */
     colorActive        : '--lg-colorActive',
+
+    /**
+     * a custom css props for manipulating foreground at active state.
+     */
+    colorActiveFn      : '--lg-colorActiveFn',
+
+    /**
+     * defines the background color at active state.
+     */
+    backgActive        : '--lg-backgActive',
+
+    /**
+     * a custom css props for manipulating background(s) at active state.
+     */
+    backgActiveFn      : '--lg-backgActiveFn',
+
+    /**
+     * (internal) Forwards animFn from parent element to children element.
+    */
+    animFw             : '--lg-animFw',
 
 
     // anim props:
 
     backgActivePassive : '--lg-backgActivePassive',
     colorActivePassive : '--lg-colorActivePassive',
-    animActivePassive  : '--lg-animActivePassive',
 });
 
-// define default cssProps' value to be stored into css vars:
 // re-defined later, we need to construct varProps first
-// const keyframesEnabled  = { from: undefined, to: undefined };
-// const keyframesDisabled = { from: undefined, to: undefined };
-const keyframesActive   = { from: undefined, to: undefined };
-const keyframesPassive  = { from: undefined, to: undefined };
+export const keyframesActive   = { from: undefined, to: undefined };
+export const keyframesPassive  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 const icssProps = Indicators.cssProps;
+// define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    // '@keyframes enabled'  : keyframesEnabled,
-    // '@keyframes disabled' : keyframesDisabled,
+    orientation : 'column',
+
+
+    // anim props:
+
+    filterActive          : ecssProps.filterNone,
+
     '@keyframes active'   : keyframesActive,
     '@keyframes passive'  : keyframesPassive,
-    // animEnabled           : [['300ms', 'ease-out', 'both', keyframesEnabled ]],
-    // animDisabled          : [['300ms', 'ease-out', 'both', keyframesDisabled]],
-    animActive            : [['1000ms', 'ease-out', 'both', keyframesActive  ]],
-    animPassive           : [['1000ms', 'ease-out', 'both', keyframesPassive ]],
+    animActive            : [['150ms', 'ease-out', 'both', keyframesActive  ]],
+    animPassive           : [['300ms', 'ease-out', 'both', keyframesPassive ]],
 };
 
-// Object.assign(keyframesDisabled, {
-//     from: {
-//         filter: [[
-//             Elements.cssProps.filter,
-//             getVar(Controls.vars.filterHoverLeave), // first priority, but now become the second priority
-//             // getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
-//         ]],
 
-//         // backg: getVar(vars.backgActivePassive),
-//         // color: getVar(vars.colorActivePassive),
-//     },
-//     to: {
-//         filter: [[
-//             Elements.cssProps.filter,
-//             getVar(Controls.vars.filterHoverLeave), // first priority, but now become the second priority
-//             getVar(Controls.vars.filterEnabledDisabled), // last priority, but now become the first priority
-//         ]],
-
-//         backg: getVar(vars.backgActivePassive),
-//         color: getVar(vars.colorActivePassive),
-//     }
-// });
-// Object.assign(keyframesEnabled, {
-//     from : keyframesDisabled.to,
-//     to   : keyframesDisabled.from
-// });
 
 Object.assign(keyframesActive, {
-    from: {
-    },
-    to: {
-        backg: getVar(vars.backgActivePassive),
-        color: getVar(vars.colorActivePassive),
-    }
+    from: Object.assign({}, Indicators.keyframesActive.from, {
+        color: getVar(vars.colorFn),
+        backg: getVar(vars.backgFn),
+    }),
+    to: Object.assign({}, Indicators.keyframesActive.to, {
+        color: getVar(vars.colorActiveFn),
+        backg: getVar(vars.backgActiveFn),
+    })
 });
 Object.assign(keyframesPassive, {
     from : keyframesActive.to,
@@ -138,164 +144,125 @@ export { config, cssProps };
 
 
 
-const states = {
-    [vars.filterEnabledDisabled]   : ecssProps.filterNone,
-    [vars.filterHoverLeave]        : ecssProps.filterNone,
-    [vars.filterActivePassive]     : ecssProps.filterNone,
-    [vars.backgActivePassive]      : getVar(vars.backgFn),
-    [vars.colorActivePassive]      : ecssProps.color,
-
-    [vars.animEnabledDisabled]     : ecssProps.animNone,
-    [vars.animActivePassive]       : ecssProps.animNone,
-
-    '& >*': {
-        anim: [
-            ecssProps.anim,
-            getVar(vars.animEnabledDisabled), // 1st : ctrl must be enabled
-            getVar(vars.animActivePassive),   // 4th : ctrl got pressed
-        ],
-    },
-
-
-    extend:[
-        stateEnabledDisabled({
-            [vars.filterEnabledDisabled] : icssProps.filterDisabled,
-        }),
-        stateEnabled({
-            [vars.animEnabledDisabled]   : icssProps.animEnabled,
-        }),
-        stateDisabled({
-            [vars.animEnabledDisabled]   : icssProps.animDisabled,
-        }),
-        {
-            '&.disabled:not(.disable)'  : {extend:[ // if ctrl was disabled at the first page load, disable first animation
-                Controls.stateNoAnimStartup(),
-            ]},
-        },
-        
-
-        // stateNotDisabled({extend:[
-            stateActivePassive({
-                [vars.backgActivePassive]     : getVar(vars.backgActiveFn),
-                [vars.colorActivePassive]     : getVar(vars.colorActive),
-            }),
-            stateActive({
-                [vars.animActivePassive]      : cssProps.animActive,
-            }),
-            statePassive({
-                [vars.animActivePassive]      : cssProps.animPassive,
-            }),
-            {
-                '&.active,&.actived': { // if activated programmatically (not by user input)
-                    '& >*': {
-                        anim: [
-                            ecssProps.anim,
-                            getVar(vars.animActivePassive),   // 1st : ctrl already pressed, then released
-                            getVar(vars.animEnabledDisabled), // 4th : ctrl disabled
-                        ],
-                    },
-                },
-                '&.actived': {extend:[ // if ctrl was activated at the first page load, disable first animation
-                    Controls.stateNoAnimStartup(),
-                ]},
-            },
-        // ]}),
-    ],
-};
-
 const styles = {
     main: {
         extend: [
-            stipOuts.list,
+            stipOuts.list, // clear browser's default styles
         ],
 
-
-        display       : 'flex',
-        flexDirection : 'column',
-
-
-        [vars.backgFn]       : [ecssProps.backg],           // default background
-        [vars.backgActiveFn] : getVar(vars.backgActive), // active  background
-
-        borderRadius         : ecssProps.borderRadius,
+        // flex settings:
+        display        : 'flex',
+        flexDirection  : cssProps.orientation,
+        justifyContent : 'start',
+        alignItems     : 'stretch',
 
 
-        '& >*': {
+
+        '& >li': { // wrapper element
             extend: [
-                states,
+                filterValidProps(icssProps), // apply Indicator's filtered cssProps
+                Indicators.states,           // apply Indicator's states
             ],
 
+            '--indi-filterActive' : cssProps.filterActive, // override Indicator's filter active
+            '--indi-animActive'   : cssProps.animActive,   // override Indicator's anim active
+            '--indi-animPassive'  : cssProps.animPassive,  // override Indicator's anim passive
+
             display: 'block',
-
-
-            borderRadius : undefined,
-            overflow     : 'hidden',
     
-            '& + *': {
+
+
+            // make a nicely rounded corners:
+            border         : ecssProps.border, // moved from children
+            overflow       : 'hidden',
+            '& + li': {
                 borderTopWidth: 0,
             },
             '&:first-child': {extend:[
-                border.radius.top('inherit'),
+                border.radius.top(ecssProps.borderRadius),    // moved from children
             ]},
             '&:last-child' : {extend:[
-                border.radius.bottom('inherit'),
+                border.radius.bottom(ecssProps.borderRadius), // moved from children
             ]},
 
-            border: ecssProps.border,
 
 
-            '& >*': {
-                extend: [
-                    filterValidProps(Elements.cssProps),
-                    filterValidProps(cssProps),
+            [vars.animFw]: getVar(vars.animFn),
+            '& >.lg-wrapper': { // main child element
+                extend:[
+                    Elements.styles.main, // copy styles from Control, including Control's cssProps & Control's states.
                 ],
 
-                border       : undefined,
-                borderRadius : 0,
-                backg        : getVar(vars.backgFn),
-    
-    
-                display        : 'block',
-                position       : 'relative',
-            }
-        },
+                display       : 'block',
+                position      : 'relative',
+
+                border        : undefined, // move to parent
+                borderRadius  : undefined, // move to parent
+
+
+
+                [vars.animFn] : getVar(vars.animFw),
+            } // main element
+        }, // wrapper element
+
+
+
+        // we have 4 custom css props [colorActive, colorActiveFn, backgActive, backgActiveFn]
+        // set the default value of them:
+
+        // define the foreground color at active state:
+        [vars.colorActive]: 'black', //TODO: remove hard coding
+
+        // a custom css props for manipulating foreground at active state:
+        [vars.colorActiveFn]: getVar(vars.colorActive), // set default value
+        // color: getVar(vars.colorActiveFn),           // not apply yet
+
+        // define the background color at active state:
+        [vars.backgActive]: 'rgba(0,0,0, 0.2)', //TODO: remove hard coding
+
+        // a custom css props for manipulating background(s) at active state:
+        [vars.backgActiveFn]: getVar(vars.backgActive), // set default value
+        // backg: getVar(vars.backgActiveFn),           // not apply yet
     },
-    gradient: { '&:not(._)': { // force to win conflict with main
-        [vars.backgFn]: [      // default background with gradient
-            ecssProps.backgGrad,
-            ecssProps.backg,
+    gradient: { '&>li>.lg-wrapper:not(._)': { // force to win conflict with main child element
+        extend: [
+            // copy the themes from Element:
+            Elements.styles.gradient,
         ],
-        [vars.backgActiveFn]: [ // active  background with gradient
+
+        // customize the backg at active state:
+        [vars.backgActiveFn]: [ // active background with gradient
             ecssProps.backgGrad,
             getVar(vars.backgActive),
         ],
     }},
 };
-Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
+
+defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     // overwrite the backg & color props
     // we ignore the backg & color if the theme applied
 
-    '--elm-backg' : (colors as any)[`${theme}Thin`],
     '--elm-color' : (colors as any)[`${theme}Cont`],
+    '--elm-backg' : (colors as any)[`${theme}Thin`],
 
 
     // customize the backg & color at active state:
-    [vars.backgActive] : themeColor,
     [vars.colorActive] : (colors as any)[`${theme}Text`],
+    [vars.backgActive] : themeColor,
 }));
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { styles, useStyles };
 
 
 
-type Child = string|React.ReactElement<ListGroupItems.Props>;
-type Children = Child | Array<Child>;
 export interface Props
     extends
         Elements.Props
 {
-    children?: Children
+    orientation? : Orientation
+
+    children?    : React.ReactNode
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
@@ -305,8 +272,8 @@ export default function ListGroup(props: Props) {
     const variTheme      = Elements.useVariantTheme(props, styles);
     const variGradient   = Elements.useVariantGradient(props, styles);
 
-    // useContext()
-
+    
+    
     return (
         <ul className={[
                 styles.main,
@@ -327,6 +294,8 @@ export default function ListGroup(props: Props) {
     
                         return child;
                     } // if
+
+                    return undefined;
                 })
             }
         </ul>
