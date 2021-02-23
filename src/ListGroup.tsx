@@ -285,17 +285,15 @@ export default function ListGroup(props: Props) {
         >
             {
                 (Array.isArray(props.children) ? props.children : [props.children]).map((child, index) => {
-                    if (child) {
-                        if (typeof(child) === 'string') return (
-                            <ListGroupItem key={index}>
-                                {child}
-                            </ListGroupItem>
-                        );
-    
-                        return child;
-                    } // if
+                    if (!child) return child;
 
-                    return undefined;
+                    if ((typeof(child) === 'string') || (typeof(child) === 'number')) return (
+                        <ListGroupItem key={index}>
+                            {child}
+                        </ListGroupItem>
+                    );
+
+                    return child;
                 })
             }
         </ul>

@@ -3,12 +3,11 @@ import
     useMemo
 }                          from 'react';
 
-import
-    * as Elements          from './Element';
+import * as Elements       from './Element';
 import type
     { base as typoBase }   from './typos/index';
-import fontMaterial        from './Icon-font-material';
 import Path                from 'path';
+import fontMaterial        from './Icon-font-material';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -18,7 +17,7 @@ import JssVarCollection    from './jss-var-collection';
 function resolveUrl(file: string, path: string) {
     if (!file) return file;
 
-    if (file[0] === '~') file = Path.join("/node_modules", file.substr(1));
+    if (file[0] === '~') file = Path.join('/node_modules', file.substr(1));
     return Path.join(path, file);
 }
 function formatOf(file: string) {
@@ -49,21 +48,25 @@ const none    = 'none';
 // const inherit = 'inherit';
 const normal    = 'normal';
 
+// internal css vars:
+const getVar = (name: string) => `var(${name})`;
+export const vars = {
+    img: '--ico-img',
+};
+
+// define default cssProps' value to be stored into css vars:
 const basics = {
     color      : 'currentColor',
     
     sizeNm     : '24px',
 };
 
-const _cssProps: CssProps = Object.assign({},
-    basics,
-    {
-        size   :  basics.sizeNm,
-        sizeSm : [['calc(', basics.sizeNm, '*', [0.75]  , ')']],
-        sizeMd : [['calc(', basics.sizeNm, '*', [1.50]  , ')']],
-        sizeLg : [['calc(', basics.sizeNm, '*', [2.00]  , ')']],
-    }
-);
+const _cssProps: CssProps = Object.assign({}, basics, {
+    size   :  basics.sizeNm,
+    sizeSm : [['calc(', basics.sizeNm, '*', [0.75]  , ')']],
+    sizeMd : [['calc(', basics.sizeNm, '*', [1.50]  , ')']],
+    sizeLg : [['calc(', basics.sizeNm, '*', [2.00]  , ')']],
+});
 
 const config = {
     varPrefix: 'ico',
@@ -78,8 +81,8 @@ const config = {
 
         fontFamily     : '"Material Icons"',
         fontWeight     : 400,
-        fontStyle      : 'normal',
-        textDecoration : 'none',
+        fontStyle      : normal,
+        textDecoration : none,
 
         items          : fontMaterial,
     },
@@ -98,7 +101,7 @@ const config = {
 // convert _cssProps => varProps => cssProps:
 const collection = new JssVarCollection(
     /*cssProps :*/ _cssProps as { [index: string]: any },
-    /*config   :*/ config   as { [index: string]: any }
+    /*config   :*/ config    as { [index: string]: any }
 );
 const config2  = collection.config   as unknown as typeof config;
 const cssProps = collection.varProps as typeof _cssProps;
@@ -114,6 +117,7 @@ const customFont = {
     fontStyle      : config.font.fontStyle,
     textDecoration : config.font.textDecoration,
 };
+
 const styles = {
     main: {
         extend: [
@@ -167,12 +171,12 @@ const styles = {
     img: {
         backg         : cssProps.color,
 
-        maskImage     : 'var(--ico-img)',
+        maskImage     : getVar(vars.img),
         maskSize      : 'contain',
         maskRepeat    : 'no-repeat',
         maskPosition  : 'center',
 
-        '-webkit-maskImage'     : 'var(--ico-img)',
+        '-webkit-maskImage'     : getVar(vars.img),
         '-webkit-maskSize'      : 'contain',
         '-webkit-maskRepeat'    : 'no-repeat',
         '-webkit-maskPosition'  : 'center',
@@ -184,11 +188,11 @@ const styles = {
     }
 };
 
-const varPropsAny = cssProps as any;
+const cssPropsAny = cssProps as any;
 Elements.defineSizes(styles, (size, Size, sizeProp) => ({
     // overwrite the props with the props{Size}:
 
-    '--ico-size': (size === '1em') ? '1em' : varPropsAny[`size${Size}`],
+    '--ico-size': (size === '1em') ? '1em' : cssPropsAny[`size${Size}`],
 }), ['sm', 'nm', 'md', 'lg', '1em']);
 
 Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
@@ -220,35 +224,36 @@ export default function Icon(props: Props) {
 
 
 
-    const fontIcon = useMemo(() =>
-        config.font.items.includes(props.icon)
-    , [props.icon]);
-
     const imgIcon = useMemo(() => {
         const file = config.img.files.find((file) => file.match(/[\w-.]+(?=[.]\w+$)/)?.[0] === props.icon);
         if (!file) return null;
         return resolveUrl(file, config.img.path);
     }, [props.icon]);
 
+    const fontIcon = useMemo(() =>
+        config.font.items.includes(props.icon)
+    , [props.icon]);
+
 
 
     return (
         <span className={[
                 styles.main,
-                (fontIcon ? styles.font : (imgIcon ? styles.img : null)),
+                (imgIcon ? styles.img : (fontIcon ? styles.font : null)),
                 
                 variSize.class,
                 variTheme.class,
             ].join(' ')}
 
-            style={imgIcon ? ({'--ico-img': `url("${imgIcon}")`} as React.CSSProperties) : undefined}
+            style={imgIcon ? ({[vars.img]: `url("${imgIcon}")`} as React.CSSProperties) : undefined}
 
             aria-hidden={props['aria-hidden'] ?? true}
         >
-            {fontIcon ? props.icon : undefined}
-            {!fontIcon && imgIcon ? (
+            {imgIcon ? (
                 <img src={imgIcon} alt='' />
             ) : undefined}
+            
+            {(!imgIcon && fontIcon) ? props.icon : undefined}
         </span>
     );
 }

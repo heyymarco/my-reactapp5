@@ -2,7 +2,7 @@ import JssVarCollection from './jss-var-collection';
 
 
 
-// define default props' value to be stored into css vars:
+// define default cssProps' value to be stored into css vars:
 const basics = {
     none        : '0px',
     sm          : '0.2rem',

@@ -1,5 +1,4 @@
-import
-    * as breakpoint        from './breakpoints';
+import  * as breakpoint    from './breakpoints';
 
 import { 
     create as createJss,
@@ -11,8 +10,8 @@ import { pascalCase }      from 'pascal-case';
 
 
 
-// define default props' value to be stored into css vars:
-const props = {
+// define default cssProps' value to be stored into css vars:
+const _cssProps = {
     x    : '12px',
     y    : '9px',
 
@@ -34,16 +33,16 @@ const props = {
 
 
 
-// convert props => varProps:
+// convert _cssProps => varProps => cssProps:
 const collection = new JssVarCollection(
-    /*props  :*/ props,
-    /*config :*/ { varPrefix: 'con'}
+    /*cssProps :*/ _cssProps,
+    /*config   :*/ { varPrefix: 'con'}
 );
 const config   = collection.config;
-const varProps = collection.varProps as (typeof props & { [key: string]: (undefined|string|number|(string|number)[][]) });
-// export the configurable props:
-export { config, varProps as containers };
-// export default varProps;
+const cssProps = collection.varProps as (typeof _cssProps & { [key: string]: (undefined|string|number|(string|number)[][]) });
+// export the configurable varPops:
+export { config, cssProps as containers };
+// export default cssProps;
 
 
 
@@ -51,8 +50,8 @@ const stylesMedia = { };
 for (const bpName in breakpoint.breakpoints) {
     const BpName = pascalCase(bpName);
 
-    const x = varProps[`x${BpName}`];
-    const y = varProps[`y${BpName}`];
+    const x = cssProps[`x${BpName}`];
+    const y = cssProps[`y${BpName}`];
     if (x || y) {
         Object.assign(stylesMedia, breakpoint.mediaUp(bpName, {
             '@global': { ':root': {
@@ -73,13 +72,14 @@ createJss().setup({plugins:[
 
 const styles = {
     main: {
-        paddingX : varProps.x,
-        paddingY : varProps.y,
+        paddingX : cssProps.x,
+        paddingY : cssProps.y,
     },
 };
 
 const useStyles = createUseStyles(styles);
 export { styles, useStyles };
+
 
 
 export interface Props {

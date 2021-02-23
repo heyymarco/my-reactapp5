@@ -3,7 +3,7 @@ import Color            from 'color';
 
 
 
-// define default props' value to be stored into css vars:
+// define default cssProps' value to be stored into css vars:
 const basics = {
     blue        : Color('#0d6efd') as (Color | string),
     indigo      : Color('#6610f2') as (Color | string),

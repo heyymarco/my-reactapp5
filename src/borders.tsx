@@ -4,7 +4,7 @@ import * as radius      from './borders-radiuses';
 
 
 
-// define default props' value to be stored into css vars:
+// define default cssProps' value to be stored into css vars:
 const widths = {
     none: '0px',
     hair: '1px',
