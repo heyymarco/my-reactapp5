@@ -1,7 +1,8 @@
 import
     React, {
     useState,
-    useEffect }            from 'react';
+    useEffect
+}                          from 'react';
 
 import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
