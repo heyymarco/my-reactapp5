@@ -3,6 +3,15 @@ import Color            from 'color';
 
 
 
+export let themeTranspLevel = 0.5;
+const transpColor = (color: Color) => color.alpha(themeTranspLevel)                     as (Color | string);
+const textColor   = (color: Color) => (color.isLight() ? themes.dark : themes.light)    as (Color | string);
+export let themeThinLevel = 0.2;
+const thinColor   = (color: Color) => color.alpha(themeThinLevel)                       as (Color | string);
+const contColor   = (color: Color) => color.mix(page2.foreg as Color, 0.8)              as (Color | string);
+
+
+
 // define default cssProps' value to be stored into css vars:
 const basics = {
     blue        : Color('#0d6efd') as (Color | string),
@@ -35,16 +44,21 @@ const themes = {
 
 const page = {
     backg     : basics.white,
-    foreg     : themes.dark,
 };
 
-export let pageTranspLevel = 0.8;
 const page2 = {
-    backgTransp : (page.backg as Color).alpha(pageTranspLevel) as (Color | string),
+    foreg       : textColor(page.backg as Color),
+};
+const page3 = {
+    backgTransp : transpColor(page.backg as Color),
+    backgThin   : thinColor(page.backg as Color),
+    backgCont   : contColor(page.backg as Color),
+
+    foregTransp : transpColor(page2.foreg as Color),
+    foregThin   : thinColor(page2.foreg as Color),
+    foregCont   : contColor(page2.foreg as Color),
 };
 
-export let themeTranspLevel = 0.5;
-const transpColor = (color: Color) => color.alpha(themeTranspLevel) as (Color | string)
 const themesTransp = {
     primaryTransp   : transpColor(themes.primary   as Color),
     secondaryTransp : transpColor(themes.secondary as Color),
@@ -56,7 +70,6 @@ const themesTransp = {
     darkTransp      : transpColor(themes.dark      as Color),
 };
 
-const textColor = (color: Color) => (color.isLight() ? themes.dark : themes.light) as (Color | string);
 const themesText = {
     primaryText   : textColor(themes.primary   as Color),
     secondaryText : textColor(themes.secondary as Color),
@@ -68,20 +81,17 @@ const themesText = {
     darkText      : textColor(themes.dark      as Color),
 };
 
-export let themeThinLevel = 0.2;
-const thinTranspColor = (color: Color) => color.alpha(themeThinLevel) as (Color | string)
 const themesThin = {
-    primaryThin   : thinTranspColor(themes.primary   as Color),
-    secondaryThin : thinTranspColor(themes.secondary as Color),
-    successThin   : thinTranspColor(themes.success   as Color),
-    infoThin      : thinTranspColor(themes.info      as Color),
-    warningThin   : thinTranspColor(themes.warning   as Color),
-    dangerThin    : thinTranspColor(themes.danger    as Color),
-    lightThin     : thinTranspColor(themes.light     as Color),
-    darkThin      : thinTranspColor(themes.dark      as Color),
+    primaryThin   : thinColor(themes.primary   as Color),
+    secondaryThin : thinColor(themes.secondary as Color),
+    successThin   : thinColor(themes.success   as Color),
+    infoThin      : thinColor(themes.info      as Color),
+    warningThin   : thinColor(themes.warning   as Color),
+    dangerThin    : thinColor(themes.danger    as Color),
+    lightThin     : thinColor(themes.light     as Color),
+    darkThin      : thinColor(themes.dark      as Color),
 };
 
-const contColor = (color: Color) => color.mix(page.foreg as Color, 0.8) as (Color | string);
 const themesCont = {
     primaryCont   : contColor(themes.primary   as Color),
     secondaryCont : contColor(themes.secondary as Color),
@@ -101,15 +111,16 @@ const props4 = Object.assign({},
 const props3 = Object.assign({},
     props4,
     page2,
-    themesTransp,
+    page3,
 );
 const props2 = Object.assign({},
     props3,
+    themesTransp,
     themesText,
-    themesThin,
 );
 const props = Object.assign({},
     props2,
+    themesThin,
     themesCont,
 );
 

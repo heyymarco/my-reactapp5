@@ -6,6 +6,7 @@ import './App.css';
 import Element from './Element';
 import Indicator from './Indicator';
 import Control from './Control';
+import Content from './Content';
 import Button from './Button';
 import Icon from './Icon';
 import ButtonIcon from './ButtonIcon';
@@ -109,6 +110,9 @@ export default function App (props: any) {
 				<Element theme={theme} enableGradient={enableGrad} size={size}></Element>
 				<Indicator theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}></Indicator>
 				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus}></Control>
+				<Content theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+					Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum aliquam aperiam magni sint eum!
+				</Content>
 				<Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
 				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
