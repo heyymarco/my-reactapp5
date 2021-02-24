@@ -117,10 +117,19 @@ export { config, cssProps };
 
 
 const states = Object.assign({}, Indicators.states, {
-    // change the Indicator's behavior when in active state:
-    '--indi-filterActive' : cssProps.filterActive, // override Indicator's filter active
-    '--indi-animActive'   : cssProps.animActive,   // override Indicator's anim active
-    '--indi-animPassive'  : cssProps.animPassive,  // override Indicator's anim passive
+    // specific states:
+    extend:[
+        // change the Indicator's behavior when in active state:
+        stateActivePassive({
+            [vars.filterActivePassive] : cssProps.filterActive, // override Indicator's filter active
+        }),
+        stateActive({
+            [vars.animActivePassive]   : cssProps.animActive,   // override Indicator's anim active
+        }),
+        statePassive({
+            [vars.animActivePassive]   : cssProps.animPassive,  // override Indicator's anim passive
+        }),
+    ],
 
 
 

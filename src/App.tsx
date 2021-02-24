@@ -111,7 +111,10 @@ export default function App (props: any) {
 				<Indicator theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}></Indicator>
 				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus}></Control>
 				<Content theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum aliquam aperiam magni sint eum!
+					Lorem ipsum dolor sit amet consectetur adipisicing elit.
+					<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+					<Button  theme='success'>Hello Button</Button>
+					Ipsum aliquam aperiam magni sint eum!
 				</Content>
 				<Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
@@ -126,13 +129,17 @@ export default function App (props: any) {
 				</ButtonIcon>
 				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>{[
 					'An item',
+					<ListGroupItem key={199} enabled={enabled} active={active}>
+						<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+						<Button  theme='success'>Hello Button</Button>
+					</ListGroupItem>,
 					'A second item',
 					<ListGroupItem key={2} enabled={enabled} active={active}>A third item</ListGroupItem>,
 					'A fourth item',
 					<Button key={123}  theme='none' size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>,
 					'A fifth item',
 					<ListGroupItem key={99} enabled={enabled} active={active}>
-						<Button  theme='none' size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+						<Button  theme='none' enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 					</ListGroupItem>,
 					'A sixth item',
 					<ListGroupItem key={55} enabled={enabled} active={active}>A seventh item</ListGroupItem>,
