@@ -149,7 +149,18 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
-const states = { };
+const states = {
+    // customize the foreg:
+    [vars.colorFn]: cssProps.color,
+
+    // customize the backg:
+    [vars.backgFn]: cssProps.backg,
+
+    // customize the anim:
+    [vars.animFn]: [
+        cssProps.anim,
+    ],
+};
 
 const styles = {
     main: {
@@ -160,19 +171,13 @@ const styles = {
 
 
 
-        // we have 3 custom css props [colorFn, backgFn, animFn]
-        // set the default value of them:
-
         // a custom css props for manipulating foreground:
-        [vars.colorFn]: cssProps.color, // set default value
         color: getVar(vars.colorFn),    // apply prop
 
         // a custom css props for manipulating background(s):
-        [vars.backgFn]: cssProps.backg, // set default value
         backg: getVar(vars.backgFn),    // apply prop
 
         // a custom css props for manipulating animation(s):
-        [vars.animFn]: cssProps.anim,   // set default value
         anim: getVar(vars.animFn),      // apply prop
     },
     gradient: { '&:not(._)': { // force to win conflict with main

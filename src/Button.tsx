@@ -104,11 +104,17 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
+const states = Object.assign({}, Controls.states, {
+    // customize the background(s) at outlined state:
+    [vars.backgOlFn]: 'transparent',
+});
+
 const styles = {
     main: {
         extend: [
             Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
             filterValidProps(cssProps), // apply our filtered cssProps
+            states,                     // apply our states
         ],
         
         // flex settings:
@@ -122,15 +128,6 @@ const styles = {
         verticalAlign  : middle,
 
         userSelect     : none, // disable selecting button's text
-
-
-
-        // we have 1 custom css props [backgOlFn]
-        // set the default value of it:
-
-        // a custom css props for manipulating background(s) at outlined state:
-        [vars.backgOlFn]: 'transparent',    // set default value
-        // backg: getVar(vars.backgOlFn),   // not apply yet
     },
     gradient: { '&:not(._)': { // force to win conflict with main
         extend: [
@@ -213,7 +210,7 @@ defineSizes(styles, (size, Size, sizeProp) => ({
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 const useStyles = createUseStyles(styles2);
-export { styles2 as styles, useStyles };
+export { states, styles2 as styles, useStyles };
 
 
 

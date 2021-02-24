@@ -1,7 +1,7 @@
 import React               from 'react';
 
 import * as Elements       from './Element';
-import * as Indicators     from './Indicator';
+import * as Contents       from './Content';
 import {
     stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
@@ -12,9 +12,8 @@ import {
     defineSizes, defineThemes,
 
     useStateEnabledDisabled, useStateActivePassive,
-}                          from './Indicator';
+}                          from './Content';
 import * as border         from './borders';
-import colors              from './colors';
 import stipOuts            from './strip-outs';
 import ListGroupItem       from './ListGroupItem';
 
@@ -40,16 +39,6 @@ export {
 type Orientation = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 export interface CssProps {
     orientation : Orientation | string
-
-
-    // anim props:
-
-    filterActive          : string | string[][]
-
-    '@keyframes active'   : object
-    '@keyframes passive'  : object
-    animActive            : string | (string | object)[][]
-    animPassive           : string | (string | object)[][]
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -59,75 +48,20 @@ export interface CssProps {
 
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
-export const vars = Object.assign({}, Indicators.vars, {
+export const vars = Object.assign({}, Contents.vars, {
     /**
-     * defines the foreground color at active state.
-     */
-    colorActive        : '--lg-colorActive',
-
-    /**
-     * a custom css props for manipulating foreground at active state.
-     */
-    colorActiveFn      : '--lg-colorActiveFn',
-
-    /**
-     * defines the background color at active state.
-     */
-    backgActive        : '--lg-backgActive',
-
-    /**
-     * a custom css props for manipulating background(s) at active state.
-     */
-    backgActiveFn      : '--lg-backgActiveFn',
-
-    /**
-     * (internal) Forwards animFn from parent element to children element.
+     * (internal use) Forwards anim to children element.
     */
-    animFw             : '--lg-animFw',
-
-
-    // anim props:
-
-    backgActivePassive : '--lg-backgActivePassive',
-    colorActivePassive : '--lg-colorActivePassive',
+    animFw: '--lg-animFw',
 });
 
 // re-defined later, we need to construct varProps first
-export const keyframesActive   = { from: undefined, to: undefined };
-export const keyframesPassive  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
-const icssProps = Indicators.cssProps;
+const ccssProps = Contents.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     orientation : 'column',
-
-
-    // anim props:
-
-    filterActive          : ecssProps.filterNone,
-
-    '@keyframes active'   : keyframesActive,
-    '@keyframes passive'  : keyframesPassive,
-    animActive            : [['150ms', 'ease-out', 'both', keyframesActive  ]],
-    animPassive           : [['300ms', 'ease-out', 'both', keyframesPassive ]],
 };
-
-
-
-Object.assign(keyframesActive, {
-    from: Object.assign({}, Indicators.keyframesActive.from, {
-        color: getVar(vars.colorFn),
-        backg: getVar(vars.backgFn),
-    }),
-    to: Object.assign({}, Indicators.keyframesActive.to, {
-        color: getVar(vars.colorActiveFn),
-        backg: getVar(vars.backgActiveFn),
-    })
-});
-Object.assign(keyframesPassive, {
-    from : keyframesActive.to,
-    to   : keyframesActive.from
-});
 
 
 
@@ -143,6 +77,11 @@ export { config, cssProps };
 // export default cssProps;
 
 
+
+const states = Object.assign({}, Contents.states, {
+    // customize the anim prop to be forwarded to another element(s):
+    [vars.animFw]: getVar(vars.animFn),
+});
 
 const styles = {
     main: {
@@ -160,13 +99,12 @@ const styles = {
 
         '& >li': { // wrapper element
             extend: [
-                filterValidProps(icssProps), // apply Indicator's filtered cssProps
-                Indicators.states,           // apply Indicator's states
-            ],
+                // Contents.styles.main, // we don't needed the style, just make an invisible wrapper element
 
-            '--indi-filterActive' : cssProps.filterActive, // override Indicator's filter active
-            '--indi-animActive'   : cssProps.animActive,   // override Indicator's anim active
-            '--indi-animPassive'  : cssProps.animPassive,  // override Indicator's anim passive
+                // copy props & states from Content, without the style:
+                filterValidProps(ccssProps), // apply Content's filtered cssProps
+                Contents.states,             // apply Content's states
+            ],
 
             display: 'block',
     
@@ -174,9 +112,9 @@ const styles = {
 
             // make a nicely rounded corners:
             border         : ecssProps.border, // moved from children
-            overflow       : 'hidden',
+            overflow       : 'hidden', // clip the children at rounded corners
             '& + li': {
-                borderTopWidth: 0,
+                borderTopWidth: 0, // remove duplicate border
             },
             '&:first-child': {extend:[
                 border.radius.top(ecssProps.borderRadius),    // moved from children
@@ -187,8 +125,7 @@ const styles = {
 
 
 
-            [vars.animFw]: getVar(vars.animFn),
-            '& >.lg-wrapper': { // main child element
+            '& >.lg-wrapper': { // main child elements
                 extend:[
                     Elements.styles.main, // copy styles from Element, including Control's cssProps & Control's states.
                 ],
@@ -202,74 +139,35 @@ const styles = {
 
 
                 [vars.animFn] : getVar(vars.animFw),
-            } // main element
+            } // main child elements
         }, // wrapper element
-
-
-
-        // we have 4 custom css props [colorActive, colorActiveFn, backgActive, backgActiveFn]
-        // set the default value of them:
-
-        // define the foreground color at active state:
-        [vars.colorActive]: 'black', //TODO: remove hard coding
-
-        // a custom css props for manipulating foreground at active state:
-        [vars.colorActiveFn]: getVar(vars.colorActive), // set default value
-        // color: getVar(vars.colorActiveFn),           // not apply yet
-
-        // define the background color at active state:
-        [vars.backgActive]: 'rgba(0,0,0, 0.2)', //TODO: remove hard coding
-
-        // a custom css props for manipulating background(s) at active state:
-        [vars.backgActiveFn]: getVar(vars.backgActive), // set default value
-        // backg: getVar(vars.backgActiveFn),           // not apply yet
     },
-    gradient: { '&>li>.lg-wrapper:not(._)': { // force to win conflict with main child element
+    gradient: { '& >li >.lg-wrapper:not(._)': { // force to win conflict with main child element
         extend: [
-            // copy the themes from Element:
-            Elements.styles.gradient,
-        ],
-
-        // customize the backg at active state:
-        [vars.backgActiveFn]: [ // active background with gradient
-            ecssProps.backgGrad,
-            getVar(vars.backgActive),
+            // copy the themes from Content:
+            Contents.styles.gradient,
         ],
     }},
 };
 
-defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    // overwrite the backg & color props
-    // we ignore the backg & color if the theme applied
-
-    '--elm-color' : (colors as any)[`${theme}Cont`],
-    '--elm-backg' : (colors as any)[`${theme}Thin`],
-
-
-    // customize the backg & color at active state:
-    [vars.colorActive] : (colors as any)[`${theme}Text`],
-    [vars.backgActive] : themeColor,
-}));
-
 const useStyles = createUseStyles(styles);
-export { styles, useStyles };
+export { states, styles, useStyles };
 
 
 
 export interface Props
     extends
-        Elements.Props
+        Contents.Props
 {
     orientation? : Orientation
-
-    children?    : React.ReactNode
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
+    const ctStyles       = Contents.useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, styles);
+    const variTheme      = Elements.useVariantTheme(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, styles);
 
     

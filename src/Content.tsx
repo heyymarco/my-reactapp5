@@ -37,6 +37,8 @@ export {
 export interface CssProps {
     // anim props:
 
+    colorActive           : string
+    backgActive           : string | string[][] | object
     filterActive          : string | string[][]
 
     '@keyframes active'   : object
@@ -54,19 +56,9 @@ export interface CssProps {
 const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Indicators.vars, {
     /**
-     * defines the foreground color at active state.
-     */
-    colorActive        : '--ct-colorActive',
-
-    /**
      * a custom css props for manipulating foreground at active state.
      */
     colorActiveFn      : '--ct-colorActiveFn',
-
-    /**
-     * defines the background color at active state.
-     */
-    backgActive        : '--ct-backgActive',
 
     /**
      * a custom css props for manipulating background(s) at active state.
@@ -82,12 +74,14 @@ const ecssProps = Elements.cssProps;
 const _cssProps: CssProps = {
     // anim props:
 
+    colorActive           : ecssProps.color,
+    backgActive           : colors.foregThin,
     filterActive          : ecssProps.filterNone,
 
     '@keyframes active'   : keyframesActive,
     '@keyframes passive'  : keyframesPassive,
-    animActive            : [['150ms', 'ease-out', 'both', keyframesActive  ]],
-    animPassive           : [['300ms', 'ease-out', 'both', keyframesPassive ]],
+    animActive            : [['150ms', 'ease-out', 'both', keyframesActive ]],
+    animPassive           : [['300ms', 'ease-out', 'both', keyframesPassive]],
 };
 
 
@@ -122,35 +116,28 @@ export { config, cssProps };
 
 
 
+const states = Object.assign({}, Indicators.states, {
+    // change the Indicator's behavior when in active state:
+    '--indi-filterActive' : cssProps.filterActive, // override Indicator's filter active
+    '--indi-animActive'   : cssProps.animActive,   // override Indicator's anim active
+    '--indi-animPassive'  : cssProps.animPassive,  // override Indicator's anim passive
+
+
+
+    // customize the foreground at active state:
+    [vars.colorActiveFn]: cssProps.colorActive,
+
+    // customize the background(s) at active state:
+    [vars.backgActiveFn]: cssProps.backgActive,
+});
+
 const styles = {
     main: {
         extend: [
-            Indicators.styles.main, // copy styles from Indicator, including Indicator's cssProps & Indicator's states.
+            Indicators.styles.main,     // copy styles from Indicator, including Indicator's cssProps & Indicator's states.
+            filterValidProps(cssProps), // apply our filtered cssProps
+            states,                     // apply our states
         ],
-
-        // change the Indicator's behavior when in active state:
-        '--indi-filterActive' : cssProps.filterActive, // override Indicator's filter active
-        '--indi-animActive'   : cssProps.animActive,   // override Indicator's anim active
-        '--indi-animPassive'  : cssProps.animPassive,  // override Indicator's anim passive
-
-
-
-        // we have 4 custom css props [colorActive, colorActiveFn, backgActive, backgActiveFn]
-        // set the default value of them:
-
-        // define the foreground color at active state:
-        [vars.colorActive]: ecssProps.color,
-
-        // a custom css props for manipulating foreground at active state:
-        [vars.colorActiveFn]: getVar(vars.colorActive), // set default value
-        // color: getVar(vars.colorActiveFn),           // not apply yet
-
-        // define the background color at active state:
-        [vars.backgActive]: colors.foregThin,
-
-        // a custom css props for manipulating background(s) at active state:
-        [vars.backgActiveFn]: getVar(vars.backgActive), // set default value
-        // backg: getVar(vars.backgActiveFn),           // not apply yet
     },
     gradient: { '&:not(._)': { // force to win conflict with main
         extend: [
@@ -161,7 +148,7 @@ const styles = {
         // customize the backg at active state:
         [vars.backgActiveFn]: [ // active background with gradient
             ecssProps.backgGrad,
-            getVar(vars.backgActive),
+            cssProps.backgActive,
         ],
     }},
 };
@@ -175,12 +162,12 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 
 
     // customize the backg & color at active state:
-    [vars.colorActive] : (colors as any)[`${theme}Text`],
-    [vars.backgActive] : themeColor,
+    '--ct-colorActive' : (colors as any)[`${theme}Text`],
+    '--ct-backgActive' : themeColor,
 }));
 
 const useStyles = createUseStyles(styles);
-export { styles, useStyles };
+export { states, styles, useStyles };
 
 
 

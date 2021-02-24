@@ -231,7 +231,7 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
-const states = {
+const states = Object.assign({}, Elements.states, {
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
@@ -301,7 +301,7 @@ const states = {
             ]},
         },
     ],
-};
+});
 
 const styles = {
     main: {

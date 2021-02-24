@@ -284,7 +284,17 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
-const states = {
+const states = Object.assign({}, Elements.states, { // not copy from Indicators.states because the state*** are too much different
+    // TODO: activate this code:
+    // a custom css props for manipulating a box-shadow at focused state:
+    // [vars.boxShadowFocusFn]: [[ // set default value
+    //     cssProps.boxShadowFocus,
+    //     'rgba(128, 128, 128, 0.5)',
+    // ]],
+    // boxShadow: getVar(vars.boxShadowFocusFn), // not apply yet
+
+
+
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
@@ -392,29 +402,16 @@ const states = {
             [vars.animActivePassive]              : ecssProps.animNone,
         }}),
     ],
-};
+});
 
 const styles = {
     main: {
         extend: [
             stipOuts.control,           // clear browser's default styles
-            Elements.styles.main,       // copy styles from Element, including Element's cssProps & Element's states. NOT copy from Indicator because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
+            Elements.styles.main,       // copy styles from Element, including Element's cssProps & Element's states. NOT copy from Indicators.styles.main because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
             filterValidProps(cssProps), // apply our filtered cssProps
             states,                     // apply our states
         ],
-
-
-
-        // we have 1 custom css props [backgOlFn]
-        // set the default value of it:
-
-        // TODO: activate this code:
-        // a custom css props for manipulating a box-shadow at focused state:
-        // [vars.boxShadowFocusFn]: [[ // set default value
-        //     cssProps.boxShadowFocus,
-        //     'rgba(128, 128, 128, 0.5)',
-        // ]],
-        // boxShadow: getVar(vars.boxShadowFocusFn), // not apply yet
     },
 };
 
