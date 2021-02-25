@@ -16,7 +16,7 @@ import {
     useStateEnabledDisabled, useStateActivePassive,
 }                          from './Content';
 import * as border         from './borders';
-import stipOuts            from './strip-outs';
+import stripOuts           from './strip-outs';
 import ListGroupItem       from './ListGroupItem';
 
 import { createUseStyles } from 'react-jss';
@@ -87,7 +87,7 @@ const states = Object.assign({}, Contents.states, {
 const styles = {
     main: {
         extend: [
-            stipOuts.list, // clear browser's default styles
+            stripOuts.list, // clear browser's default styles
             filterValidProps(cssProps), // apply our filtered cssProps
         ],
 

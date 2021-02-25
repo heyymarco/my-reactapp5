@@ -179,6 +179,67 @@ export default function App (props: any) {
 					<a href='/'>Card link</a>
 					<a href='/'>Another link</a>
 				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+					<img src='https://picsum.photos/300/200' alt='' />
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
+					header=
+						'Lorem ipsum dolor'
+
+					footer=
+						'dolor sit amet'
+				>
+					<img src='https://picsum.photos/300/200' alt='' />
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
+					header=
+						'Lorem ipsum dolor'
+
+					footer=
+						'dolor sit amet'
+				>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
+					header=
+						'Lorem ipsum dolor'
+
+					footer=
+						'dolor sit amet'
+				>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
+					<img src='https://picsum.photos/300/200' alt='' />
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+					<figure>
+						<img src='https://picsum.photos/300/200' alt='' />
+
+					</figure>
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
+				</Card>
 				<hr style={{flexBasis: '100%'}} />
 				<label>
 					<input type='checkbox'

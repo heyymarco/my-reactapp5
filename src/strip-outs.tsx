@@ -67,6 +67,17 @@ export const list = {
     }
 };
 
+/**
+ * removes a browser's default styling on figure.
+ */
+export const figure = {
+    display           : unset,
+    marginBlockStart  : unset,
+    marginBlockEnd    : unset,
+    marginInlineStart : unset,
+    marginInlineEnd   : unset,
+};
 
-const exports = { link, control, list };
+
+const exports = { link, control, list, figure };
 export default exports;

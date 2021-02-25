@@ -36,6 +36,38 @@ export default function normalizeShorthands(): Plugin {
                 delete (style as StyleEx)['padding-y'];
             }
 
+            const hasMarginX = ('margin-x' in style);
+            const hasMarginY = ('margin-y' in style);
+            const styleAny = style as {[key: string]: any};
+            if (hasMarginX && hasMarginY) {
+                const marginX = (style as StyleEx)['margin-x'];
+                const marginY = (style as StyleEx)['margin-y'];
+                if (Array.isArray(marginX) && Array.isArray(marginY)
+                    && (marginX.length === 1) && (marginY.length === 1)
+                    && Array.isArray(marginX[0]) && Array.isArray(marginY[0])
+                ) {
+                    style.margin = [[
+                        marginY[0].join(' '),
+                        marginX[0].join(' '),
+                    ]];
+                }
+                else {
+                    style.margin = [[
+                        marginY,
+                        marginX,
+                    ]];
+                }
+
+                delete (style as StyleEx)['margin-x'];
+                delete (style as StyleEx)['margin-y'];
+            } else if (hasMarginX) {
+                styleAny['margin-left'] = styleAny['margin-right'] = (style as StyleEx)['margin-x'];
+                delete (style as StyleEx)['margin-x'];
+            } else if (hasMarginY) {
+                styleAny['margin-top'] = styleAny['margin-bottom'] = (style as StyleEx)['margin-y'];
+                delete (style as StyleEx)['margin-y'];
+            }
+
 
             return style;
         }

@@ -18,8 +18,8 @@ import {
 import * as border         from './borders';
 import spacers             from './spacers';
 import colors              from './colors';
-import stipOuts            from './strip-outs';
-import ListGroupItem       from './ListGroupItem';
+import stripOuts           from './strip-outs';
+import { paragraph }       from './typos/index';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -101,6 +101,42 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
 const states = Object.assign({}, Contents.states, {
 });
 
+const image = {
+    width   : [['calc(100% + (', ecssProps.paddingX, ' * 2))']], // Required because we use flexbox and this inherently applies align-self: stretch
+    // height  : [['calc(100% + (', ecssProps.paddingY, ' * 2))']],
+
+    // cancel-out parent's padding with negative margin:
+    marginX : [['calc(0px - ', ecssProps.paddingX, ')']],
+    marginY : [['calc(0px - ', ecssProps.paddingY, ')']],
+
+    // add an extra spaces to the next sibling:
+    '&:not(:last-child)': {
+        marginBottom: ecssProps.paddingY,
+    },
+};
+
+const cardItem = {
+    display: 'grid',
+
+    // moved paddings from main:
+    paddingX: ecssProps.paddingX,
+    paddingY: ecssProps.paddingY,
+    
+    position: 'relative', // support for absolute positioned figure
+    overflow: 'hidden', // clip the oversized overlay
+    '& >figure': {
+        extend: [
+            stripOuts.figure,
+        ],
+        display: 'flex', // do not take space if the img fail to load image
+
+        '& >img': {
+            width: '100%',
+        }
+    },
+    '& >figure, & >img': image,
+};
+
 const styles = {
     main: {
         extend: [
@@ -109,9 +145,10 @@ const styles = {
             states,                     // apply our states
         ],
 
-        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
+
+        overflow: 'hidden', // clip the children at rounded corners
 
         // move paddings to [header, body, footer]:
         paddingX: undefined,
@@ -130,34 +167,24 @@ const styles = {
     },
     header: {
         extend: [
+            cardItem,
+
             // apply cssProps ending with ***Cap:
             filterPrefixProps(cssProps, 'cap'),
         ],
-
-        display: 'block',
-
-        // moved paddings from main:
-        paddingX: ecssProps.paddingX,
-        paddingY: ecssProps.paddingY,
     },
     footer: {
         extend: [
+            cardItem,
+
             // apply cssProps ending with ***Cap:
             filterPrefixProps(cssProps, 'cap'),
         ],
-
-        display: 'block',
-
-        // moved paddings from main:
-        paddingX: ecssProps.paddingX,
-        paddingY: ecssProps.paddingY,
     },
     body: {
-        display: 'block',
-
-        // moved paddings from main:
-        paddingX: ecssProps.paddingX,
-        paddingY: ecssProps.paddingY,
+        extend: [
+            cardItem,
+        ],
 
         // Enable `flex-grow: 1` for decks and groups so that card blocks take up
         // as much space as possible, ensuring footers are aligned to the bottom.

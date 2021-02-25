@@ -18,7 +18,7 @@ import {
     useStateEnabledDisabled, useStateActivePassive,
 }                          from './Indicator';
 import colors              from './colors';
-import stipOuts            from './strip-outs';
+import stripOuts           from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -404,7 +404,7 @@ const states = Object.assign({}, Elements.states, { // not copy from Indicators.
 const styles = {
     main: {
         extend: [
-            stipOuts.control,           // clear browser's default styles
+            stripOuts.control,          // clear browser's default styles
             Elements.styles.main,       // copy styles from Element, including Element's cssProps & Element's states. NOT copy from Indicators.styles.main because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
             filterValidProps(cssProps), // apply our filtered cssProps
             states,                     // apply our states
