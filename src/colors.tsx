@@ -6,7 +6,7 @@ import Color            from 'color';
 export let transpLevel = 0.5;
 const transpColor = (color: Color) => color.alpha(transpLevel)                     as (Color | string);
 const textColor   = (color: Color) => (color.isLight() ? themes.dark : themes.light)    as (Color | string);
-export let thinLevel = 0.15;
+export let thinLevel = 0.2;
 const thinColor   = (color: Color) => color.alpha(thinLevel)                       as (Color | string);
 const contColor   = (color: Color) => color.mix(page2.foreg as Color, 0.8)              as (Color | string);
 

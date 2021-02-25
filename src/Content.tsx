@@ -9,7 +9,7 @@ import {
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
-    filterValidProps,
+    filterValidProps, filterPrefixProps,
 
     defineSizes, defineThemes,
 
@@ -27,7 +27,7 @@ export {
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
-    filterValidProps,
+    filterValidProps, filterPrefixProps,
 
     defineSizes, defineThemes,
 

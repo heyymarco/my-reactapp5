@@ -9,7 +9,7 @@ import {
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
-    filterValidProps,
+    filterValidProps, filterPrefixProps,
 
     defineSizes, defineThemes,
 
@@ -29,7 +29,7 @@ export {
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
-    filterValidProps,
+    filterValidProps, filterPrefixProps,
 
     defineSizes, defineThemes,
 
@@ -88,6 +88,7 @@ const styles = {
     main: {
         extend: [
             stipOuts.list, // clear browser's default styles
+            filterValidProps(cssProps), // apply our filtered cssProps
         ],
 
         // flex settings:

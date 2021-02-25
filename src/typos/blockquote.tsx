@@ -52,5 +52,10 @@ base.declareCss({
     'blockquote,.blockquote': {
         extend  : varProps,
         display : 'block',
+
+
+        '&:last-child': {
+            marginBlockEnd: 0,
+        },
     },
 });

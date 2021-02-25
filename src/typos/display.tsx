@@ -24,6 +24,8 @@ const cssProps: CssProps = {
     fontSize5         : [['calc(', 3.0, '*', (gens.fontSize as string), ')']],
     fontSize6         : [['calc(', 2.5, '*', (gens.fontSize as string), ')']],
 
+    subOpacity        : heads.subOpacity,
+
     fontSize          : undefined as unknown as string,
     fontFamily        : heads.fontFamily,
     fontWeight        : 300,

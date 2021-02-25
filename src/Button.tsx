@@ -11,6 +11,8 @@ import {
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
 
+    filterValidProps, filterPrefixProps,
+
     defineSizes, defineThemes,
 
     useStateEnabledDisabled, useStateActivePassive,
@@ -31,6 +33,8 @@ export {
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
+
+    filterValidProps, filterPrefixProps,
 
     defineSizes, defineThemes,
 
@@ -94,15 +98,6 @@ export { config, cssProps };
 // export default cssProps;
 
 
-
-export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
-    const cssPropsCopy: { [key: string]: any } = { };
-    for (const [key, value] of Object.entries(Controls.filterValidProps(cssProps))) {
-        if ((/^(orientation)$/).test(key)) continue;
-        cssPropsCopy[key] = value;
-    }
-    return cssPropsCopy;
-}
 
 const states = Object.assign({}, Controls.states, {
     // customize the background(s) at outlined state:

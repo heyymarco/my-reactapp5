@@ -15,6 +15,7 @@ import typos,
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
 import { pascalCase }      from 'pascal-case';
+import { camelCase }       from 'camel-case';
 
 
 
@@ -144,8 +145,16 @@ export { config, cssProps };
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None)$|^(@)|backgGrad|anim/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enabled|Disabled|Active|Passive|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation/).test(key)) continue;
         cssPropsCopy[key] = value;
+    }
+    return cssPropsCopy;
+}
+export const filterPrefixProps = <TCssProps,>(cssProps: TCssProps, prefix: string) => {
+    const cssPropsCopy: { [key: string]: any } = { };
+    for (const [key, value] of Object.entries(cssProps)) {
+        if (!key.startsWith(prefix)) continue;
+        cssPropsCopy[camelCase(key.substr(prefix.length))] = value;
     }
     return cssPropsCopy;
 }

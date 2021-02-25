@@ -9,11 +9,14 @@ import {
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
+    filterPrefixProps,
+
     defineSizes, defineThemes,
 
     useStateEnabledDisabled, useStateActivePassive,
 }                          from './Content';
 import * as border         from './borders';
+import spacers             from './spacers';
 import colors              from './colors';
 import stipOuts            from './strip-outs';
 import ListGroupItem       from './ListGroupItem';
@@ -28,6 +31,8 @@ export {
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
+    filterPrefixProps,
+
     defineSizes, defineThemes,
 
     useStateEnabledDisabled, useStateActivePassive,
@@ -36,12 +41,13 @@ export {
 
 
 export interface CssProps {
-    orientation : Css.Orientation
+    orientation       : Css.Orientation
 
-    height      : Css.Height
+    height            : Css.Height
 
-    colorCap    : Css.Color,
-    backgCap    : Css.Background
+    capColor          : Css.Color
+    capBackg          : Css.Background
+    capBackdropFilter : Css.Filter
 }
 const unset   = 'unset';
 // const none    = 'none';
@@ -59,12 +65,13 @@ const ecssProps = Elements.cssProps;
 const ccssProps = Contents.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    orientation : 'column',
+    orientation       : 'column',
 
-    height: unset,
+    height            : unset,
 
-    colorCap: unset,
-    backgCap: colors.foregThin as string,
+    capColor          : unset,
+    capBackg          : unset,
+    capBackdropFilter : 'brightness(0.8)',
 };
 
 
@@ -85,16 +92,8 @@ export { config, cssProps };
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(Contents.filterValidProps(cssProps))) {
-        if ((/(Cap)$/).test(key)) continue;
+        if ((/^(cap)/).test(key)) continue;
         cssPropsCopy[key] = value;
-    }
-    return cssPropsCopy;
-}
-export const filterPropsSuffix = <TCssProps,>(cssProps: TCssProps, suffix: string) => {
-    const cssPropsCopy: { [key: string]: any } = { };
-    for (const [key, value] of Object.entries(cssProps)) {
-        if (!key.endsWith(suffix)) continue;
-        cssPropsCopy[key.substr(0, key.length - suffix.length)] = value;
     }
     return cssPropsCopy;
 }
@@ -114,33 +113,64 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
 
+        // move paddings to [header, body, footer]:
         paddingX: undefined,
         paddingY: undefined,
+
         minWidth: 0, // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
         wordWrap: 'break-word',
         backgroundClip: 'border-box',
 
+
+        '& a': {
+            '& +a': {
+                marginLeft: spacers.default,
+            },
+        },
     },
     header: {
         extend: [
-            filterPropsSuffix(cssProps, 'Cap'),
+            // apply cssProps ending with ***Cap:
+            filterPrefixProps(cssProps, 'cap'),
         ],
+
+        display: 'block',
+
+        // moved paddings from main:
         paddingX: ecssProps.paddingX,
         paddingY: ecssProps.paddingY,
-        borderBottom: ecssProps.border,
     },
     footer: {
         extend: [
-            filterPropsSuffix(cssProps, 'Cap'),
+            // apply cssProps ending with ***Cap:
+            filterPrefixProps(cssProps, 'cap'),
         ],
+
+        display: 'block',
+
+        // moved paddings from main:
         paddingX: ecssProps.paddingX,
         paddingY: ecssProps.paddingY,
-        borderTop: ecssProps.border,
     },
     body: {
+        display: 'block',
+
+        // moved paddings from main:
         paddingX: ecssProps.paddingX,
         paddingY: ecssProps.paddingY,
+
+        // Enable `flex-grow: 1` for decks and groups so that card blocks take up
+        // as much space as possible, ensuring footers are aligned to the bottom.
         flex: [[1, 1, 'auto']],
+
+        '&:not(:first-child)': {
+            // add border between header & body:
+            borderTop: ecssProps.border,
+        },
+        '&:not(:last-child)': {
+            // add border between body & footer:
+            borderBottom: ecssProps.border,
+        }
     },
 };
 

@@ -8,6 +8,8 @@ import
 
 import * as Elements       from './Element';
 import {
+    filterValidProps, filterPrefixProps,
+    
     defineSizes, defineThemes,
 }                          from './Element';
 
@@ -17,6 +19,8 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    filterValidProps, filterPrefixProps,
+
     defineSizes, defineThemes,
 };
 
@@ -223,15 +227,6 @@ export const stateNoAnimStartup     = () =>
     );
 
 
-
-export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
-    const cssPropsCopy: { [key: string]: any } = { };
-    for (const [key, value] of Object.entries(Elements.filterValidProps(cssProps))) {
-        if ((/(Enabled|Disabled|Active|Passive)$/).test(key)) continue;
-        cssPropsCopy[key] = value;
-    }
-    return cssPropsCopy;
-}
 
 const states = Object.assign({}, Elements.states, {
     // customize the anim:

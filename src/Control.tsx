@@ -11,6 +11,8 @@ import * as Indicators     from './Indicator';
 import {
     stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
 
+    filterValidProps, filterPrefixProps,
+
     defineSizes, defineThemes,
 
     useStateEnabledDisabled, useStateActivePassive,
@@ -26,6 +28,8 @@ import JssVarCollection    from './jss-var-collection';
 export {
     stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
 
+    filterValidProps, filterPrefixProps,
+    
     defineSizes, defineThemes,
 
     useStateEnabledDisabled, useStateActivePassive,
@@ -276,15 +280,6 @@ export const stateNoAnimStartup     = () =>
     );
 
 
-
-export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
-    const cssPropsCopy: { [key: string]: any } = { };
-    for (const [key, value] of Object.entries(Indicators.filterValidProps(cssProps))) {
-        if ((/(Hover|Leave|Focus|Blur)$/).test(key)) continue;
-        cssPropsCopy[key] = value;
-    }
-    return cssPropsCopy;
-}
 
 const states = Object.assign({}, Elements.states, { // not copy from Indicators.states because the state*** are too much different
     // TODO: activate this code:

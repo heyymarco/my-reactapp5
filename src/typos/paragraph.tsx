@@ -57,5 +57,10 @@ base.declareCss({
     'p, .p': {
         extend  : varProps,
         display : 'block',
+
+
+        '&:last-child': {
+            marginBlockEnd: 0,
+        },
     },
 });

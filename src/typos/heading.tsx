@@ -12,12 +12,14 @@ import JssVarCollection from '../jss-var-collection';
 export interface CssProps
     extends par.CssProps {
     
-    fontSize1 : Css.FontSize
-    fontSize2 : Css.FontSize
-    fontSize3 : Css.FontSize
-    fontSize4 : Css.FontSize
-    fontSize5 : Css.FontSize
-    fontSize6 : Css.FontSize
+    fontSize1  : Css.FontSize
+    fontSize2  : Css.FontSize
+    fontSize3  : Css.FontSize
+    fontSize4  : Css.FontSize
+    fontSize5  : Css.FontSize
+    fontSize6  : Css.FontSize
+
+    subOpacity : Css.Opacity
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -31,6 +33,8 @@ const cssProps: CssProps = {
     fontSize4         : [['calc(', 1.50, '*', (gens.fontSize as string), ')']],
     fontSize5         : [['calc(', 1.25, '*', (gens.fontSize as string), ')']],
     fontSize6         : [['calc(', 1.00, '*', (gens.fontSize as string), ')']],
+
+    subOpacity        : 0.8,
 
     fontSize          : undefined as unknown as string,
     fontFamily        : inherit,
@@ -70,16 +74,36 @@ export function createCss(varProps: typeof cssProps, classLevelDecl: (level: num
 
 
     newVarProps[levels.map(classLevelDecl).join(',')] = {
-        extend    : varProps,
+        extend     : varProps,
         
-        display   : 'block',
-        fontSize  : null,
-        fontSize1 : null,
-        fontSize2 : null,
-        fontSize3 : null,
-        fontSize4 : null,
-        fontSize5 : null,
-        fontSize6 : null,
+        display    : 'block',
+        fontSize   : null,
+        fontSize1  : null,
+        fontSize2  : null,
+        fontSize3  : null,
+        fontSize4  : null,
+        fontSize5  : null,
+        fontSize6  : null,
+        subOpacity : null,
+
+
+        '&:last-child': {
+            marginBlockEnd: 0,
+        },
+
+        
+        // make sub-title near the main title and apply margin to sub-title:
+        [levels.reverse().map(classLevelDecl).map(cls => `& +${cls}`).join(',')]: {
+            opacity: varProps.subOpacity,
+
+            // make sub-title near the main title:
+            marginBlockStart: [['calc(', varProps.marginBlockEnd, '*', -1, ')']],
+
+            // apply margin to sub-title:
+            '&:not(:last-child)': {
+                marginBlockEnd: varProps.marginBlockEnd,
+            },
+        },
     };
 
 

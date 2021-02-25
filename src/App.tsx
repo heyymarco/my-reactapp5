@@ -166,6 +166,19 @@ export default function App (props: any) {
 						'dolor sit amet'
 					
 				/>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+					<h5>Card title</h5>
+					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+					<a href='/'>Card link</a>
+					<a href='/'>Another link</a>
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+					<h5>Card title</h5>
+					<h6>Card subtitle</h6>
+					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+					<a href='/'>Card link</a>
+					<a href='/'>Another link</a>
+				</Card>
 				<hr style={{flexBasis: '100%'}} />
 				<label>
 					<input type='checkbox'

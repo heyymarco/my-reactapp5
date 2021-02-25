@@ -26,7 +26,7 @@ const cssProps: CssProps = {
     lineHeight     : inherit,
 
     color          : inherit,
-    opacity        : 0.63,
+    opacity        : 0.65,
 };
 
 
