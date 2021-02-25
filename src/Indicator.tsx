@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import
     React, {
     useState,
@@ -23,17 +25,17 @@ export {
 export interface CssProps {
     // anim props:
 
-    filterDisabled        : string | string[][]
-    filterActive          : string | string[][]
+    filterDisabled        : Css.Filter
+    filterActive          : Css.Filter
 
-    '@keyframes enabled'  : object
-    '@keyframes disabled' : object
-    '@keyframes active'   : object
-    '@keyframes passive'  : object
-    animEnabled           : string | (string | object)[][]
-    animDisabled          : string | (string | object)[][]
-    animActive            : string | (string | object)[][]
-    animPassive           : string | (string | object)[][]
+    '@keyframes enabled'  : Css.Keyframes
+    '@keyframes disabled' : Css.Keyframes
+    '@keyframes active'   : Css.Keyframes
+    '@keyframes passive'  : Css.Keyframes
+    animEnabled           : Css.Animation
+    animDisabled          : Css.Animation
+    animActive            : Css.Animation
+    animPassive           : Css.Animation
 }
 // const unset   = 'unset';
 // const none    = 'none';

@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import React               from 'react';
 
 import
@@ -7,8 +9,7 @@ import
     borders,
     * as border            from './borders';
 import spacers             from './spacers';
-import
-    typos,
+import typos,
     { base as typoBase }   from './typos/index';
 
 import { createUseStyles } from 'react-jss';
@@ -20,39 +21,39 @@ import { pascalCase }      from 'pascal-case';
 export interface CssProps
     extends typoBase.CssProps {
 
-    fontSizeSm         : string | number | typoBase.Expression
-    fontSizeLg         : string | number | typoBase.Expression
+    fontSizeSm         : Css.FontSize
+    fontSizeLg         : Css.FontSize
 
-    color              : string
-    backg              : string | string[][] | object
-    backgGrad          : string | string[][]
+    color              : Css.Color
+    backg              : Css.Background
+    backgGrad          : Css.Background
 
-    paddingX           : string | number | typoBase.Expression
-    paddingY           : string | number | typoBase.Expression
-    paddingXSm         : string | number | typoBase.Expression
-    paddingYSm         : string | number | typoBase.Expression
-    paddingXLg         : string | number | typoBase.Expression
-    paddingYLg         : string | number | typoBase.Expression
+    paddingX           : Css.PaddingXY
+    paddingY           : Css.PaddingXY
+    paddingXSm         : Css.PaddingXY
+    paddingYSm         : Css.PaddingXY
+    paddingXLg         : Css.PaddingXY
+    paddingYLg         : Css.PaddingXY
 
-    border             : string | string[][]
-    borderRadius       : string | number
-    borderRadiusSm     : string | number
-    borderRadiusLg     : string | number
+    border             : Css.Border
+    borderRadius       : Css.BorderRadius
+    borderRadiusSm     : Css.BorderRadius
+    borderRadiusLg     : Css.BorderRadius
 
 
     // anim props:
 
-    transition         : string | string[][]
+    transition         : Css.Transition
 
-    boxShadowNone      : (number|string)[][]
-    boxShadow          : (number|string)[][]
+    boxShadowNone      : Css.BoxShadow
+    boxShadow          : Css.BoxShadow
 
     filterNone         : 'brightness(100%)'
-    filter             : string | string[][]
+    filter             : Css.Filter
 
     '@keyframes none'  : { }
-    animNone           : string | (string | object)[][]
-    anim               : string | (string | object)[][]
+    animNone           : { }[][]
+    anim               : Css.Animation
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -82,7 +83,7 @@ const keyframesNone  = { };
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     fontSize          : typos.fontSizeNm,
-    fontSizeSm        : [['calc((', typos.fontSizeSm, '+', typos.fontSizeNm, ')/2)']],
+    fontSizeSm        : [['calc((', (typos.fontSizeSm as string), '+', (typos.fontSizeNm as string), ')/2)']],
     fontSizeLg        : typos.fontSizeMd,
     fontFamily        : inherit,
     fontWeight        : inherit,
@@ -94,8 +95,8 @@ const _cssProps: CssProps = {
     backg             : 'rgba(255, 255, 255, 0)', // transp white, so the foreg color will be black
     backgGrad         : [['linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(0,0,0, 0.2))', 'border-box']],
 
-    paddingX          : [['calc((', spacers.sm as string, '+', spacers.md as string, ')/2)']],
-    paddingY          : [['calc((', spacers.xs as string, '+', spacers.sm as string, ')/2)']],
+    paddingX          : [['calc((', (spacers.sm as string), '+', (spacers.md as string), ')/2)']],
+    paddingY          : [['calc((', (spacers.xs as string), '+', (spacers.sm as string), ')/2)']],
     paddingXSm        : spacers.sm as string,
     paddingYSm        : spacers.xs as string,
     paddingXLg        : spacers.md as string,

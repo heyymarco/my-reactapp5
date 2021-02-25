@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import
     React, {
     useMemo
@@ -35,13 +37,13 @@ function formatOf(file: string) {
 
 
 export interface CssProps {
-    color      : string
+    color      : Css.Color
     
-    size       : string | number | typoBase.Expression
-    sizeSm     : string | number | typoBase.Expression
-    sizeNm     : string | number | typoBase.Expression
-    sizeMd     : string | number | typoBase.Expression
-    sizeLg     : string | number | typoBase.Expression
+    size       : Css.Height | Css.Expression
+    sizeSm     : Css.Height | Css.Expression
+    sizeNm     : Css.Height | Css.Expression
+    sizeMd     : Css.Height | Css.Expression
+    sizeLg     : Css.Height | Css.Expression
 }
 // const unset   = 'unset';
 const none    = 'none';
@@ -63,9 +65,9 @@ const basics = {
 
 const _cssProps: CssProps = Object.assign({}, basics, {
     size   :  basics.sizeNm,
-    sizeSm : [['calc(', basics.sizeNm, '*', [0.75]  , ')']],
-    sizeMd : [['calc(', basics.sizeNm, '*', [1.50]  , ')']],
-    sizeLg : [['calc(', basics.sizeNm, '*', [2.00]  , ')']],
+    sizeSm : [['calc(', basics.sizeNm, '*', 0.75  , ')']],
+    sizeMd : [['calc(', basics.sizeNm, '*', 1.50  , ')']],
+    sizeLg : [['calc(', basics.sizeNm, '*', 2.00  , ')']],
 });
 
 const config = {

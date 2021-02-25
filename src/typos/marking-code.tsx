@@ -1,5 +1,6 @@
-import * as base        from './base';
 import type * as mark   from './marking-mark';
+
+import * as base        from './base';
 
 import gens             from './general';
 import colors           from '../colors';
@@ -17,7 +18,7 @@ const inherit = 'inherit';
 
 // define default cssProps' value to be stored into css vars:
 const cssProps: CssProps = {
-    fontSize          : [['calc((', gens.fontSizeSm, '+', gens.fontSizeMd, ')/2)']],
+    fontSize          : [['calc((', (gens.fontSizeSm as string), '+', (gens.fontSizeMd as string), ')/2)']],
     fontFamily        : gens.fontFamilyMonospace,
     fontWeight        : gens.fontWeightNormal,
     fontStyle         : none,

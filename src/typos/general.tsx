@@ -1,9 +1,44 @@
+import type * as Css    from '../Css';
+
 import colors           from '../colors';
 
 import JssVarCollection from '../jss-var-collection';
 
 
 
+export interface CssProps {
+    fontSize              : Css.FontSize
+    fontSizeXs            : Css.FontSize
+    fontSizeSm            : Css.FontSize
+    fontSizeNm            : Css.FontSize
+    fontSizeMd            : Css.FontSize
+    fontSizeLg            : Css.FontSize
+    fontSizeXl            : Css.FontSize
+    fontSizeXxl           : Css.FontSize
+    fontSizeXxxl          : Css.FontSize
+
+    fontFamily            : Css.FontFamily
+    fontFamilySansSerief  : Css.FontFamily
+    fontFamilyMonospace   : Css.FontFamily
+
+    fontWeight            : Css.FontWeight
+    fontWeightLighter     : Css.FontWeight
+    fontWeightLight       : Css.FontWeight
+    fontWeightNormal      : Css.FontWeight
+    fontWeightBold        : Css.FontWeight
+    fontWeightBolder      : Css.FontWeight
+
+    fontStyle             : Css.FontStyle
+    textDecoration        : Css.TextDecoration
+
+    lineHeight            : Css.LineHeight
+    lineHeightSm          : Css.LineHeight
+    lineHeightNm          : Css.LineHeight
+    lineHeightLg          : Css.LineHeight
+
+    color                 : Css.Color
+    backg                 : Css.Background
+}
 // const unset   = 'unset';
 const none    = 'none';
 // const inherit = 'inherit';
@@ -32,17 +67,17 @@ const basics = {
     backg                 : colors.backg as string,
 };
 
-const cssProps = Object.assign({},
+const cssProps: CssProps = Object.assign({},
     basics,
     {
         fontSize          : basics.fontSizeNm,
-        fontSizeXs        : [['calc(', basics.fontSizeNm, '*', [0.50]  , ')']],
-        fontSizeSm        : [['calc(', basics.fontSizeNm, '*', [0.75]  , ')']],
-        fontSizeMd        : [['calc(', basics.fontSizeNm, '*', [1.25]  , ')']],
-        fontSizeLg        : [['calc(', basics.fontSizeNm, '*', [1.50]  , ')']],
-        fontSizeXl        : [['calc(', basics.fontSizeNm, '*', [1.75]  , ')']],
-        fontSizeXxl       : [['calc(', basics.fontSizeNm, '*', [2.00]  , ')']],
-        fontSizeXxxl      : [['calc(', basics.fontSizeNm, '*', [2.25]  , ')']],
+        fontSizeXs        : [['calc(', basics.fontSizeNm, '*', 0.50  , ')']],
+        fontSizeSm        : [['calc(', basics.fontSizeNm, '*', 0.75  , ')']],
+        fontSizeMd        : [['calc(', basics.fontSizeNm, '*', 1.25  , ')']],
+        fontSizeLg        : [['calc(', basics.fontSizeNm, '*', 1.50  , ')']],
+        fontSizeXl        : [['calc(', basics.fontSizeNm, '*', 1.75  , ')']],
+        fontSizeXxl       : [['calc(', basics.fontSizeNm, '*', 2.00  , ')']],
+        fontSizeXxxl      : [['calc(', basics.fontSizeNm, '*', 2.25  , ')']],
 
         fontFamily        : basics.fontFamilySansSerief,
 
@@ -51,7 +86,6 @@ const cssProps = Object.assign({},
         lineHeight        : basics.lineHeightNm,
     }
 );
-export type CssProps = typeof cssProps;
 
 
 

@@ -1,5 +1,7 @@
-import * as base        from './base';
+import type * as Css    from '../Css';
 import type * as par    from './paragraph';
+
+import * as base        from './base';
 
 import gens             from './general';
 
@@ -10,12 +12,12 @@ import JssVarCollection from '../jss-var-collection';
 export interface CssProps
     extends par.CssProps {
     
-    fontSize1 : string | number | (string | number)[][];
-    fontSize2 : string | number | (string | number)[][];
-    fontSize3 : string | number | (string | number)[][];
-    fontSize4 : string | number | (string | number)[][];
-    fontSize5 : string | number | (string | number)[][];
-    fontSize6 : string | number | (string | number)[][];
+    fontSize1 : Css.FontSize
+    fontSize2 : Css.FontSize
+    fontSize3 : Css.FontSize
+    fontSize4 : Css.FontSize
+    fontSize5 : Css.FontSize
+    fontSize6 : Css.FontSize
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -23,12 +25,12 @@ const inherit = 'inherit';
 
 // define default cssProps' value to be stored into css vars:
 const cssProps: CssProps = {
-    fontSize1         : [['calc(', 2.25, '*', gens.fontSize, ')']],
-    fontSize2         : [['calc(', 2.00, '*', gens.fontSize, ')']],
-    fontSize3         : [['calc(', 1.75, '*', gens.fontSize, ')']],
-    fontSize4         : [['calc(', 1.50, '*', gens.fontSize, ')']],
-    fontSize5         : [['calc(', 1.25, '*', gens.fontSize, ')']],
-    fontSize6         : [['calc(', 1.00, '*', gens.fontSize, ')']],
+    fontSize1         : [['calc(', 2.25, '*', (gens.fontSize as string), ')']],
+    fontSize2         : [['calc(', 2.00, '*', (gens.fontSize as string), ')']],
+    fontSize3         : [['calc(', 1.75, '*', (gens.fontSize as string), ')']],
+    fontSize4         : [['calc(', 1.50, '*', (gens.fontSize as string), ')']],
+    fontSize5         : [['calc(', 1.25, '*', (gens.fontSize as string), ')']],
+    fontSize6         : [['calc(', 1.00, '*', (gens.fontSize as string), ')']],
 
     fontSize          : undefined as unknown as string,
     fontFamily        : inherit,
@@ -39,10 +41,10 @@ const cssProps: CssProps = {
 
     color             : inherit,
     
-    marginBlockStart  : '0px',
+    marginBlockStart  : 0,
     marginBlockEnd    : '0.75em',
-    marginInlineStart : '0px',
-    marginInlineEnd   : '0px',
+    marginInlineStart : 0,
+    marginInlineEnd   : 0,
 };
 
 

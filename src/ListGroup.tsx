@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import React               from 'react';
 
 import * as Elements       from './Element';
@@ -36,9 +38,8 @@ export {
 
 
 
-type Orientation = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 export interface CssProps {
-    orientation : Orientation | string
+    orientation : Css.Orientation
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -159,7 +160,7 @@ export interface Props
     extends
         Contents.Props
 {
-    orientation? : Orientation
+    orientation? : Css.Orientation
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();

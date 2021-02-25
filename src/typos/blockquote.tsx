@@ -1,7 +1,8 @@
-import * as base        from './base';
 import type * as par    from './paragraph';
 
-import gens              from './general';
+import * as base        from './base';
+
+import gens             from './general';
 
 import JssVarCollection from '../jss-var-collection';
 
@@ -25,10 +26,10 @@ const cssProps: CssProps = {
 
     color             : inherit,
     
-    marginBlockStart  : '0px',
+    marginBlockStart  : 0,
     marginBlockEnd    : '1em',
-    marginInlineStart : '0px',
-    marginInlineEnd   : '0px',
+    marginInlineStart : 0,
+    marginInlineEnd   : 0,
 };
 
 

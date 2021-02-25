@@ -1,3 +1,5 @@
+import type * as Css    from '../Css';
+
 import * as base        from './base';
 
 import colors           from '../colors';
@@ -11,13 +13,13 @@ import JssVarCollection from '../jss-var-collection';
 export interface CssProps
     extends base.CssProps {
 
-    color        : string                       ;
-    backg        : string | string[][] | object ;
+    color        : Css.Color
+    backg        : Css.Background
 
-    paddingX     : string | number              ;
-    paddingY     : string | number              ;
-    border       : string | string[][]          ;
-    borderRadius : string | number              ;
+    paddingX     : Css.PaddingXY
+    paddingY     : Css.PaddingXY
+    border       : Css.Border
+    borderRadius : Css.BorderRadius
 }
 // const unset   = 'unset';
 // const none    = 'none';

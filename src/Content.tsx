@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import React               from 'react';
 
 import * as Elements       from './Element';
@@ -37,14 +39,14 @@ export {
 export interface CssProps {
     // anim props:
 
-    colorActive           : string
-    backgActive           : string | string[][] | object
-    filterActive          : string | string[][]
+    colorActive           : Css.Color
+    backgActive           : Css.Background
+    filterActive          : Css.Filter
 
-    '@keyframes active'   : object
-    '@keyframes passive'  : object
-    animActive            : string | (string | object)[][]
-    animPassive           : string | (string | object)[][]
+    '@keyframes active'   : Css.Keyframes
+    '@keyframes passive'  : Css.Keyframes
+    animActive            : Css.Animation
+    animPassive           : Css.Animation
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -75,7 +77,7 @@ const _cssProps: CssProps = {
     // anim props:
 
     colorActive           : ecssProps.color,
-    backgActive           : colors.foregThin,
+    backgActive           : (colors.foregThin as string),
     filterActive          : ecssProps.filterNone,
 
     '@keyframes active'   : keyframesActive,

@@ -17,12 +17,12 @@ export interface CssProps
 
 // define default cssProps' value to be stored into css vars:
 const cssProps: CssProps = {
-    fontSize1         : [['calc(', 5.0, '*', gens.fontSize, ')']],
-    fontSize2         : [['calc(', 4.5, '*', gens.fontSize, ')']],
-    fontSize3         : [['calc(', 4.0, '*', gens.fontSize, ')']],
-    fontSize4         : [['calc(', 3.5, '*', gens.fontSize, ')']],
-    fontSize5         : [['calc(', 3.0, '*', gens.fontSize, ')']],
-    fontSize6         : [['calc(', 2.5, '*', gens.fontSize, ')']],
+    fontSize1         : [['calc(', 5.0, '*', (gens.fontSize as string), ')']],
+    fontSize2         : [['calc(', 4.5, '*', (gens.fontSize as string), ')']],
+    fontSize3         : [['calc(', 4.0, '*', (gens.fontSize as string), ')']],
+    fontSize4         : [['calc(', 3.5, '*', (gens.fontSize as string), ')']],
+    fontSize5         : [['calc(', 3.0, '*', (gens.fontSize as string), ')']],
+    fontSize6         : [['calc(', 2.5, '*', (gens.fontSize as string), ')']],
 
     fontSize          : undefined as unknown as string,
     fontFamily        : heads.fontFamily,

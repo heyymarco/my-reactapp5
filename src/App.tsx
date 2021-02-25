@@ -13,6 +13,7 @@ import ButtonIcon from './ButtonIcon';
 import Container from './Container';
 import ListGroup from './ListGroup';
 import ListGroupItem from './ListGroupItem';
+import Card from './Card';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -134,7 +135,7 @@ export default function App (props: any) {
 						<Button  theme='success'>Hello Button</Button>
 					</ListGroupItem>,
 					'A second item',
-					<ListGroupItem key={2} enabled={enabled} active={active}>A third item</ListGroupItem>,
+					<ListGroupItem key={24} enabled={enabled} active={active}>A third item</ListGroupItem>,
 					'A fourth item',
 					<Button key={123}  theme='none' size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>,
 					'A fifth item',
@@ -149,6 +150,22 @@ export default function App (props: any) {
 				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>
 					An item
 				</ListGroup>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+					Lorem ipsum dolor sit amet consectetur adipisicing elit.
+					Lorem ipsum dolor sit amet consectetur adipisicing elit.
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
+					header=
+						'Lorem ipsum dolor'
+					
+					children={<>
+						<p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+						<p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+					</>}
+					footer=
+						'dolor sit amet'
+					
+				/>
 				<hr style={{flexBasis: '100%'}} />
 				<label>
 					<input type='checkbox'

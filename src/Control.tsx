@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import
     React, {
     useState,
@@ -32,24 +34,24 @@ export {
 
 
 export interface CssProps {
-    cursor                : string
-    cursorDisabled        : string
+    cursor                : Css.Cursor
+    cursorDisabled        : Css.Cursor
     
     
     // anim props:
 
-    boxShadowFocus        : (number|string)[][]
+    boxShadowFocus        : Css.BoxShadow
 
-    filterHover           : string | string[][]
+    filterHover           : Css.Filter
 
-    '@keyframes hover'    : object
-    '@keyframes leave'    : object
-    '@keyframes focus'    : object
-    '@keyframes blur'     : object
-    animHover             : string | (string | object)[][]
-    animLeave             : string | (string | object)[][]
-    animFocus             : string | (string | object)[][]
-    animBlur              : string | (string | object)[][]
+    '@keyframes hover'    : Css.Keyframes
+    '@keyframes leave'    : Css.Keyframes
+    '@keyframes focus'    : Css.Keyframes
+    '@keyframes blur'     : Css.Keyframes
+    animHover             : Css.Animation
+    animLeave             : Css.Animation
+    animFocus             : Css.Animation
+    animBlur              : Css.Animation
 }
 // const unset   = 'unset';
 // const none    = 'none';

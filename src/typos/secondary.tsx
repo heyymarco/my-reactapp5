@@ -1,3 +1,5 @@
+import type * as Css    from '../Css';
+
 import * as base        from './base';
 
 import JssVarCollection from '../jss-var-collection';
@@ -7,8 +9,8 @@ import JssVarCollection from '../jss-var-collection';
 export interface CssProps
     extends base.CssProps {
 
-    color   : string          ;
-    opacity : string | number ;
+    color   : Css.Color
+    opacity : Css.Opacity
 }
 // const unset   = 'unset';
 // const none    = 'none';

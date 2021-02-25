@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import React               from 'react';
 
 import * as Elements       from './Element';
@@ -38,18 +40,16 @@ export {
 
 
 
-type Orientation = 'row' | 'row-reverse' | 'column' | 'column-reverse';
-type WhiteSpace  = 'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces';
 export interface CssProps {
-    orientation : Orientation | string
-    whiteSpace  : WhiteSpace  | string
+    orientation : Css.Orientation
+    whiteSpace  : Css.WhiteSpace
 
-    gapX        : string | number | (string|number)[][]
-    gapY        : string | number | (string|number)[][]
-    gapXSm      : string | number | (string|number)[][]
-    gapYSm      : string | number | (string|number)[][]
-    gapXLg      : string | number | (string|number)[][]
-    gapYLg      : string | number | (string|number)[][]
+    gapX        : Css.Gap
+    gapY        : Css.Gap
+    gapXSm      : Css.Gap
+    gapYSm      : Css.Gap
+    gapXLg      : Css.Gap
+    gapYLg      : Css.Gap
 }
 // const unset   = 'unset';
 const none    = 'none';
@@ -72,12 +72,12 @@ const _cssProps: CssProps = {
     orientation : 'row',
     whiteSpace  : 'normal',
 
-    gapX        : spacers.sm,
-    gapY        : spacers.sm,
-    gapXSm      : spacers.xs,
-    gapYSm      : spacers.xs,
-    gapXLg      : spacers.md,
-    gapYLg      : spacers.md,
+    gapX        : (spacers.sm as string),
+    gapY        : (spacers.sm as string),
+    gapXSm      : (spacers.xs as string),
+    gapYSm      : (spacers.xs as string),
+    gapXLg      : (spacers.md as string),
+    gapYLg      : (spacers.md as string),
 };
 
 
@@ -241,8 +241,8 @@ export interface Props
         Controls.Props,
         VariantButton
 {
-    orientation? : Orientation
-    whiteSpace?  : WhiteSpace
+    orientation? : Css.Orientation
+    whiteSpace?  : Css.WhiteSpace
 
     text?        : string
     children?    : React.ReactNode

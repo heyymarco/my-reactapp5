@@ -1,3 +1,5 @@
+import type * as Css    from '../Css';
+
 import * as base        from './base';
 
 import borders          from '../borders';
@@ -8,15 +10,15 @@ import JssVarCollection from '../jss-var-collection';
 
 
 export interface CssProps {
-    color             : string          ;
-    opacity           : string | number ;
+    color             : Css.Color
+    opacity           : Css.Opacity
 
-    width             : string | number ;
+    width             : Css.Width
 
-    marginBlockStart  : string | number ;
-    marginBlockEnd    : string | number ;
-    marginInlineStart : string | number ;
-    marginInlineEnd   : string | number ;
+    marginBlockStart  : Css.MarginBlock
+    marginBlockEnd    : Css.MarginBlock
+    marginInlineStart : Css.MarginInline
+    marginInlineEnd   : Css.MarginInline
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -31,8 +33,8 @@ const cssProps: CssProps = {
     
     marginBlockStart  : spacers.default,
     marginBlockEnd    : spacers.default,
-    marginInlineStart : '0px',
-    marginInlineEnd   : '0px',
+    marginInlineStart : 0,
+    marginInlineEnd   : 0,
 };
 
 
@@ -58,6 +60,6 @@ base.declareCss({
         backgroundColor : 'currentColor',
         width           : null,
         height          : varProps.width,
-        border          : '0px',
+        border          : 0,
     },
 });

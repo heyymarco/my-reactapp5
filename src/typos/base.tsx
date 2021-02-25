@@ -1,3 +1,5 @@
+import type * as Css                from '../Css';
+
 import { 
     create as createJss
 }                                   from 'jss';
@@ -18,14 +20,13 @@ import jssPluginNormalizeShorthands from '../jss-plugin-normalize-shorthands';
 
 
 
-export type Expression = (string | number | Expression)[] | (string | number | Expression)[][];
 export interface CssProps {
-    fontSize       : string | number   | Expression;
-    fontFamily     : string | string[] ;
-    fontWeight     : string | number   ;
-    fontStyle      : string            ;
-    textDecoration : string            ;
-    lineHeight     : string | number   ;
+    fontSize       : Css.FontSize
+    fontFamily     : Css.FontFamily
+    fontWeight     : Css.FontWeight
+    fontStyle      : Css.FontStyle
+    textDecoration : Css.TextDecoration
+    lineHeight     : Css.LineHeight
 }
 
 

@@ -1,3 +1,5 @@
+import type * as Css    from '../Css';
+
 import * as base        from './base';
 
 import JssVarCollection from '../jss-var-collection';
@@ -7,12 +9,12 @@ import JssVarCollection from '../jss-var-collection';
 export interface CssProps
     extends base.CssProps {
 
-    color             : string          ;
+    color             : Css.Color
 
-    marginBlockStart  : string | number ;
-    marginBlockEnd    : string | number ;
-    marginInlineStart : string | number ;
-    marginInlineEnd   : string | number ;
+    marginBlockStart  : Css.MarginBlock
+    marginBlockEnd    : Css.MarginBlock
+    marginInlineStart : Css.MarginInline
+    marginInlineEnd   : Css.MarginInline
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -29,10 +31,10 @@ const cssProps: CssProps = {
 
     color             : inherit,
     
-    marginBlockStart  : '0px',
+    marginBlockStart  : 0,
     marginBlockEnd    : '1em',
-    marginInlineStart : '0px',
-    marginInlineEnd   : '0px',
+    marginInlineStart : 0,
+    marginInlineEnd   : 0,
 };
 
 
