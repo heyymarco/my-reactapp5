@@ -15,11 +15,8 @@ import {
 
     useStateEnabledDisabled, useStateActivePassive,
 }                          from './Content';
-import * as border         from './borders';
 import spacers             from './spacers';
-import colors              from './colors';
 import stripOuts           from './strip-outs';
-import { paragraph }       from './typos/index';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -68,7 +65,7 @@ const ecssProps = Elements.cssProps;
 const ccssProps = Contents.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    height            : unset,
+    height            : '100%', // set height to maximum if parent container has specific height, otherwise no effect
 
     capColor          : unset,
     capBackg          : unset,
@@ -105,6 +102,7 @@ const states = Object.assign({}, Contents.states, {
 });
 
 const image = {
+    // maximum width including parent's paddings:
     width   : [['calc(100% + (', ecssProps.paddingX, ' * 2))']], // Required because we use flexbox and this inherently applies align-self: stretch
     // height  : [['calc(100% + (', ecssProps.paddingY, ' * 2))']],
 
@@ -126,12 +124,22 @@ const cardItem = {
     // moved paddings from main:
     paddingX: ecssProps.paddingX,
     paddingY: ecssProps.paddingY,
+
+
+
+    // handle <a> as card-link:
+    '& >a': {
+        '& +a': {
+            marginLeft: spacers.default,
+        },
+    },
     
-    position: 'relative', // support for absolute positioned figure
+
+    // handle <figure> & <img> as card-image:
     overflow: 'hidden', // clip the oversized overlay
     '& >figure': {
         extend: [
-            stripOuts.figure,
+            stripOuts.figure, // clear browser's default styles
         ],
         display: 'flex', // do not take space if the img fail to load image
 
@@ -162,13 +170,6 @@ const styles = {
         minWidth: 0, // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
         wordWrap: 'break-word',
         backgroundClip: 'border-box',
-
-
-        '& a': {
-            '& +a': {
-                marginLeft: spacers.default,
-            },
-        },
     },
     header: {
         extend: [
@@ -250,8 +251,8 @@ export interface Props
         Contents.Props,
         VariantCard
 {
-    header?      : React.ReactNode
-    footer?      : React.ReactNode
+    header? : React.ReactNode
+    footer? : React.ReactNode
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
@@ -269,7 +270,7 @@ export default function ListGroup(props: Props) {
     
     
     return (
-        <div className={[
+        <article className={[
                 styles.main,
 
                 variSize.class,
@@ -303,6 +304,6 @@ export default function ListGroup(props: Props) {
                     {props.footer}
                 </footer>
             )}
-        </div>
+        </article>
     );
 }
