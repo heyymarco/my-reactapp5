@@ -68,6 +68,7 @@ export default function App (props: any) {
 	const [size, 	   setSize       ] = useState<'sm'|'lg'|undefined>(undefined);
 	const [theme, 	   setTheme      ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
 	const [btnStyle,   setBtnStyle   ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
+	const cardStyle = btnStyle==='outline' ? 'outline' : undefined;
 
 
 	const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,11 +151,11 @@ export default function App (props: any) {
 				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>
 					An item
 				</ListGroup>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 					
@@ -166,30 +167,30 @@ export default function App (props: any) {
 						'dolor sit amet'
 					
 				/>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
 					<h5>Card title</h5>
 					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
 					<a href='/'>Card link</a>
 					<a href='/'>Another link</a>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
 					<h5>Card title</h5>
 					<h6>Card subtitle</h6>
 					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
 					<a href='/'>Card link</a>
 					<a href='/'>Another link</a>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
 					<img src='https://picsum.photos/300/200' alt='' />
 					<h5>Card title</h5>
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 
@@ -198,20 +199,7 @@ export default function App (props: any) {
 				>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
-					header=
-						'Lorem ipsum dolor'
-
-					footer=
-						'dolor sit amet'
-				>
-					<img src='https://picsum.photos/300/200' alt='' />
-					<h5>Card title</h5>
-					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
-					</br>This content is a little bit longer.</p>
-					<p>Last updated 3 mins ago</p>
-				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 
@@ -223,6 +211,19 @@ export default function App (props: any) {
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
+					header=
+						'Lorem ipsum dolor'
+
+					footer=
+						'dolor sit amet'
+				>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
 					<img src='https://picsum.photos/300/200' alt='' />
 					<h5>Card title</h5>
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
@@ -230,7 +231,7 @@ export default function App (props: any) {
 					<p>Last updated 3 mins ago</p>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
 					<figure>
 						<img src='https://picsum.photos/300/200' alt='' />
 

@@ -23,6 +23,7 @@ import { paragraph }       from './typos/index';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
+import { pascalCase }      from 'pascal-case';
 
 
 
@@ -41,8 +42,6 @@ export {
 
 
 export interface CssProps {
-    orientation       : Css.Orientation
-
     height            : Css.Height
 
     capColor          : Css.Color
@@ -58,6 +57,10 @@ const unset   = 'unset';
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Contents.vars, {
+    /**
+     * a custom css props for manipulating background(s) at outlined state.
+     */
+    backgOlFn : '--crd-backgOlFn',
 });
 
 // re-defined later, we need to construct varProps first
@@ -65,8 +68,6 @@ const ecssProps = Elements.cssProps;
 const ccssProps = Contents.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    orientation       : 'column',
-
     height            : unset,
 
     capColor          : unset,
@@ -99,6 +100,8 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
 }
 
 const states = Object.assign({}, Contents.states, {
+    // customize the background(s) at outlined state:
+    [vars.backgOlFn]: 'transparent',
 });
 
 const image = {
@@ -116,7 +119,9 @@ const image = {
 };
 
 const cardItem = {
-    display: 'grid',
+    // copy parent's flex properties:
+    display: 'inherit',
+    flexDirection: 'inherit',
 
     // moved paddings from main:
     paddingX: ecssProps.paddingX,
@@ -192,12 +197,36 @@ const styles = {
 
         '&:not(:first-child)': {
             // add border between header & body:
-            borderTop: ecssProps.border,
+            borderTop: 'inherit',
         },
         '&:not(:last-child)': {
             // add border between body & footer:
-            borderBottom: ecssProps.border,
+            borderBottom: 'inherit',
         }
+    },
+
+    gradient: { '&:not(._)': { // force to win conflict with main
+        extend: [
+            // copy the themes from Content:
+            Contents.styles.gradient,
+        ],
+
+        // customize the backg at outlined state:
+        [vars.backgOlFn]: ecssProps.backgGrad,
+    }},
+    cardOutline: { // already have specific rule :not-active => always win conflict with main
+        extend:[
+            stateNotActive({
+                // apply the outlined-backg:
+                backg : getVar(vars.backgOlFn),
+        
+                // customize the text-color (foreground):
+                [vars.colorFn] : ccssProps.backgActive,
+        
+                // set border color = text-color:
+                borderColor    : getVar(vars.colorFn),
+            }),
+        ],
     },
 };
 
@@ -206,12 +235,21 @@ export { states, styles, useStyles };
 
 
 
+type CardStyle = 'outline';
+export interface VariantCard {
+    cardStyle?: CardStyle
+}
+export function useVariantCard(props: VariantCard, styles: Record<string, string>) {
+    return {
+        class: props.cardStyle ? (styles as any)[`card${pascalCase(props.cardStyle)}`] : null,
+    };
+}
+
 export interface Props
     extends
-        Contents.Props
+        Contents.Props,
+        VariantCard
 {
-    orientation? : Css.Orientation
-
     header?      : React.ReactNode
     footer?      : React.ReactNode
 }
@@ -222,7 +260,8 @@ export default function ListGroup(props: Props) {
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
-    const variGradient   = Elements.useVariantGradient(props, ctStyles);
+    const variGradient   = Elements.useVariantGradient(props, styles);
+    const variCard       =          useVariantCard(props, styles);
 
     const stateEnbDis    = useStateEnabledDisabled(props);
     const stateActPass   = useStateActivePassive(props);
@@ -236,6 +275,7 @@ export default function ListGroup(props: Props) {
                 variSize.class,
                 variTheme.class,
                 variGradient.class,
+                variCard.class,
 
                 stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateActPass.class,
