@@ -96,34 +96,38 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
-const states = Object.assign({}, Contents.states, {
+const states = {extend:[ Contents.states, { // copy Content's states
     // customize the background(s) at outlined state:
     [vars.backgOlFn]: 'transparent',
-});
+}]};
 
 const image = {
     // maximum width including parent's paddings:
-    width   : [['calc(100% + (', ecssProps.paddingX, ' * 2))']], // Required because we use flexbox and this inherently applies align-self: stretch
-    // height  : [['calc(100% + (', ecssProps.paddingY, ' * 2))']],
+    width   : [['calc(100% + (', ccssProps.paddingX, ' * 2))']], // Required because we use flexbox and this inherently applies align-self: stretch
+    // height  : [['calc(100% + (', ccssProps.paddingY, ' * 2))']],
 
     // cancel-out parent's padding with negative margin:
-    marginX : [['calc(0px - ', ecssProps.paddingX, ')']],
-    marginY : [['calc(0px - ', ecssProps.paddingY, ')']],
+    marginX : [['calc(0px - ', ccssProps.paddingX, ')']],
+    marginY : [['calc(0px - ', ccssProps.paddingY, ')']],
+
+    // allow prev sibling to add an extra spaces:
+    '&:not(:first-child)': {
+        marginTop: 0,
+    },
 
     // add an extra spaces to the next sibling:
     '&:not(:last-child)': {
-        marginBottom: ecssProps.paddingY,
+        marginBottom: ccssProps.paddingY,
     },
 };
 
 const cardItem = {
-    // copy parent's flex properties:
-    display: 'inherit',
-    flexDirection: 'inherit',
+    display: 'grid',
+    justifyContent: 'start',
 
     // moved paddings from main:
-    paddingX: ecssProps.paddingX,
-    paddingY: ecssProps.paddingY,
+    paddingX: ccssProps.paddingX,
+    paddingY: ccssProps.paddingY,
 
 
 
@@ -256,10 +260,9 @@ export interface Props
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
     const ctStyles       = Contents.useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
+    const variSize       = Elements.useVariantSize(props, ctStyles);
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, styles);
     const variCard       =          useVariantCard(props, styles);

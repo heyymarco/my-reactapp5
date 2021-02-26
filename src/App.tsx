@@ -14,6 +14,7 @@ import Container from './Container';
 import ListGroup from './ListGroup';
 import ListGroupItem from './ListGroupItem';
 import Card from './Card';
+import Modal from './Modal';
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -241,6 +242,20 @@ export default function App (props: any) {
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
 				</Card>
+				<Modal theme={theme} enableGradient={enableGrad} active={active}
+					header=
+						'Modal Is Here'
+
+					footer={
+						<Button theme='primary' text='Close' />
+					}
+				>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
+				</Modal>
 				<hr style={{flexBasis: '100%'}} />
 				<label>
 					<input type='checkbox'

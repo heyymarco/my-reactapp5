@@ -99,10 +99,10 @@ export { config, cssProps };
 
 
 
-const states = Object.assign({}, Controls.states, {
+const states = {extend:[ Controls.states, { // copy Control's states
     // customize the background(s) at outlined state:
     [vars.backgOlFn]: 'transparent',
-});
+}]};
 
 const styles = {
     main: {

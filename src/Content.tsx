@@ -15,6 +15,7 @@ import {
 
     useStateEnabledDisabled, useStateActivePassive,
 }                          from './Indicator';
+import spacers             from './spacers';
 import colors              from './colors';
 
 import { createUseStyles } from 'react-jss';
@@ -37,6 +38,14 @@ export {
 
 
 export interface CssProps {
+    paddingX              : Css.PaddingXY
+    paddingY              : Css.PaddingXY
+    paddingXSm            : Css.PaddingXY
+    paddingYSm            : Css.PaddingXY
+    paddingXLg            : Css.PaddingXY
+    paddingYLg            : Css.PaddingXY
+
+
     // anim props:
 
     colorActive           : Css.Color
@@ -74,6 +83,14 @@ export const keyframesPassive  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
+    paddingX              : spacers.default as string,
+    paddingY              : spacers.default as string,
+    paddingXSm            : spacers.sm      as string,
+    paddingYSm            : spacers.sm      as string,
+    paddingXLg            : spacers.lg      as string,
+    paddingYLg            : spacers.lg      as string,
+
+
     // anim props:
 
     colorActive           : ecssProps.color,
@@ -118,8 +135,7 @@ export { config, cssProps };
 
 
 
-const states = Object.assign({}, Indicators.states, {
-    // specific states:
+const states = {extend:[ Indicators.states, { // copy Indicator's states
     extend:[
         // change the Indicator's behavior when in active state:
         stateActivePassive({
@@ -140,7 +156,7 @@ const states = Object.assign({}, Indicators.states, {
 
     // customize the background(s) at active state:
     [vars.backgActiveFn]: cssProps.backgActive,
-});
+}]};
 
 const styles = {
     main: {
@@ -163,6 +179,20 @@ const styles = {
         ],
     }},
 };
+
+const cssPropsAny = cssProps as any;
+defineSizes(styles, (size, Size, sizeProp) => ({
+    extend: [
+        // copy the size specific props from Element:
+        (Elements.styles as any)[sizeProp],
+    ],
+
+
+    // overwrite the props with the props{Size}:
+
+    '--ct-paddingX' : cssPropsAny[`paddingX${Size}`],
+    '--ct-paddingY' : cssPropsAny[`paddingY${Size}`],
+}));
 
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     // overwrite the backg & color props
@@ -190,9 +220,8 @@ export interface Props
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
+    const variSize       = Elements.useVariantSize(props, styles);
     const variTheme      = Elements.useVariantTheme(props, styles);
     const variGradient   = Elements.useVariantGradient(props, styles);
 

@@ -281,7 +281,7 @@ export const stateNoAnimStartup     = () =>
 
 
 
-const states = Object.assign({}, Elements.states, { // not copy from Indicators.states because the state*** are too much different
+const states = {extend:[ Elements.states, { // not copy from Indicator's states because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
     // TODO: activate this code:
     // a custom css props for manipulating a box-shadow at focused state:
     // [vars.boxShadowFocusFn]: [[ // set default value
@@ -399,7 +399,7 @@ const states = Object.assign({}, Elements.states, { // not copy from Indicators.
             [vars.animActivePassive]              : ecssProps.animNone,
         }}),
     ],
-});
+}]};
 
 const styles = {
     main: {

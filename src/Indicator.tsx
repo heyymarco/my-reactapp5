@@ -228,7 +228,7 @@ export const stateNoAnimStartup     = () =>
 
 
 
-const states = Object.assign({}, Elements.states, {
+const states = {extend:[ Elements.states, { // copy Element's states
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
@@ -298,7 +298,7 @@ const states = Object.assign({}, Elements.states, {
             ]},
         },
     ],
-});
+}]};
 
 const styles = {
     main: {

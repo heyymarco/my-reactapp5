@@ -79,16 +79,17 @@ export { config, cssProps };
 
 
 
-const states = Object.assign({}, Contents.states, {
+const states = {extend:[ Contents.states, { // copy Content's states
     // customize the anim prop to be forwarded to another element(s):
     [vars.animFw]: getVar(vars.animFn),
-});
+}]};
 
 const styles = {
     main: {
         extend: [
             stripOuts.list, // clear browser's default styles
             filterValidProps(cssProps), // apply our filtered cssProps
+            // states,                  // NOT apply our states here, but in child <li>
         ],
 
         // flex settings:
@@ -101,11 +102,7 @@ const styles = {
 
         '& >li': { // wrapper element
             extend: [
-                // Contents.styles.main, // we don't needed the style, just make an invisible wrapper element
-
-                // copy props & states from Content, without the style:
-                filterValidProps(ccssProps), // apply Content's filtered cssProps
-                Contents.states,             // apply Content's states
+                states, // apply our states
             ],
 
             display: 'block',
@@ -129,7 +126,7 @@ const styles = {
 
             '& >.lg-wrapper': { // main child elements
                 extend:[
-                    Elements.styles.main, // copy styles from Element, including Control's cssProps & Control's states.
+                    Elements.styles.main, // copy styles from Element, including Element's cssProps & Element's states.
                 ],
 
                 display       : 'block',
@@ -165,10 +162,9 @@ export interface Props
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
     const ctStyles       = Contents.useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
+    const variSize       = Elements.useVariantSize(props, ctStyles);
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, styles);
 
