@@ -102,6 +102,8 @@ const states = {extend:[ Contents.states, { // copy Content's states
 }]};
 
 const image = {
+    display: 'block', // remove unecessary space to the next sibling
+
     // maximum width including parent's paddings:
     width   : [['calc(100% + (', ccssProps.paddingX, ' * 2))']], // Required because we use flexbox and this inherently applies align-self: stretch
     // height  : [['calc(100% + (', ccssProps.paddingY, ' * 2))']],
@@ -122,8 +124,7 @@ const image = {
 };
 
 const cardItem = {
-    display: 'grid',
-    justifyContent: 'start',
+    display: 'block',
 
     // moved paddings from main:
     paddingX: ccssProps.paddingX,
@@ -145,9 +146,9 @@ const cardItem = {
         extend: [
             stripOuts.figure, // clear browser's default styles
         ],
-        display: 'flex', // do not take space if the img fail to load image
 
         '& >img': {
+            display: 'block', // remove unecessary space to the next sibling
             width: '100%',
         }
     },
