@@ -93,7 +93,7 @@ const _cssProps: CssProps = {
     lineHeight        : inherit,
 
     color             : 'currentColor',
-    backg             : 'rgba(255, 255, 255, 0)', // transp white, so the foreg color will be black
+    backg             : colors.backgThin as string,
     backgGrad         : [['linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(0,0,0, 0.2))', 'border-box']],
 
     paddingX          : [['calc((', (spacers.sm as string), '+', (spacers.md as string), ')/2)']],
@@ -145,7 +145,7 @@ export { config, cssProps };
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enabled|Disabled|Active|Passive|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enabled|Disabled|Active|Passive|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation|align/).test(key)) continue;
         cssPropsCopy[key] = value;
     }
     return cssPropsCopy;

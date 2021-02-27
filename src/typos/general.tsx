@@ -37,6 +37,11 @@ export interface CssProps {
     lineHeightLg          : Css.LineHeight
 
     color                 : Css.Color
+
+    /**
+     * Defaults is color's backg.
+     * It can be an image with the average color as color's backg.
+     */
     backg                 : Css.Background
 }
 // const unset   = 'unset';
@@ -64,7 +69,7 @@ const basics = {
     lineHeightLg          : 2.00,
 
     color                 : colors.foreg as string,
-    backg                 : colors.backg as string,
+    backg                 : colors.backg as string, // defaults is color's backg. It can be an image with the average color as color's backg.
 };
 
 const cssProps: CssProps = Object.assign({},

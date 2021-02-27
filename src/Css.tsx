@@ -36,3 +36,6 @@ export type Orientation     = 'row' | 'row-reverse' | 'column' | 'column-reverse
 export type WhiteSpace      = 'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces';
 
 export type Gap             = string | 0
+
+
+export type AlignItems      = 'center' | 'start' | 'end' | 'stretch'

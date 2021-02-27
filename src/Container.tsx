@@ -41,7 +41,7 @@ const collection = new JssVarCollection(
 const config   = collection.config;
 const cssProps = collection.varProps as (typeof _cssProps & { [key: string]: (undefined|string|number|(string|number)[][]) });
 // export the configurable varPops:
-export { config, cssProps as containers };
+export { config, cssProps, cssProps as containers };
 // export default cssProps;
 
 
@@ -74,6 +74,8 @@ const styles = {
     main: {
         paddingX : cssProps.x,
         paddingY : cssProps.y,
+
+        display  : 'block',
     },
 };
 

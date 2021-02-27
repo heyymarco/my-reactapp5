@@ -126,6 +126,9 @@ const image = {
 const cardItem = {
     display: 'block',
 
+    // default card's items are unresizeable (excepts for card's body):
+    flex: [[0, 0, 'auto']],
+
     // moved paddings from main:
     paddingX: ccssProps.paddingX,
     paddingY: ccssProps.paddingY,

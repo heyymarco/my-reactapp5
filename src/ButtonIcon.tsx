@@ -49,5 +49,5 @@ export default function ButtonIcon(props: Props) {
             </>
         );
     } // if
-    return Button(btnProps);
+    return <Button {...btnProps} />;
 }

@@ -78,6 +78,14 @@ export const figure = {
     marginInlineEnd   : unset,
 };
 
+/**
+ * removes a browser's default styling on focusable element.
+ */
+export const focusableElement = {
+    '&:focus': {
+        outline: unset,
+    }
+}
 
-const exports = { link, control, list, figure };
+const exports = { link, control, list, figure, focusableElement };
 export default exports;

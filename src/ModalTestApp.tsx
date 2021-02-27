@@ -39,10 +39,14 @@ const jss = createJss().setup({plugins:[
 	jssPluginNormalizeShorthands()
 ]});
 export default function App (props: any) {
+    const [longContent, setLongContent] = useState(false);
+    const [scrollable, setScrollable] = useState(false);
+    const [theme, 	   setTheme      ] = useState<string|undefined>(undefined);
+
     return (
         <JssProvider jss={jss}>
             <Container>
-                <Modal
+                <Modal scrollable={scrollable} theme={theme}
                     header=
                         'Modal Is Here'
 
@@ -51,8 +55,63 @@ export default function App (props: any) {
                     }
                 >
                     <h5>Card title</h5>
+                    <p>
+                        Long Content:
+                        <input type='checkbox' checked={longContent} onChange={(e) => setLongContent(e.target.checked)} />
+                    </p>
+                    <p>
+                        Scrollable:
+                        <input type='checkbox' checked={scrollable} onChange={(e) => setScrollable(e.target.checked)} />
+                    </p>
+                    <p>
+                        Theme:
+                        {
+                            [undefined,'primary','secondary','success','info','warning','danger','light','dark'].map(t =>
+                                <label key={t ?? ''}>
+                                    <input type='radio'
+                                        value={t}
+                                        checked={theme===t}
+                                        onChange={(e) => setTheme(e.target.value || undefined)}
+                                    />
+                                    {`${t}`}
+                                </label>
+                            )
+                        }
+                    </p>
                     <p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
                     </br>This content is a little bit longer.</p>
+                    {longContent && <p>
+                        Lorem<br/>
+                        ipsum<br/>
+                        dolor<br/>
+                        sit,<br/>
+                        amet<br/>
+                        consectetur<br/>
+                        adipisicing<br/>
+                        elit.<br/>
+                        Obcaecati,<br/>
+                        fugiat<br/>
+                        quam<br/>
+                        corrupti<br/>
+                        doloremque<br/>
+                        mollitia<br/>
+                        fuga<br/>
+                        tempora<br/>
+                        sequi<br/>
+                        repellat?<br/>
+                        Sint<br/>
+                        quia<br/>
+                        doloremque,<br/>
+                        accusantium<br/>
+                        perferendis<br/>
+                        autem<br/>
+                        cupiditate!<br/>
+                        Sapiente<br/>
+                        odio<br/>
+                        sit<br/>
+                        voluptatem<br/>
+                        accusamus.
+                    </p>}
                     <p>Last updated 3 mins ago</p>
                 </Modal>
             </Container>
