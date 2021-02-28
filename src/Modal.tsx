@@ -1,6 +1,9 @@
 import type * as Css       from './Css';
 
-import React               from 'react';
+import
+    React, {
+    useMemo
+}                          from 'react';
 
 import * as Elements       from './Element';
 import * as Contents       from './Content';
@@ -18,13 +21,13 @@ import {
 
     useStateEnabledDisabled, useStateActivePassive,
 }                          from './Card';
-import colors              from './colors';
 import * as Containers     from './Container'
-import spacers             from './spacers';
 import {
     general as typoGeneral
 }                          from './typos/index';
 import stripOuts           from './strip-outs';
+import Button              from './Button';
+import ButtonIcon          from './ButtonIcon';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -47,31 +50,103 @@ export {
 
 
 export interface CssProps {
-    backg     : Css.Background
+    align     : Css.AlignItems
+
     boxShadow : Css.BoxShadow
 
-    align     : Css.AlignItems
+
+    // anim props:
+
+    '@keyframes active'       : Css.Keyframes
+    '@keyframes passive'      : Css.Keyframes
+    animActive                : Css.Animation
+    animPassive               : Css.Animation
+
+    '@keyframes backgActive'  : Css.Keyframes
+    '@keyframes backgPassive' : Css.Keyframes
+    backgAnimActive           : Css.Animation
+    backgAnimPassive          : Css.Animation
 }
 // const unset   = 'unset';
-// const none    = 'none';
+const none    = 'none';
 // const inherit = 'inherit';
 const center  = 'center';
 // const middle  = 'middle';
 
 // internal css vars:
-// const getVar = (name: string) => `var(${name})`;
+const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Contents.vars, {
+    /**
+     * custom css props for manipulating animation(s).
+     */
+    animFn       : '--mod-animFn',
+
+    /**
+     * custom css props for manipulating backg's animation(s).
+     */
+    animBackgFn  : '--mod-animBackgFn',
 });
 
 // re-defined later, we need to construct varProps first
+export const keyframesActive       = { from: undefined, to: undefined };
+export const keyframesPassive      = { from: undefined, to: undefined };
+export const keyframesBackgActive  = { from: undefined, to: undefined };
+export const keyframesBackgPassive = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    backg     : 'rgba(0, 0, 0, 0.5)',
-    boxShadow : [[0, 0, '20px', 0, 'black']],
-    
     align     : center,
+
+    boxShadow : [[0, 0, '10px', 'black']],
+    
+
+    // anim props:
+
+    '@keyframes active'       : keyframesActive,
+    '@keyframes passive'      : keyframesPassive,
+    animActive                : [['300ms', 'ease-out', 'both', keyframesActive ]],
+    animPassive               : [['500ms', 'ease-in',  'both', keyframesPassive]],
+
+    '@keyframes backgActive'  : keyframesBackgActive,
+    '@keyframes backgPassive' : keyframesBackgPassive,
+    backgAnimActive           : [['300ms', 'ease-out', 'both', keyframesBackgActive ]],
+    backgAnimPassive          : [['500ms', 'ease-in',  'both', keyframesBackgPassive]],
 };
+
+
+
+Object.assign(keyframesActive, {
+    from: {
+        opacity: 0,
+        transform: 'scale(0)',
+    },
+    '70%': {
+        transform: 'scale(1.1)',
+    },
+    to: {
+        opacity: 1,
+        transform: 'scale(1)',
+    }
+});
+Object.assign(keyframesPassive, {
+    from : keyframesActive.to,
+    '30%': (keyframesActive as any)['70%'],
+    to   : keyframesActive.from
+});
+
+Object.assign(keyframesBackgActive, {
+    from: {
+        opacity: 0,
+    },
+    to: {
+        opacity: 1,
+        background: 'rgba(0,0,0, 0.5)',
+    }
+});
+Object.assign(keyframesBackgPassive, {
+    from : keyframesBackgActive.to,
+    to   : keyframesBackgActive.from
+});
 
 
 
@@ -88,7 +163,27 @@ export { config, cssProps };
 
 
 
-const states = { };
+const states = {
+    // customize the anim:
+    [vars.animFn]      : none,
+    [vars.animBackgFn] : none,
+
+
+
+    extend:[
+        stateActive({
+            [vars.animFn]      : cssProps.animActive,
+            [vars.animBackgFn] : cssProps.backgAnimActive,
+        }),
+        statePassive({
+            [vars.animFn]      : cssProps.animPassive,
+            [vars.animBackgFn] : cssProps.backgAnimPassive,
+        }),
+        stateNotActivePassive({ // hides the modal if not [activating, actived, deactivating]
+            display: none,
+        }),
+    ],
+};
 
 const styles = {
     modalOpen: {
@@ -98,11 +193,12 @@ const styles = {
     main: { // overlay layer with limited width & height as scroller
         extend: [
             stripOuts.focusableElement, // clear browser's default styles
-            filterValidProps(cssProps), // apply our filtered cssProps
+            filterPrefixProps(cssProps, 'backg'), // apply our cssProps starting with backg***
             states,                     // apply our states
         ],
 
-        boxShadow : undefined, // move to background layer
+        // a custom css props for manipulating backg's animation(s):
+        anim: getVar(vars.animBackgFn), // apply prop
 
         // fill the entire screen:
         position : 'fixed',
@@ -133,12 +229,17 @@ const styles = {
 
 
             '& >*': { // background layer
+                extend: [
+                    filterValidProps(cssProps), // apply our filtered cssProps
+                ],
+
+                // a custom css props for manipulating animation(s):
+                anim: getVar(vars.animFn), // apply prop
+
                 display   : 'block',
                 width     : 'fit-content',
                 height    : 'fit-content',
                 boxSizing : 'content-box',
-
-                boxShadow : cssProps.boxShadow, // moved from overlay layer
 
                 // set backg as same as page's backg (can be solid color or image):
                 // to overcome card's transparent/trancluent backg color:
@@ -150,7 +251,7 @@ const styles = {
                 
                 '& >*': { // card layer
                     // overwrite some Card's props:
-                    '--crd-height'        : 'auto',             // overwrite card's height to auto resize
+                    '--crd-height'    : 'auto', // overwrite card's height to auto resize
                 },
             },
         },
@@ -177,6 +278,17 @@ const styles = {
     },
     alignEnd: {
         alignItems: 'end',
+    },
+
+    title: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    actionBar: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
     },
 };
 
@@ -206,6 +318,8 @@ export interface Props
     header?     : React.ReactNode
     children?   : React.ReactNode
     footer?     : React.ReactNode
+
+    onClose?    : () => void
 }
 export default function ListGroup(props: Props) {
     const styles       = useStyles();
@@ -216,9 +330,32 @@ export default function ListGroup(props: Props) {
 
     
     
-    const cardProps: Cards.Props = Object.assign({}, props, {
-        active: undefined,
-    });
+    const cardProps = useMemo(() => {
+        const cardProps: Cards.Props = Object.assign({}, props, {
+            active: undefined,
+        });
+
+        if ((cardProps.header === undefined) || (typeof(cardProps.header) === 'string')) {
+            cardProps.header = (
+                <h5 className={styles.title}>
+                    {cardProps.header}
+                    <ButtonIcon btnStyle='link' theme='secondary' aria-label='Close' icon='close' onClick={props.onClose} />
+                </h5>
+            );
+        }
+
+        if ((cardProps.footer === undefined) || (typeof(cardProps.footer) === 'string')) {
+            cardProps.footer = (
+                <p className={styles.actionBar}>
+                    {cardProps.footer}
+                    <Button theme='primary' text='Close' onClick={props.onClose} />
+                </p>
+            );
+        }
+
+
+        return cardProps;
+    }, [props, styles.title, styles.actionBar]);
     return (
         <section className={[
                 styles.main,
@@ -229,8 +366,8 @@ export default function ListGroup(props: Props) {
                 stateActPass.class,
             ].join(' ')}
         
-            onAnimationEnd={() => {
-                stateActPass.handleAnimationEnd();
+            onAnimationEnd={(e) => {
+                stateActPass.handleAnimationEnd(e);
             }}
 
             tabIndex={-1}

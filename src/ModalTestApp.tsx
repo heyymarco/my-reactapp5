@@ -42,17 +42,19 @@ export default function App (props: any) {
     const [longContent, setLongContent] = useState(false);
     const [scrollable, setScrollable] = useState(false);
     const [theme, 	   setTheme      ] = useState<string|undefined>(undefined);
+    const [active, setActive] = useState(false);
 
     return (
         <JssProvider jss={jss}>
             <Container>
-                <Modal scrollable={scrollable} theme={theme}
+                <Button theme='primary' text='Show Modal' onClick={() => setActive(true)} />
+                <Modal scrollable={scrollable} theme={theme} active={active}
                     header=
                         'Modal Is Here'
 
-                    footer={
-                        <Button theme='primary' text='Close' />
-                    }
+                    footer={undefined}
+
+                    onClose={() => setActive(false)}
                 >
                     <h5>Card title</h5>
                     <p>

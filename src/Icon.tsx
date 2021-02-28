@@ -6,8 +6,6 @@ import
 }                          from 'react';
 
 import * as Elements       from './Element';
-import type
-    { base as typoBase }   from './typos/index';
 import Path                from 'path';
 import fontMaterial        from './Icon-font-material';
 
@@ -94,6 +92,7 @@ const config = {
         files          : [
             'instagram.svg',
             'whatsapp.svg',
+            'close.svg',
         ],
     },
 };

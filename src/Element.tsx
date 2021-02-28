@@ -29,6 +29,8 @@ export interface CssProps
     backg              : Css.Background
     backgGrad          : Css.Background
 
+    opacity            : Css.Opacity
+
     paddingX           : Css.PaddingXY
     paddingY           : Css.PaddingXY
     paddingXSm         : Css.PaddingXY
@@ -95,6 +97,8 @@ const _cssProps: CssProps = {
     color             : 'currentColor',
     backg             : colors.backgThin as string,
     backgGrad         : [['linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(0,0,0, 0.2))', 'border-box']],
+
+    opacity           : 1,
 
     paddingX          : [['calc((', (spacers.sm as string), '+', (spacers.md as string), ')/2)']],
     paddingY          : [['calc((', (spacers.xs as string), '+', (spacers.sm as string), ')/2)']],

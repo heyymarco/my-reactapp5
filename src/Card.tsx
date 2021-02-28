@@ -289,9 +289,9 @@ export default function ListGroup(props: Props) {
                 stateActPass.class,
             ].join(' ')}
         
-            onAnimationEnd={() => {
-                stateEnbDis.handleAnimationEnd();
-                stateActPass.handleAnimationEnd();
+            onAnimationEnd={(e) => {
+                stateEnbDis.handleAnimationEnd(e);
+                stateActPass.handleAnimationEnd(e);
             }}
         >
             {props.header && (

@@ -465,9 +465,13 @@ export function useStateLeave(stateEnabledDisabled: {enabled:boolean}) {
     }
     return {
         class: leaving ? 'leave': null,
-        handleMouseEnter   : handleHover,
-        handleMouseLeave   : handleLeaving,
-        handleAnimationEnd : handleIdle,
+        handleMouseEnter   : handleHover,                                // bubbles: no
+        handleMouseLeave   : handleLeaving,                              // bubbles: no
+        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => { // bubbles: yes
+            if (e.target !== e.currentTarget) return;
+            if (e.animationName.startsWith('none')) return;
+            handleIdle();
+        },
     };
 }
 
@@ -522,9 +526,13 @@ export function useStateFocusBlur(props: Props, stateEnabledDisabled: {enabled:b
     }
     return {
         class: blurring ? 'blur' : ((focused && stateEnabledDisabled.enabled) ? 'focus' : null),
-        handleFocus        : handleFocus,
-        handleBlur         : handleBlurring,
-        handleAnimationEnd : handleIdle,
+        handleFocus        : handleFocus,                                // bubbles: no
+        handleBlur         : handleBlurring,                             // bubbles: no
+        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => { // bubbles: yes
+            if (e.target !== e.currentTarget) return;
+            if (e.animationName.startsWith('none')) return;
+            handleIdle();
+        },
     };
 }
 
@@ -573,11 +581,11 @@ export default function Control(props: Props) {
             onKeyDown={stateActPass.handleKeyDown}
             onMouseUp={stateActPass.handleMouseUp}
             onKeyUp={stateActPass.handleKeyUp}
-            onAnimationEnd={() => {
-                stateEnbDis.handleAnimationEnd();
-                stateLeave.handleAnimationEnd();
-                stateFocusBlur.handleAnimationEnd();
-                stateActPass.handleAnimationEnd();
+            onAnimationEnd={(e) => {
+                stateEnbDis.handleAnimationEnd(e);
+                stateLeave.handleAnimationEnd(e);
+                stateFocusBlur.handleAnimationEnd(e);
+                stateActPass.handleAnimationEnd(e);
             }}
         >
             {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Control'}

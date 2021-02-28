@@ -296,20 +296,20 @@ export default class JssVarCollection<TProp> {
         for (const [id, keyframe] of Object.entries(keyframes)) {
             if ((keyframe === undefined) || (keyframe === null)) continue;
 
-            const keyframe2 = Object.assign({}, keyframe);
+            const keyframeCopy = Object.assign({}, keyframe);
             let modified = false;
 
-            for (const [key, frame] of Object.entries(keyframe2)) {
+            for (const [key, frame] of Object.entries(keyframeCopy)) {
                 if ((frame === undefined) || (frame === null)) continue;
 
                 const frameRep = replaceDuplicates(frame, cssProps);
                 if (frameRep) {
-                    (keyframe2 as { [key: string]: any })[key] = frameRep;
+                    (keyframeCopy as { [key: string]: any })[key] = frameRep;
                     modified = true;
                 }
             } // for
 
-            if (modified) keyframes[id] = keyframe2;
+            if (modified) keyframes[id] = keyframeCopy;
         } // for
 
 

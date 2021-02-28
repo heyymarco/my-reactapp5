@@ -46,9 +46,9 @@ export default function ListGroupItem(props: Props) {
                 stateActPass.class,
             ].join(' ')}
         
-            onAnimationEnd={() => {
-                stateEnbDis.handleAnimationEnd();
-                stateActPass.handleAnimationEnd();
+            onAnimationEnd={(e) => {
+                stateEnbDis.handleAnimationEnd(e);
+                stateActPass.handleAnimationEnd(e);
             }}
         >
             <div className='lg-wrapper'>

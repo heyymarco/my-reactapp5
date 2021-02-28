@@ -286,11 +286,11 @@ export default function Button(props: Props) {
             onKeyDown={stateActPass.handleKeyDown}
             onMouseUp={stateActPass.handleMouseUp}
             onKeyUp={stateActPass.handleKeyUp}
-            onAnimationEnd={() => {
-                stateEnbDis.handleAnimationEnd();
-                stateLeave.handleAnimationEnd();
-                stateFocusBlur.handleAnimationEnd();
-                stateActPass.handleAnimationEnd();
+            onAnimationEnd={(e) => {
+                stateEnbDis.handleAnimationEnd(e);
+                stateLeave.handleAnimationEnd(e);
+                stateFocusBlur.handleAnimationEnd(e);
+                stateActPass.handleAnimationEnd(e);
             }}
             onClick={props.onClick}
         >

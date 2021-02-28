@@ -25,6 +25,7 @@ export type Height          = string | 0 |               (string|0)[][]
 
 export type Transition      = string |                   string[][]
 export type Filter          = string |                   string[][]
+export type Transform       = string |                   string[][]
 export type Keyframes       = object
 export type Animation       = string | (string | Keyframes)[][]
 

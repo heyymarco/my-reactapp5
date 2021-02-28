@@ -106,14 +106,14 @@ const _cssProps: CssProps = {
 
 
 Object.assign(keyframesActive, {
-    from: Object.assign({}, Indicators.keyframesActive.from, {
+    from: {extend:[ Indicators.keyframesActive.from, { // copy Indicator's keyframes
         color: getVar(vars.colorFn),
         backg: getVar(vars.backgFn),
-    }),
-    to: Object.assign({}, Indicators.keyframesActive.to, {
+    }]},
+    to: {extend:[ Indicators.keyframesActive.to, { // copy Indicator's keyframes
         color: getVar(vars.colorActiveFn),
         backg: getVar(vars.backgActiveFn),
-    })
+    }]}
 });
 Object.assign(keyframesPassive, {
     from : keyframesActive.to,
@@ -242,9 +242,9 @@ export default function ListGroup(props: Props) {
                 stateActPass.class,
             ].join(' ')}
         
-            onAnimationEnd={() => {
-                stateEnbDis.handleAnimationEnd();
-                stateActPass.handleAnimationEnd();
+            onAnimationEnd={(e) => {
+                stateEnbDis.handleAnimationEnd(e);
+                stateActPass.handleAnimationEnd(e);
             }}
         >
             {props.children}
