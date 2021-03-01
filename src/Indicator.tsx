@@ -349,10 +349,11 @@ export function useStateEnabledDisabled(props: Props) {
         enabled: enabled,
         disabled: !enabled,
         class: (enabling? 'enable' : (disabling ? 'disable': null)),
-        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => { // bubbles: yes
-            if (e.target !== e.currentTarget) return;
-            if (e.animationName.startsWith('none')) return;
-            handleIdle();
+        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
+            if (e.target !== e.currentTarget) return; // no bubbling
+            if (/((?<![a-z])(enable|disable)|(?<=[a-z])(Enable|Disable))(?![a-z])/.test(e.animationName)) {
+                handleIdle();
+            }
         },
     };
 }
@@ -395,15 +396,36 @@ export function useStateActivePassive(props: Props) {
         if (passivating) setPassivating(false);
     }
     return {
+        /**
+         * partially/fully active
+        */
+        active  : actived,
+
+        /**
+         * partially/fully passive
+         */
+        passive : !actived,
+
+        /**
+         * fully active
+        */
+        actived : actived && !activating,
+
+        /**
+         * fully passive
+         */
+        passived: !actived && !passivating,
+
         class: (!activating && !passivating) ? (actived ? 'actived' : null) : (activating? 'active' : (passivating ? 'passive': null)),
-        handleMouseDown    : handleIdle,        // for Control           // bubbles: yes
-        handleKeyDown      : handleIdle,        // for Control           // bubbles: yes
-        handleMouseUp      : handlePassivating, // for Control           // bubbles: yes
-        handleKeyUp        : handlePassivating, // for Control           // bubbles: yes
-        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => { // bubbles: yes
-            if (e.target !== e.currentTarget) return;
-            if (e.animationName.startsWith('none')) return;
-            handleIdle();
+        handleMouseDown    : handleIdle,        // for Control
+        handleKeyDown      : handleIdle,        // for Control
+        handleMouseUp      : handlePassivating, // for Control
+        handleKeyUp        : handlePassivating, // for Control
+        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
+            if (e.target !== e.currentTarget) return; // no bubbling
+            if (/((?<![a-z])(active|passive)|(?<=[a-z])(Active|Passive))(?![a-z])/.test(e.animationName)) {
+                handleIdle();
+            }
         },
     };
 }

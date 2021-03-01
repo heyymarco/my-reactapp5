@@ -465,12 +465,13 @@ export function useStateLeave(stateEnabledDisabled: {enabled:boolean}) {
     }
     return {
         class: leaving ? 'leave': null,
-        handleMouseEnter   : handleHover,                                // bubbles: no
-        handleMouseLeave   : handleLeaving,                              // bubbles: no
-        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => { // bubbles: yes
-            if (e.target !== e.currentTarget) return;
-            if (e.animationName.startsWith('none')) return;
-            handleIdle();
+        handleMouseEnter   : handleHover,
+        handleMouseLeave   : handleLeaving,
+        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
+            if (e.target !== e.currentTarget) return; // no bubbling
+            if (/((?<![a-z])(leave)|(?<=[a-z])(Leave))(?![a-z])/.test(e.animationName)) {
+                handleIdle();
+            }
         },
     };
 }
@@ -526,12 +527,13 @@ export function useStateFocusBlur(props: Props, stateEnabledDisabled: {enabled:b
     }
     return {
         class: blurring ? 'blur' : ((focused && stateEnabledDisabled.enabled) ? 'focus' : null),
-        handleFocus        : handleFocus,                                // bubbles: no
-        handleBlur         : handleBlurring,                             // bubbles: no
-        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => { // bubbles: yes
-            if (e.target !== e.currentTarget) return;
-            if (e.animationName.startsWith('none')) return;
-            handleIdle();
+        handleFocus        : handleFocus,
+        handleBlur         : handleBlurring,
+        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
+            if (e.target !== e.currentTarget) return; // no bubbling
+            if (/((?<![a-z])(blur)|(?<=[a-z])(Blur))(?![a-z])/.test(e.animationName)) {
+                handleIdle();
+            }
         },
     };
 }

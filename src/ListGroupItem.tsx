@@ -45,13 +45,13 @@ export default function ListGroupItem(props: Props) {
                 stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateActPass.class,
             ].join(' ')}
-        
-            onAnimationEnd={(e) => {
-                stateEnbDis.handleAnimationEnd(e);
-                stateActPass.handleAnimationEnd(e);
-            }}
         >
-            <div className='lg-wrapper'>
+            <div className='lg-wrapper'
+                onAnimationEnd={(e) => {
+                    stateEnbDis.handleAnimationEnd(e);
+                    stateActPass.handleAnimationEnd(e);
+                }}
+            >
                 {props.children}
             </div>
         </li>

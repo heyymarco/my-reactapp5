@@ -2,7 +2,7 @@ import type * as Css       from './Css';
 
 import
     React, {
-    useMemo
+    useMemo, useRef, useEffect
 }                          from 'react';
 
 import * as Elements       from './Element';
@@ -298,7 +298,7 @@ export { states, styles, useStyles };
 
 
 export interface VariantAlign {
-    align?    : Css.AlignItems
+    align?   : Css.AlignItems
 }
 export function useVariantAlign(props: VariantAlign, styles: Record<string, string>) {
     return {
@@ -306,6 +306,7 @@ export function useVariantAlign(props: VariantAlign, styles: Record<string, stri
     };
 }
 
+export type CloseType = 'ui' | 'backg' | 'shortcut';
 export interface Props
     extends
         Elements.VariantTheme,
@@ -319,7 +320,7 @@ export interface Props
     children?   : React.ReactNode
     footer?     : React.ReactNode
 
-    onClose?    : () => void
+    onClose?    : (closeType: CloseType) => void
 }
 export default function ListGroup(props: Props) {
     const styles       = useStyles();
@@ -328,7 +329,7 @@ export default function ListGroup(props: Props) {
 
     const stateActPass = useStateActivePassive(props);
 
-    
+
     
     const cardProps = useMemo(() => {
         const cardProps: Cards.Props = Object.assign({}, props, {
@@ -339,7 +340,7 @@ export default function ListGroup(props: Props) {
             cardProps.header = (
                 <h5 className={styles.title}>
                     {cardProps.header}
-                    <ButtonIcon btnStyle='link' theme='secondary' aria-label='Close' icon='close' onClick={props.onClose} />
+                    <ButtonIcon btnStyle='link' theme='secondary' aria-label='Close' icon='close' onClick={() => props.onClose?.('ui')} />
                 </h5>
             );
         }
@@ -348,7 +349,7 @@ export default function ListGroup(props: Props) {
             cardProps.footer = (
                 <p className={styles.actionBar}>
                     {cardProps.footer}
-                    <Button theme='primary' text='Close' onClick={props.onClose} />
+                    <Button theme='primary' text='Close' onClick={() => props.onClose?.('ui')} />
                 </p>
             );
         }
@@ -356,6 +357,15 @@ export default function ListGroup(props: Props) {
 
         return cardProps;
     }, [props, styles.title, styles.actionBar]);
+
+
+    const modalUi = useRef<HTMLElement>(null);
+    useEffect(() => {
+        if (stateActPass.actived) modalUi.current?.focus();
+    }, [stateActPass.actived]);
+
+
+
     return (
         <section className={[
                 styles.main,
@@ -370,7 +380,17 @@ export default function ListGroup(props: Props) {
                 stateActPass.handleAnimationEnd(e);
             }}
 
+            // watch [escape key] on the whole modal, including card & children:
+            onKeyDown={(e) => ((e.code === 'Escape') || (e.key === 'Escape')) && props.onClose?.('shortcut')}
+
+            // watch left click on the backg only (not at the card):
+            onClick={(e)   => (e.target === e.currentTarget) && (e.type === 'click') && props.onClose?.('backg')}
+
+            // turn the modal as a focusable control but cannot be focused by tab key:
             tabIndex={-1}
+
+            // make a reference for focusing programatically at shown (active = true)
+            ref={modalUi}
         >
             <div>
                 <div>
