@@ -29,17 +29,17 @@ export {
 export interface CssProps {
     // anim props:
 
-    filterDisabled        : Css.Filter
-    filterActive          : Css.Filter
+    filterDisable        : Css.Filter
+    filterActive         : Css.Filter
 
-    '@keyframes enabled'  : Css.Keyframes
-    '@keyframes disabled' : Css.Keyframes
-    '@keyframes active'   : Css.Keyframes
-    '@keyframes passive'  : Css.Keyframes
-    animEnabled           : Css.Animation
-    animDisabled          : Css.Animation
-    animActive            : Css.Animation
-    animPassive           : Css.Animation
+    '@keyframes enable'  : Css.Keyframes
+    '@keyframes disable' : Css.Keyframes
+    '@keyframes active'  : Css.Keyframes
+    '@keyframes passive' : Css.Keyframes
+    animEnable           : Css.Animation
+    animDisable          : Css.Animation
+    animActive           : Css.Animation
+    animPassive          : Css.Animation
 }
 // const unset   = 'unset';
 // const none    = 'none';
@@ -50,19 +50,19 @@ const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Elements.vars, {
     // anim props:
 
-    filterEnabledDisabled : '--indi-filterEnabledDisabled',
-    animEnabledDisabled   : '--indi-animEnabledDisabled',
+    filterEnableDisable : '--indi-filterEnableDisable',
+    animEnableDisable   : '--indi-animEnableDisable',
 
-    filterHoverLeave      : '--ctrl-filterHoverLeave', // will be used    in Control
-    // animHoverLeave     : '--ctrl-animHoverLeave',   // will be defined in Control
+    filterHoverLeave    : '--ctrl-filterHoverLeave', // will be used    in Control
+    // animHoverLeave   : '--ctrl-animHoverLeave',   // will be defined in Control
 
-    filterActivePassive   : '--indi-filterActivePassive',
-    animActivePassive     : '--indi-animActivePassive',
+    filterActivePassive : '--indi-filterActivePassive',
+    animActivePassive   : '--indi-animActivePassive',
 });
 
 // re-defined later, we need to construct varProps first
-export const keyframesEnabled  = { from: undefined, to: undefined };
-export const keyframesDisabled = { from: undefined, to: undefined };
+export const keyframesEnable   = { from: undefined, to: undefined };
+export const keyframesDisable = { from: undefined, to: undefined };
 export const keyframesActive   = { from: undefined, to: undefined };
 export const keyframesPassive  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
@@ -70,28 +70,28 @@ const ecssProps = Elements.cssProps;
 const _cssProps: CssProps = {
     // anim props:
 
-    filterDisabled        : [['grayscale(50%)',  'opacity(50%)'  ]],
-    filterActive          : [['brightness(65%)', 'contrast(150%)']],
+    filterDisable        : [['grayscale(50%)',  'opacity(50%)'  ]],
+    filterActive         : [['brightness(65%)', 'contrast(150%)']],
 
-    '@keyframes enabled'  : keyframesEnabled,
-    '@keyframes disabled' : keyframesDisabled,
-    '@keyframes active'   : keyframesActive,
-    '@keyframes passive'  : keyframesPassive,
-    animEnabled           : [['300ms', 'ease-out', 'both', keyframesEnabled ]],
-    animDisabled          : [['300ms', 'ease-out', 'both', keyframesDisabled]],
-    animActive            : [['150ms', 'ease-out', 'both', keyframesActive  ]],
-    animPassive           : [['300ms', 'ease-out', 'both', keyframesPassive ]],
+    '@keyframes enable'  : keyframesEnable,
+    '@keyframes disable' : keyframesDisable,
+    '@keyframes active'  : keyframesActive,
+    '@keyframes passive' : keyframesPassive,
+    animEnable           : [['300ms', 'ease-out', 'both', keyframesEnable ]],
+    animDisable          : [['300ms', 'ease-out', 'both', keyframesDisable]],
+    animActive           : [['150ms', 'ease-out', 'both', keyframesActive ]],
+    animPassive          : [['300ms', 'ease-out', 'both', keyframesPassive]],
 };
 
 
 
-Object.assign(keyframesDisabled, {
+Object.assign(keyframesDisable, {
     from: {
         filter: [[
             ecssProps.filter,
             getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, but now become the second priority
-            // getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
+            // getVar(vars.filterEnableDisable), // last priority, but now become the first priority
         ]],
     },
     to: {
@@ -99,20 +99,20 @@ Object.assign(keyframesDisabled, {
             ecssProps.filter,
             getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, but now become the second priority
-            getVar(vars.filterEnabledDisabled), // last priority, but now become the first priority
+            getVar(vars.filterEnableDisable), // last priority, but now become the first priority
         ]],
     }
 });
-Object.assign(keyframesEnabled, {
-    from : keyframesDisabled.to,
-    to   : keyframesDisabled.from
+Object.assign(keyframesEnable, {
+    from : keyframesDisable.to,
+    to   : keyframesDisable.from
 });
 
 Object.assign(keyframesActive, {
     from: {
         filter: [[
             ecssProps.filter,
-            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
+            getVar(vars.filterEnableDisable), // last priority, rarely happened
             // getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
@@ -120,7 +120,7 @@ Object.assign(keyframesActive, {
     to: {
         filter: [[
             ecssProps.filter,
-            getVar(vars.filterEnabledDisabled), // last priority, rarely happened
+            getVar(vars.filterEnableDisable), // last priority, rarely happened
             getVar(vars.filterActivePassive),
             getVar(vars.filterHoverLeave), // first priority, serving smooth responsiveness
         ]],
@@ -146,38 +146,38 @@ export { config, cssProps };
 
 
 
-export const stateEnabled            = (content: object) => ({
+export const stateEnable             = (content: object) => ({
     '&.enable': { // .enable
         extend: [content]
     }
 });
-export const stateNotEnabled         = (content: object) => ({
+export const stateNotEnable          = (content: object) => ({
     '&:not(.enable)': { // not-.enable
         extend: [content]
     }
 });
-export const stateDisabled           = (content: object) => ({
+export const stateDisable            = (content: object) => ({
     '&:disabled,&.disabled,&.disable': { // :disabled or .disabled or .disable
         extend: [content]
     }
 });
-export const stateNotDisabled        = (content: object) => ({
+export const stateNotDisable         = (content: object) => ({
     '&:not(:disabled):not(.disabled):not(.disable)': { // not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
 });
-export const stateEnabledDisabled    = (content: object) => ({
+export const stateEnableDisable      = (content: object) => ({
     '&.enable,&:disabled,&.disabled,&.disable': { // .enable or :disabled or .disabled or .disable
         extend: [content]
     }
 });
-export const stateNotEnabledDisabled = (content: object) => ({
+export const stateNotEnableDisable   = (content: object) => ({
     '&:not(.enable):not(:disabled):not(.disabled):not(.disable)': { // not-.enable and not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
 });
 export const stateNotEnablingDisabling = (content: object) => ({
-    '&:not(.enable):not(.disable)': { // not-.enable and not-:disabled and not-.disabled and not-.disable
+    '&:not(.enable):not(.disable)': { // not-.enable and not-.disable
         extend: [content]
     }
 });
@@ -232,32 +232,32 @@ const states = {extend:[ Elements.states, { // copy Element's states
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
-        getVar(vars.animEnabledDisabled), // 1st : ctrl must be enabled
-        getVar(vars.animActivePassive),   // 4th : ctrl got pressed
+        getVar(vars.animEnableDisable), // 1st : ctrl must be enable
+        getVar(vars.animActivePassive), // 4th : ctrl got pressed
     ],
 
 
 
     // all initial states are none:
 
-    [vars.filterEnabledDisabled] : ecssProps.filterNone,
-    [vars.animEnabledDisabled]   : ecssProps.animNone,
+    [vars.filterEnableDisable] : ecssProps.filterNone,
+    [vars.animEnableDisable]   : ecssProps.animNone,
 
-    [vars.filterHoverLeave]      : ecssProps.filterNone, // supports for control
+    [vars.filterHoverLeave]    : ecssProps.filterNone, // supports for control
 
-    [vars.filterActivePassive]   : ecssProps.filterNone,
-    [vars.animActivePassive]     : ecssProps.animNone,
+    [vars.filterActivePassive] : ecssProps.filterNone,
+    [vars.animActivePassive]   : ecssProps.animNone,
 
     // specific states:
     extend:[
-        stateEnabledDisabled({
-            [vars.filterEnabledDisabled]          : cssProps.filterDisabled,
+        stateEnableDisable({
+            [vars.filterEnableDisable]            : cssProps.filterDisable,
         }),
-        stateEnabled({
-            [vars.animEnabledDisabled]            : cssProps.animEnabled,
+        stateEnable({
+            [vars.animEnableDisable]              : cssProps.animEnable,
         }),
-        stateDisabled({
-            [vars.animEnabledDisabled]            : cssProps.animDisabled,
+        stateDisable({
+            [vars.animEnableDisable]              : cssProps.animDisable,
         }),
         {
             '&:disabled:not(.disable),&.disabled' : {extend:[ // if ctrl was disabled programatically, disable first animation
@@ -280,16 +280,16 @@ const states = {extend:[ Elements.states, { // copy Element's states
                 // customize the anim:
                 [vars.animFn]: [
                     ecssProps.anim,
-                    getVar(vars.animActivePassive),   // 1st : ctrl already pressed, move to the least priority
-                    getVar(vars.animEnabledDisabled), // 4th : ctrl enabled/disabled
+                    getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
+                    getVar(vars.animEnableDisable), // 4th : ctrl enable/disable
                 ],
 
                 '&:disabled:not(.disable),&.disabled': { // if ctrl was disabled programatically
                     // customize the anim:
                     [vars.animFn]: [
                         ecssProps.anim,
-                        getVar(vars.animEnabledDisabled), // 1st : ctrl already disabled, move to the least priority
-                        getVar(vars.animActivePassive),   // 4th : ctrl deactivated programatically, move to moderate priority
+                        getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
+                        getVar(vars.animActivePassive), // 4th : ctrl deactivated programatically, move to moderate priority
                     ],
                 },
             },
@@ -315,19 +315,19 @@ export { states, styles, useStyles };
 
 
 
-export function useStateEnabledDisabled(props: Props) {
+export function useStateEnableDisable(props: Props) {
     const defaultEnabled = true; // if [enabled] was not specified => the default value is enabled=true
     const [enabled,   setEnabled  ] = useState(props.enabled ?? defaultEnabled);
     const [enabling,  setEnabling ] = useState(false);
     const [disabling, setDisabling] = useState(false);
 
     
-    const newEnabled = props.enabled ?? defaultEnabled;
+    const newEnable = props.enabled ?? defaultEnabled;
     useEffect(() => {
-        if (enabled !== newEnabled) {
-            setEnabled(newEnabled);
+        if (enabled !== newEnable) {
+            setEnabled(newEnable);
 
-            if (newEnabled) {
+            if (newEnable) {
                 setDisabling(false);
                 setEnabling(true);
             }
@@ -336,7 +336,7 @@ export function useStateEnabledDisabled(props: Props) {
                 setDisabling(true);
             }
         }
-    }, [enabled, newEnabled]);
+    }, [enabled, newEnable]);
 
     
     const handleIdle = () => {
@@ -346,7 +346,7 @@ export function useStateEnabledDisabled(props: Props) {
         if (disabling) setDisabling(false);
     }
     return {
-        enabled: enabled,
+        enabled : enabled,
         disabled: !enabled,
         class: (enabling? 'enable' : (disabling ? 'disable': null)),
         handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
@@ -445,7 +445,7 @@ export default function Indicator(props: Props) {
     const variTheme      = Elements.useVariantTheme(props, elmStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
-    const stateEnbDis    = useStateEnabledDisabled(props);
+    const stateEnbDis    = useStateEnableDisable(props);
     const stateActPass   = useStateActivePassive(props);
 
     

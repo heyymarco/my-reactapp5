@@ -62,21 +62,21 @@ const jss = createJss().setup({plugins:[
 ]});
 
 export default function App (props: any) {
-	const [enableGrad, setEnableGrad ] = useState(false);
-	const [enabled,    setEnabled    ] = useState(true);
-	const [active, 	   setActive     ] = useState(false);
-	const [focus, 	   setFocus      ] = useState(false);
-	const [size, 	   setSize       ] = useState<'sm'|'lg'|undefined>(undefined);
-	const [theme, 	   setTheme      ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
-	const [btnStyle,   setBtnStyle   ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
+	const [enableGrad, setEnableGrad] = useState(false);
+	const [enable,     setEnable    ] = useState(true);
+	const [active, 	   setActive    ] = useState(false);
+	const [focus, 	   setFocus     ] = useState(false);
+	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
+	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
+	const [btnStyle,   setBtnStyle  ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
 	const cardStyle = btnStyle==='outline' ? 'outline' : undefined;
 
 
 	const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnableGrad(e.target.checked);
 	}
-	const handleChangeEnabled = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setEnabled(e.target.checked);
+	const handleChangeEnable = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setEnable(e.target.checked);
 	}
 	const handleChangeActive = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setActive(e.target.checked);
@@ -111,52 +111,52 @@ export default function App (props: any) {
 					Learn React
 				</a>
 				<Element theme={theme} enableGradient={enableGrad} size={size}></Element>
-				<Indicator theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}></Indicator>
-				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus}></Control>
-				<Content theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active}>
+				<Indicator theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active}></Indicator>
+				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}></Control>
+				<Content theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active}>
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
-					<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+					<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 					<Button  theme='success'>Hello Button</Button>
 					Ipsum aliquam aperiam magni sint eum!
 				</Content>
-				<Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+				<Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
 				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
-				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
 					<span>hey</span>
 				</ButtonIcon>
-				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} btnStyle={btnStyle}>
+				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} btnStyle={btnStyle}>
 					<span>hey</span>
 				</ButtonIcon>
-				<ButtonIcon icon="instagram" theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+				<ButtonIcon icon="instagram" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
 				</ButtonIcon>
 				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>{[
 					'An item',
-					<ListGroupItem key={199} enabled={enabled} active={active}>
-						<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+					<ListGroupItem key={199} enabled={enable} active={active}>
+						<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 						<Button  theme='success'>Hello Button</Button>
 					</ListGroupItem>,
 					'A second item',
-					<ListGroupItem key={24} enabled={enabled} active={active}>A third item</ListGroupItem>,
+					<ListGroupItem key={24} enabled={enable} active={active}>A third item</ListGroupItem>,
 					'A fourth item',
-					<Button key={123}  theme='none' size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>,
+					<Button key={123}  theme='none' size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>,
 					'A fifth item',
-					<ListGroupItem key={99} enabled={enabled} active={active}>
-						<Button  theme='none' enableGradient={enableGrad} size={size} enabled={enabled} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+					<ListGroupItem key={99} enabled={enable} active={active}>
+						<Button  theme='none' enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 					</ListGroupItem>,
 					'A sixth item',
-					<ListGroupItem key={55} enabled={enabled} active={active}>A seventh item</ListGroupItem>,
+					<ListGroupItem key={55} enabled={enable} active={active}>A seventh item</ListGroupItem>,
 					'A eighth item',
 				]}
 				</ListGroup>
 				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>
 					An item
 				</ListGroup>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 					
@@ -168,30 +168,30 @@ export default function App (props: any) {
 						'dolor sit amet'
 					
 				/>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
 					<h5>Card title</h5>
 					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
 					<a href='/'>Card link</a>
 					<a href='/'>Another link</a>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
 					<h5>Card title</h5>
 					<h6>Card subtitle</h6>
 					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
 					<a href='/'>Card link</a>
 					<a href='/'>Another link</a>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
 					<img src='https://picsum.photos/300/200' alt='' />
 					<h5>Card title</h5>
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 
@@ -200,20 +200,7 @@ export default function App (props: any) {
 				>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
-					header=
-						'Lorem ipsum dolor'
-
-					footer=
-						'dolor sit amet'
-				>
-					<img src='https://picsum.photos/300/200' alt='' />
-					<h5>Card title</h5>
-					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
-					</br>This content is a little bit longer.</p>
-					<p>Last updated 3 mins ago</p>
-				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 
@@ -225,6 +212,19 @@ export default function App (props: any) {
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
+				</Card>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
+					header=
+						'Lorem ipsum dolor'
+
+					footer=
+						'dolor sit amet'
+				>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
 					<img src='https://picsum.photos/300/200' alt='' />
 					<h5>Card title</h5>
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
@@ -232,7 +232,7 @@ export default function App (props: any) {
 					<p>Last updated 3 mins ago</p>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enabled} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
 					<figure>
 						<img src='https://picsum.photos/300/200' alt='' />
 
@@ -266,8 +266,8 @@ export default function App (props: any) {
 				</label>
 				<label>
 					<input type='checkbox'
-						checked={enabled}
-						onChange={handleChangeEnabled}
+						checked={enable}
+						onChange={handleChangeEnable}
 					/>
 					enabled
 				</label>

@@ -5,7 +5,7 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
@@ -13,7 +13,7 @@ import {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
 }                          from './Indicator';
 import spacers             from './spacers';
 import colors              from './colors';
@@ -24,7 +24,7 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
@@ -32,7 +32,7 @@ export {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
 };
 
 
@@ -225,7 +225,7 @@ export default function ListGroup(props: Props) {
     const variTheme      = Elements.useVariantTheme(props, styles);
     const variGradient   = Elements.useVariantGradient(props, styles);
 
-    const stateEnbDis    = useStateEnabledDisabled(props);
+    const stateEnbDis    = useStateEnableDisable(props);
     const stateActPass   = useStateActivePassive(props);
 
     

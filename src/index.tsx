@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import ModalTestApp from './ModalTestApp';
+import CheckTestApp from './CheckTestApp';
+import JssTestApp from './JssTestApp';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <ModalTestApp />
+    <CheckTestApp />
   </React.StrictMode>,
   document.getElementById('root')
 );

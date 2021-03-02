@@ -11,7 +11,7 @@ import
     Card,
     * as Cards             from './Card';
 import {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
@@ -19,7 +19,7 @@ import {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
 }                          from './Card';
 import * as Containers     from './Container'
 import {
@@ -36,7 +36,7 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
@@ -44,7 +44,7 @@ export {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
 };
 
 
@@ -322,7 +322,7 @@ export interface Props
 
     onClose?    : (closeType: CloseType) => void
 }
-export default function ListGroup(props: Props) {
+export default function Modal(props: Props) {
     const styles       = useStyles();
 
     const variAlign    = useVariantAlign(props, styles);

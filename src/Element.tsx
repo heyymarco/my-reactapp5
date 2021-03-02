@@ -149,7 +149,7 @@ export { config, cssProps };
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enabled|Disabled|Active|Passive|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation|align/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation|align/).test(key)) continue;
         cssPropsCopy[key] = value;
     }
     return cssPropsCopy;

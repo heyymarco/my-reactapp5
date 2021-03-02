@@ -5,7 +5,7 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Controls       from './Control';
 import {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
@@ -15,7 +15,7 @@ import {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
 }                          from './Control';
 import * as border         from './borders';
@@ -28,7 +28,7 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
@@ -38,7 +38,7 @@ export {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
 };
 
@@ -59,7 +59,7 @@ export interface CssProps {
 const none    = 'none';
 // const inherit = 'inherit';
 const center  = 'center';
-const middle  = 'middle';
+// const middle  = 'middle';
 
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
@@ -120,7 +120,7 @@ const styles = {
 
         // typo settings:
         textAlign      : center,
-        verticalAlign  : middle,
+        verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
 
         userSelect     : none, // disable selecting button's text
     },
@@ -254,7 +254,7 @@ export default function Button(props: Props) {
     const variGradient   = Elements.useVariantGradient(props, styles);
     const variButton     =          useVariantButton(props, styles);
 
-    const stateEnbDis    = useStateEnabledDisabled(props);
+    const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
     const stateActPass   = useStateActivePassive(props);

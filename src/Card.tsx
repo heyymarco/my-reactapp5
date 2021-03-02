@@ -5,7 +5,7 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Contents       from './Content';
 import {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
@@ -13,7 +13,7 @@ import {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
 }                          from './Content';
 import spacers             from './spacers';
 import stripOuts           from './strip-outs';
@@ -25,7 +25,7 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
-    stateEnabled, stateNotEnabled, stateDisabled, stateNotDisabled, stateEnabledDisabled, stateNotEnabledDisabled, stateNotEnablingDisabling,
+    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
@@ -33,7 +33,7 @@ export {
 
     defineSizes, defineThemes,
 
-    useStateEnabledDisabled, useStateActivePassive,
+    useStateEnableDisable, useStateActivePassive,
 };
 
 
@@ -271,7 +271,7 @@ export default function ListGroup(props: Props) {
     const variGradient   = Elements.useVariantGradient(props, styles);
     const variCard       =          useVariantCard(props, styles);
 
-    const stateEnbDis    = useStateEnabledDisabled(props);
+    const stateEnbDis    = useStateEnableDisable(props);
     const stateActPass   = useStateActivePassive(props);
 
     
