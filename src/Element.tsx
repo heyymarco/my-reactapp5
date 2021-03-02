@@ -118,6 +118,7 @@ const _cssProps: CssProps = {
         ['background', '300ms', 'ease-out'],
         ['color'     , '300ms', 'ease-out'],
         ['border'    , '300ms', 'ease-out'],
+        ['font-size' , '300ms', 'ease-out'],
     ],
 
     boxShadowNone     : [[0, 0, 'transparent']],
@@ -149,7 +150,7 @@ export { config, cssProps };
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation|align/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Check|Clear|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation|align/).test(key)) continue;
         cssPropsCopy[key] = value;
     }
     return cssPropsCopy;

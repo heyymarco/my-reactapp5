@@ -146,32 +146,32 @@ export { config, cssProps };
 
 
 
-export const stateEnable             = (content: object) => ({
+export const stateEnable               = (content: object) => ({
     '&.enable': { // .enable
         extend: [content]
     }
 });
-export const stateNotEnable          = (content: object) => ({
+export const stateNotEnable            = (content: object) => ({
     '&:not(.enable)': { // not-.enable
         extend: [content]
     }
 });
-export const stateDisable            = (content: object) => ({
+export const stateDisable              = (content: object) => ({
     '&:disabled,&.disabled,&.disable': { // :disabled or .disabled or .disable
         extend: [content]
     }
 });
-export const stateNotDisable         = (content: object) => ({
+export const stateNotDisable           = (content: object) => ({
     '&:not(:disabled):not(.disabled):not(.disable)': { // not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
 });
-export const stateEnableDisable      = (content: object) => ({
+export const stateEnableDisable        = (content: object) => ({
     '&.enable,&:disabled,&.disabled,&.disable': { // .enable or :disabled or .disabled or .disable
         extend: [content]
     }
 });
-export const stateNotEnableDisable   = (content: object) => ({
+export const stateNotEnableDisable     = (content: object) => ({
     '&:not(.enable):not(:disabled):not(.disabled):not(.disable)': { // not-.enable and not-:disabled and not-.disabled and not-.disable
         extend: [content]
     }
@@ -183,43 +183,43 @@ export const stateNotEnablingDisabling = (content: object) => ({
 });
 
 // non-pseudo active only
-export const stateActive            = (content: object) => ({
+export const stateActive                   = (content: object) => ({
     '&.active,&.actived': {
         extend: [content]
     }
 });
-export const stateNotActive         = (content: object) => ({
+export const stateNotActive                = (content: object) => ({
     '&:not(.active):not(.actived)': {
         extend: [content]
     }
 });
-export const statePassive           = (content: object) => ({
+export const statePassive                  = (content: object) => ({
     '&.passive': {
         extend: [content]
     }
 });
-export const stateNotPassive        = (content: object) => ({
+export const stateNotPassive               = (content: object) => ({
     '&:not(.passive)': {
         extend: [content]
     }
 });
-export const stateActivePassive     = (content: object) => ({
+export const stateActivePassive            = (content: object) => ({
     '&.active,&.actived,&.passive': {
         extend: [content]
     }
 });
-export const stateNotActivePassive  = (content: object) => ({
+export const stateNotActivePassive         = (content: object) => ({
     '&:not(.active):not(.actived):not(.passive)': {
         extend: [content]
     }
 });
-export const stateNotActivatingPassivating  = (content: object) => ({
+export const stateNotActivatingPassivating = (content: object) => ({
     '&:not(.active):not(.passive)': {
         extend: [content]
     }
 });
 
-export const stateNoAnimStartup     = () =>
+export const stateNoAnimStartup = () =>
     stateNotEnablingDisabling(
         stateNotActivatingPassivating({
             animationDuration: [['0ms'], '!important'],
@@ -260,7 +260,7 @@ const states = {extend:[ Elements.states, { // copy Element's states
             [vars.animEnableDisable]              : cssProps.animDisable,
         }),
         {
-            '&:disabled:not(.disable),&.disabled' : {extend:[ // if ctrl was disabled programatically, disable first animation
+            '&.disabled,&:disabled:not(.disable)' : {extend:[ // if ctrl was disabled programatically, disable first animation
                 stateNoAnimStartup(),
             ]},
         },
@@ -284,7 +284,7 @@ const states = {extend:[ Elements.states, { // copy Element's states
                     getVar(vars.animEnableDisable), // 4th : ctrl enable/disable
                 ],
 
-                '&:disabled:not(.disable),&.disabled': { // if ctrl was disabled programatically
+                '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
                     // customize the anim:
                     [vars.animFn]: [
                         ecssProps.anim,

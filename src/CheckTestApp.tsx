@@ -48,6 +48,7 @@ export default function App (props: any) {
 	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
 	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
 	const [btnStyle,   setBtnStyle  ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
+	const [check,      setCheck   ] = useState(false);
 
     const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnableGrad(e.target.checked);
@@ -67,6 +68,9 @@ export default function App (props: any) {
 	const handleChangeTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined));
 	}
+	const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setCheck(e.target.checked);
+	}
 
 
     return (
@@ -77,7 +81,10 @@ export default function App (props: any) {
                     <Button theme='primary' text='Hello' />
                     Hello
 					<input type='checkbox'/>
-                    <Check text='Hello' theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} />
+                    <Check text='Hello' theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
+						checked={check}
+						onChange={handleChangeCheck}
+					/>
                     Hello
                     <ButtonIcon theme='primary' icon='checkbox' />
                     Hello
@@ -156,6 +163,13 @@ export default function App (props: any) {
 						)
 					}
 				</p>
+				<label>
+					<input type='checkbox'
+						checked={check}
+						onChange={handleChangeCheck}
+					/>
+					checked
+				</label>
             </Container>
         </JssProvider>
     );

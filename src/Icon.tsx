@@ -129,11 +129,11 @@ const styles = {
         display       : 'inline-block',
         verticalAlign : 'middle',
 
+        color         : undefined, // delete
+
         size          : undefined, // delete
         height        : cssProps.size,
         width         : 'min-content',
-
-        userSelect    : none, // disable selecting icon's text
     },
     '@font-face': [
         Object.assign({
@@ -150,6 +150,8 @@ const styles = {
 
         backg         : 'transparent',
         color         : cssProps.color,
+
+        userSelect    : none, // disable selecting icon's text
 
         lineHeight    : 1,
         textTransform : none,

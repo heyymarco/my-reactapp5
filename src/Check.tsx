@@ -1,6 +1,10 @@
 import type * as Css       from './Css';
 
-import React               from 'react';
+import
+    React, {
+    useState,
+    useEffect
+}                          from 'react';
 
 import * as Elements       from './Element';
 import * as Controls       from './Control';
@@ -49,12 +53,12 @@ export {
 export interface CssProps {
     // anim props:
 
-    filterCheck          : Css.Filter
+    filterClear        : Css.Filter
 
-    '@keyframes check'   : Css.Keyframes
-    '@keyframes uncheck' : Css.Keyframes
-    animCheck            : Css.Animation
-    animUncheck          : Css.Animation
+    '@keyframes check' : Css.Keyframes
+    '@keyframes clear' : Css.Keyframes
+    animCheck          : Css.Animation
+    animClear          : Css.Animation
 }
 // const unset   = 'unset';
 const none    = 'none';
@@ -65,23 +69,50 @@ const middle  = 'middle';
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Controls.vars, Icons.vars, {
+    /**
+     * custom css props for manipulating icon's animation(s).
+     */
+    animIconFn       : '--chk-animIconFn',
+
+
+    // anim props:
+
+    filterCheckClear : '--chk-filterCheckClear',
+    animCheckClear   : '--chk-animCheckClear',
 });
 
 // re-defined later, we need to construct varProps first
-export const keyframesCheck   = { from: undefined, to: undefined };
-export const keyframesUncheck = { from: undefined, to: undefined };
+export const keyframesCheck = { from: undefined, to: undefined };
+export const keyframesClear = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     // anim props:
 
-    filterCheck          : [['brightness(65%)', 'contrast(150%)']],
+    filterClear        : [['opacity(0%)']],
 
-    '@keyframes check'   : keyframesCheck,
-    '@keyframes uncheck' : keyframesUncheck,
-    animCheck            : [['150ms', 'ease-out', 'both', keyframesCheck  ]],
-    animUncheck          : [['300ms', 'ease-out', 'both', keyframesUncheck]],
+    '@keyframes check' : keyframesCheck,
+    '@keyframes clear' : keyframesClear,
+    animCheck          : [['150ms', 'ease-out', 'both', keyframesCheck]],
+    animClear          : [['300ms', 'ease-out', 'both', keyframesClear]],
 };
+
+
+
+Object.assign(keyframesClear, {
+    from: {
+        filter: none,
+    },
+    to: {
+        filter: [[
+            getVar(vars.filterCheckClear),
+        ]],
+    }
+});
+Object.assign(keyframesCheck, {
+    from : keyframesClear.to,
+    to   : keyframesClear.from
+});
 
 
 
@@ -97,6 +128,87 @@ export { config, cssProps };
 // export default cssProps;
 
 
+
+export const stateCheck               = (content: object) => ({
+    '&.check,&:checked': {
+        extend: [content]
+    }
+});
+export const stateNotCheck            = (content: object) => ({
+    '&:not(.check):not(:checked)': {
+        extend: [content]
+    }
+});
+export const stateClear               = (content: object) => ({
+    '&.clear': {
+        extend: [content]
+    }
+});
+export const stateNotClear            = (content: object) => ({
+    '&:not(.clear)': {
+        extend: [content]
+    }
+});
+export const stateCheckClear          = (content: object) => ({
+    '&.check,&:checked,&.clear': {
+        extend: [content]
+    }
+});
+export const stateNotCheckClear       = (content: object) => ({
+    '&:not(.check):not(:checked):not(.clear)': {
+        extend: [content]
+    }
+});
+export const stateNotCheckingClearing = (content: object) => ({
+    '&:not(.check):not(.clear)': {
+        extend: [content]
+    }
+});
+
+
+
+export function useStateCheckClear(props: Props) {
+    const defaultChecked = false; // if [checked] was not specified => the default value is checked=false
+    const [checked,  setChecked ] = useState(props.checked ?? defaultChecked);
+    const [checking, setChecking] = useState(false);
+    const [clearing, setClearing] = useState(false);
+
+    
+    const newCheck = props.checked ?? defaultChecked;
+    useEffect(() => {
+        if (checked !== newCheck) {
+            setChecked(newCheck);
+
+            if (newCheck) {
+                setClearing(false);
+                setChecking(true);
+            }
+            else {
+                setChecking(false);
+                setClearing(true);
+            }
+        }
+    }, [checked, newCheck]);
+
+    
+    const handleIdle = () => {
+        // clean up expired animations
+
+        if (checking) setChecking(false);
+        if (clearing) setClearing(false);
+    }
+    return {
+        checked : checked,
+        cleared: !checked,
+        class: (checking? 'check' : (clearing ? 'clear': null)),
+        handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
+            if (e.target !== e.currentTarget) return; // no bubbling
+            if (/((?<![a-z])(check|clear)|(?<=[a-z])(Check|Clear))(?![a-z])/.test(e.animationName)) {
+                handleIdle();
+            }
+        },
+    };
+}
 
 function escapeSvg(svg: string) {
     const svgCopy = Array.from(svg);
@@ -117,7 +229,40 @@ function escapeSvg(svg: string) {
 
 
 
-const states = {extend:[ Buttons.states, { // copy Control's states
+const states = {extend:[ Controls.states, { // copy Control's states
+    // customize the icon's anim:
+    [vars.animIconFn]: [
+        getVar(vars.animCheckClear),
+    ],
+
+
+
+    // all initial states are none:
+
+    [vars.filterCheckClear] : ecssProps.filterNone,
+    [vars.animCheckClear]   : ecssProps.animNone,
+
+    // specific states:
+    extend:[
+        stateCheckClear({
+            [vars.filterCheckClear]           : cssProps.filterClear,
+        }),
+        stateCheck({
+            [vars.animCheckClear]             : cssProps.animCheck,
+        }),
+        stateClear({
+            [vars.animCheckClear]             : cssProps.animClear,
+        }),
+        stateNotCheckClear({ // hides the check if not [checking, checked, clearing]
+            '&::before': {
+                display: none,
+            },
+        }),
+        {
+            '&:checked:not(.check)': // if ctrl was checked, disable first animation
+                stateNoAnimStartup(),
+        },
+    ],
 }]};
 
 const styles = {
@@ -142,20 +287,27 @@ const styles = {
 
 
         overflow: 'hidden',
-        '&:before': {
-            content : '""',
-            display : 'block',
-            width   : '100%',
-            height  : '100%',
-
+        '&::before': {
             extend: [
                 Icons.styles.main,
                 Icons.styles.img,
             ],
 
+            content : '""',
+            display : 'block',
+            height  : '100%',
+            width   : '100%',
+
+            verticalAlign : undefined, // delete
+            
             // forked from Bootstrap 5:
             [vars.img]: `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3 6-6'/></svg>")}")`,
-        }
+            
+            
+            
+            // a custom css props for manipulating icon's animation(s):
+            anim: getVar(vars.animIconFn), // apply prop
+        },
     },
 };
 
@@ -191,27 +343,28 @@ export interface Props
         Controls.Props,
         VariantCheck
 {
-    text?        : string
-    children?    : React.ReactNode
+    text?     : string
+    children? : React.ReactNode
 
-    onChange?     : React.ChangeEventHandler<HTMLInputElement>
+    checked?  : boolean
+    onChange? : React.ChangeEventHandler<HTMLInputElement>
 }
 export default function Button(props: Props) {
     const styles         =          useStyles();
     const ctrlStyles     = Controls.useStyles();
     const elmStyles      = Elements.useStyles();
-    const btnStyles      =  Buttons.useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
     const variThemeDef   =          useVariantThemeDefault(props);
     const variTheme      = Elements.useVariantTheme(props, ctrlStyles, variThemeDef);
-    const variGradient   = Elements.useVariantGradient(props, btnStyles);
+    const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variButton     =          useVariantCheck(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
     const stateActPass   = useStateActivePassive(props);
+    const stateChkClr    = useStateCheckClear(props);
 
     
 
@@ -228,11 +381,13 @@ export default function Button(props: Props) {
                 stateLeave.class,
                 stateFocusBlur.class,
                 stateActPass.class,
+                stateChkClr.class,
             ].join(' ')}
 
             type='checkbox'
 
             disabled={stateEnbDis.disabled}
+            checked={stateChkClr.checked}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
@@ -247,6 +402,7 @@ export default function Button(props: Props) {
                 stateLeave.handleAnimationEnd(e);
                 stateFocusBlur.handleAnimationEnd(e);
                 stateActPass.handleAnimationEnd(e);
+                stateChkClr.handleAnimationEnd(e);
             }}
             onChange={props.onChange}
         />

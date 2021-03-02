@@ -167,108 +167,108 @@ export { config, cssProps };
 
 
 
-export const stateHover              = (content: object) => ({
+export const stateHover         = (content: object) => ({
     '&:hover,&:focus': { // hover or focus
         extend: [content]
     }
 });
-export const stateNotHover           = (content: object) => ({
+export const stateNotHover      = (content: object) => ({
     '&:not(:hover):not(:focus)': { // not-hover and not-focus
         extend: [content]
     }
 });
-export const stateLeave              = (content: object) =>
+export const stateLeave         = (content: object) =>
     stateNotHover({ // not-hover and not-focus and (leave or blur)
         extend:[{'&.leave,&.blur': {
             extend: [content]
         }}]
     });
-export const stateNotLeave           = (content: object) => ({
+export const stateNotLeave      = (content: object) => ({
     '&:not(.leave):not(.blur)': { // not-leave and not-blur
         extend: [content]
     }
 });
-export const stateHoverLeave         = (content: object) => ({
+export const stateHoverLeave    = (content: object) => ({
     '&:hover,&:focus,&.leave,&.blur': { // hover or focus or leave or blur
         extend: [content]
     }
 });
-export const stateNotHoverLeave      = (content: object) => ({
+export const stateNotHoverLeave = (content: object) => ({
     '&:not(:hover):not(:focus):not(.leave):not(.blur)': { // not-hover and not-focus and not-leave and not-blur
         extend: [content]
     }
 });
 
-export const stateFocus             = (content: object) => ({
+export const stateFocus         = (content: object) => ({
     '&:focus,&.focus': {
         extend: [content]
     }
 });
-export const stateNotFocus          = (content: object) => ({
+export const stateNotFocus      = (content: object) => ({
     '&:not(:focus):not(.focus)': {
         extend: [content]
     }
 });
-export const stateBlur              = (content: object) => ({
+export const stateBlur          = (content: object) => ({
     '&.blur': {
         extend: [content]
     }
 });
-export const stateNotBlur           = (content: object) => ({
+export const stateNotBlur       = (content: object) => ({
     '&:not(.blur)': {
         extend: [content]
     }
 });
-export const stateFocusBlur         = (content: object) => ({
+export const stateFocusBlur     = (content: object) => ({
     '&:focus,&.focus,&.blur': {
         extend: [content]
     }
 });
-export const stateNotFocusBlur      = (content: object) => ({
+export const stateNotFocusBlur  = (content: object) => ({
     '&:not(:focus):not(.focus):not(.blur)': {
         extend: [content]
     }
 });
 
-// override base: pseudo + non-pseudo active
-export const stateActive            = (content: object) => ({
-    '&:active,&.active,&.actived': {
+// override base: non-pseudo + pseudo active
+export const stateActive                   = (content: object) => ({
+    '&.active,&.actived,&:active': {
         extend: [content]
     }
 });
-export const stateNotActive         = (content: object) => ({
-    '&:not(:active):not(.active):not(.actived)': {
+export const stateNotActive                = (content: object) => ({
+    '&:not(.active):not(.actived):not(:active)': {
         extend: [content]
     }
 });
-export const statePassive           = (content: object) => ({
+export const statePassive                  = (content: object) => ({
     '&.passive': {
         extend: [content]
     }
 });
-export const stateNotPassive        = (content: object) => ({
+export const stateNotPassive               = (content: object) => ({
     '&:not(.passive)': {
         extend: [content]
     }
 });
-export const stateActivePassive     = (content: object) => ({
-    '&:active,&.active,&.actived,&.passive': {
+export const stateActivePassive            = (content: object) => ({
+    '&.active,&.actived,&:active,&.passive': {
         extend: [content]
     }
 });
-export const stateNotActivePassive  = (content: object) => ({
-    '&:not(:active):not(.active):not(.actived):not(.passive)': {
+export const stateNotActivePassive         = (content: object) => ({
+    '&:not(.active):not(.actived):not(:active):not(.passive)': {
         extend: [content]
     }
 });
-export const stateNotActivatingPassivating  = (content: object) => ({
-    '&:not(:active):not(.active):not(.passive)': {
+export const stateNotActivatingPassivating = (content: object) => ({
+    '&:not(.active):not(.passive)': {
         extend: [content]
     }
 });
 
 // override base: pseudo + non-pseudo active
-export const stateNoAnimStartup     = () =>
+export const stateNoAnimStartup = () =>
     stateNotEnablingDisabling(
         stateNotActivatingPassivating(
             stateNotHoverLeave(
@@ -330,7 +330,7 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
             cursor: cssProps.cursorDisable,
         }),
         {
-            '&:disabled:not(.disable),&.disabled': // if ctrl was disabled programatically, disable first animation
+            '&.disabled,&:disabled:not(.disable)': // if ctrl was disabled programatically, disable first animation
                 stateNoAnimStartup(),
         },
 
@@ -379,7 +379,7 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
                     getVar(vars.animEnableDisable), // 4th : ctrl enable/disable (can interrupt focus/blur)
                 ],
 
-                '&:disabled:not(.disable),&.disabled': { // if ctrl was disabled programatically
+                '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
                     // customize the anim:
                     [vars.animFn]: [
                         ecssProps.anim,
@@ -395,6 +395,8 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
             ]},
         },
         stateDisable({ '&:active:not(.active):not(.actived)': { // if disabled => cannot be activated by mouse/keyboard (but can be activated programatically)
+            // supress activating by mouse/keyboard (:active)
+            // but still responsive activating programatically (.active & .actived)
             [vars.filterActivePassive]           : ecssProps.filterNone,
             [vars.animActivePassive]             : ecssProps.animNone,
         }}),
