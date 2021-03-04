@@ -284,7 +284,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     // specific states:
     extend:[
-        // transfers the focus state to the sibling elements:
+        // transfers the focus state to the "sibling" element(s):
         stateNotDisable({extend:[
             stateFocusBlur({
                 '& ~*': {
@@ -321,21 +321,21 @@ const labelStates = {
         stateCheckClear({
             [vars.filterCheckClear]        : cssProps.filterClear,
 
-            '& :nth-child(1n+2)': { // transfer the check/clear state to the second element(s):
+            '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
                 [vars.filterActivePassive] : icssProps.filterActive,
             },
         }),
         stateCheck({
             [vars.animCheckClear]          : cssProps.animCheck,
 
-            '& :nth-child(1n+2)': { // transfer the check/clear state to the second element(s):
+            '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
                 [vars.animActivePassive]   : icssProps.animActive,
             },
         }),
         stateClear({
             [vars.animCheckClear]          : cssProps.animClear,
 
-            '& :nth-child(1n+2)': { // transfer the check/clear state to the second element(s):
+            '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
                 [vars.animActivePassive]   : icssProps.animPassive,
             },
         }),
@@ -350,10 +350,13 @@ const labelStates = {
                 stateNoAnimStartup(),
 
                 {
-                    // the "label" element:
-                    '& >:nth-child(2)': {extend:[ // transfer the checked state to the second element(s):
-                        base_stateNoAnimStartup(),
-                    ]},
+                    // the main "checkbox" element:
+                    '& >:first-child': stateNotFocusBlur({
+                        // the "sibling" element(s):
+                        '&~*': {extend:[ // transfer the checked state to the "sibling" element(s):
+                            base_stateNoAnimStartup(),
+                        ]},
+                    }),
                 }
             ]},
         },
@@ -445,14 +448,14 @@ const styleChkBtn = {
         marginInlineEnd: 0,
 
         // turn off animations:
-        anim: none,
+        // anim: none, // still needed the anim focus/blur
         '&::before': { // the main "icon" element:
             anim: none,
         },
     },
 
-    // the "label" element:
-    '& >:nth-child(2)': {
+    // the "sibling" element(s):
+    '& >:nth-child(1n+2)': {
         extend: [
             Buttons.styles.main, // copy styles from Button, including Button's cssProps & Button's states.
             states,
@@ -518,8 +521,8 @@ const styles = {
         extend: [
             styleChkBtn,
             stateNotCheck({
-                // the "label" element:
-                '& >:nth-child(2)': {
+                // the "sibling" element(s):
+                '& >:nth-child(1n+2)': {
                     extend: [
                         Buttons.styles.btnOutline,
                     ],
@@ -550,7 +553,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     [vars.labelColor] : (colors as any)[`${theme}Cont`],
 
 
-    // transfers the theme to the sibling elements:
+    // transfers the theme to the "sibling" element(s):
     '& ~*': {
         extend: [
             // copy the themes from Control:
