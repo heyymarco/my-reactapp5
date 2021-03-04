@@ -437,7 +437,18 @@ const styleChkBtn = {
 
     // the main "checkbox" element:
     '& >:first-child': {
-        display: none, // hide the checkbox
+        // display: none, // hide the checkbox // causes focus doesn't work anymore
+
+        // hiding the checkbox while still preserving focus working
+        opacity: 0,
+        width: 0, height: 0, border: 0,
+        marginInlineEnd: 0,
+
+        // turn off animations:
+        anim: none,
+        '&::before': { // the main "icon" element:
+            anim: none,
+        },
     },
 
     // the "label" element:
@@ -521,8 +532,8 @@ const styles = {
         // the main "checkbox" element & "label" element:
         '& >*': {
             extend: [
-                // copy the themes from Element:
-                Elements.styles.gradient,
+                // copy the themes from Button:
+                Buttons.styles.gradient,
             ],
         },
     }},
@@ -603,6 +614,7 @@ export default function Button(props: Props) {
 
     
 
+    const isBtnStyle = props.chkStyle?.startsWith('btn') || undefined;
     return (
         <label className={[
                 styles.main,
@@ -649,6 +661,7 @@ export default function Button(props: Props) {
 
                 disabled={stateEnbDis.disabled}
                 checked={stateChkClr.checked}
+                aria-hidden={isBtnStyle}
             
                 // onMouseEnter={stateLeave.handleMouseEnter}
                 // onMouseLeave={stateLeave.handleMouseLeave}

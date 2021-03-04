@@ -128,7 +128,15 @@ export default function App (props: any) {
 				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} btnStyle={btnStyle}>
 					<span>hey</span>
 				</ButtonIcon>
-				<ButtonIcon icon="instagram" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+				<ButtonIcon
+					icon="instagram"
+					theme={theme}
+					enableGradient={enableGrad}
+					size={size} enabled={enable}
+					active={active} focus={focus}
+					text='Hello Button Icon'
+					btnStyle={btnStyle}
+				>
 				</ButtonIcon>
 				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>{[
 					'An item',
