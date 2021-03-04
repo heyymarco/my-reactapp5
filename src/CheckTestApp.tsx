@@ -47,7 +47,7 @@ export default function App (props: any) {
 	const [focus, 	   setFocus     ] = useState(false);
 	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
 	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
-	const [btnStyle,   setBtnStyle  ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
+	const [chkStyle,   setChkStyle  ] = useState<'switch'|'btn'|'btnOutline'|undefined>(undefined);
 	const [check,      setCheck   ] = useState(false);
 
     const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +68,9 @@ export default function App (props: any) {
 	const handleChangeTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined));
 	}
+	const handleChangeStyle = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setChkStyle((e.target.value || undefined) as ('switch'|'btn'|'btnOutline'|undefined));
+	}
 	const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCheck(e.target.checked);
 	}
@@ -76,16 +79,23 @@ export default function App (props: any) {
     return (
         <JssProvider jss={jss}>
             <Container>
-                <p style={{background: 'pink'}}>
+                <p>
                     Hello
                     <Button theme='primary' text='Hello' />
                     Hello
 					<input type='checkbox'/>
                     <Check text='Hello' theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
 						checked={check}
+						chkStyle={chkStyle}
 						onChange={handleChangeCheck}
 					/>
-                    Hello
+                    <span>Hello</span>
+					<Check theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
+						checked={check}
+						chkStyle={chkStyle}
+						onChange={handleChangeCheck}
+					/>
+					Hello
                     <ButtonIcon theme='primary' icon='checkbox' />
                     Hello
                     <Icon theme='primary' icon='checkbox' />
@@ -163,12 +173,31 @@ export default function App (props: any) {
 						)
 					}
 				</p>
+				<p>
+					Style:
+					{
+						[undefined,'switch','btn','btnOutline'].map(s =>
+							<label key={s ?? ''}>
+								<input type='radio'
+									value={s}
+									checked={chkStyle===s}
+									onChange={handleChangeStyle}
+								/>
+								{`${s}`}
+							</label>
+						)
+					}
+				</p>
 				<label>
 					<input type='checkbox'
 						checked={check}
 						onChange={handleChangeCheck}
 					/>
 					checked
+				</label>
+				<label onFocus={() => console.log('label focus')} onBlur={() => console.log('label blur')}>
+					<input type='checkbox' onFocus={() => console.log('chk focus')} onBlur={() => console.log('chk blur')} />
+					test focus
 				</label>
             </Container>
         </JssProvider>

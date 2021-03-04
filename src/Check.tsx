@@ -7,13 +7,14 @@ import
 }                          from 'react';
 
 import * as Elements       from './Element';
+import * as Indicators     from './Indicator';
 import * as Controls       from './Control';
 import {
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    stateNoAnimStartup,
+    stateNoAnimStartup as base_stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
 
@@ -24,8 +25,7 @@ import {
 }                          from './Control';
 import * as Buttons        from './Button';
 import * as Icons          from './Icon';
-import * as border         from './borders';
-import spacers             from './spacers';
+import colors              from './colors';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -38,7 +38,6 @@ export {
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
 
@@ -51,6 +50,9 @@ export {
 
 
 export interface CssProps {
+    indicatorSpacing   : Css.Gap,
+
+
     // anim props:
 
     filterClear        : Css.Filter
@@ -64,15 +66,19 @@ export interface CssProps {
 const none    = 'none';
 // const inherit = 'inherit';
 const center  = 'center';
-const middle  = 'middle';
 
 // internal css vars:
 const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     /**
-     * custom css props for manipulating icon's animation(s).
+     * a custom css props for manipulating icon's animation(s).
      */
     animIconFn       : '--chk-animIconFn',
+
+    /**
+     * a custom css props for manipulating label's text color.
+     */
+    labelColor       : '--chk-labelColor',
 
 
     // anim props:
@@ -85,8 +91,14 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
 export const keyframesCheck = { from: undefined, to: undefined };
 export const keyframesClear = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
+const icssProps = Indicators.cssProps;
+const ccssProps = Controls.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
+    indicatorSpacing   : '0.3em',
+
+
+
     // anim props:
 
     filterClear        : [['opacity(0%)']],
@@ -94,7 +106,7 @@ const _cssProps: CssProps = {
     '@keyframes check' : keyframesCheck,
     '@keyframes clear' : keyframesClear,
     animCheck          : [['150ms', 'ease-out', 'both', keyframesCheck]],
-    animClear          : [['300ms', 'ease-out', 'both', keyframesClear]],
+    animClear          : [['150ms', 'ease-out', 'both', keyframesClear]],
 };
 
 
@@ -130,12 +142,12 @@ export { config, cssProps };
 
 
 export const stateCheck               = (content: object) => ({
-    '&.check,&:checked': {
+    '&.check,&.checked,&:checked': {
         extend: [content]
     }
 });
 export const stateNotCheck            = (content: object) => ({
-    '&:not(.check):not(:checked)': {
+    '&:not(.check):not(.checked):not(:checked)': {
         extend: [content]
     }
 });
@@ -150,12 +162,12 @@ export const stateNotClear            = (content: object) => ({
     }
 });
 export const stateCheckClear          = (content: object) => ({
-    '&.check,&:checked,&.clear': {
+    '&.check,&.checked,&:checked,&.clear': {
         extend: [content]
     }
 });
 export const stateNotCheckClear       = (content: object) => ({
-    '&:not(.check):not(:checked):not(.clear)': {
+    '&:not(.check):not(.checked):not(:checked):not(.clear)': {
         extend: [content]
     }
 });
@@ -165,6 +177,23 @@ export const stateNotCheckingClearing = (content: object) => ({
     }
 });
 
+// override base: pseudo + non-pseudo active
+export const stateNoAnimStartup = () =>
+    stateNotCheckingClearing(
+        stateNotEnablingDisabling(
+            stateNotActivatingPassivating(
+                stateNotHoverLeave(
+                    stateNotFocusBlur({
+                        // the main "icon" element:
+                        '& >:first-child::before': {
+                            animationDuration: [['0ms'], '!important'],
+                        },
+                    })
+                )
+            )
+        )
+    );
+
 
 
 export function useStateCheckClear(props: Props) {
@@ -173,7 +202,7 @@ export function useStateCheckClear(props: Props) {
     const [checking, setChecking] = useState(false);
     const [clearing, setClearing] = useState(false);
 
-    
+
     const newCheck = props.checked ?? defaultChecked;
     useEffect(() => {
         if (checked !== newCheck) {
@@ -207,6 +236,12 @@ export function useStateCheckClear(props: Props) {
                 handleIdle();
             }
         },
+        handleAnimationEndPress : (e: React.AnimationEvent<HTMLElement>) => {
+            if (e.target !== e.currentTarget) return; // no bubbling
+            if (/((?<![a-z])(active|passive)|(?<=[a-z])(Active|Passive))(?![a-z])/.test(e.animationName)) {
+                handleIdle();
+            }
+        },
     };
 }
 
@@ -230,10 +265,49 @@ function escapeSvg(svg: string) {
 
 
 const states = {extend:[ Controls.states, { // copy Control's states
+
+    [vars.filterEnableDisable] : undefined, // ihnerit from <label>'s enable/disable
+    [vars.animEnableDisable]   : undefined, // ihnerit from <label>'s enable/disable
+
+    [vars.filterHoverLeave]    : undefined, // ihnerit from <label>'s hover/leave
+    [vars.animHoverLeave]      : undefined, // ihnerit from <label>'s hover/leave
+
+    [vars.filterActivePassive] : undefined, // ihnerit from <label>'s active/passive
+    [vars.animActivePassive]   : undefined, // ihnerit from <label>'s active/passive
+
+
+
     // customize the icon's anim:
     [vars.animIconFn]: [
         getVar(vars.animCheckClear),
     ],
+
+    // specific states:
+    extend:[
+        // transfers the focus state to the sibling elements:
+        stateNotDisable({extend:[
+            stateFocusBlur({
+                '& ~*': {
+                    [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
+                },
+            }),
+            stateFocus({
+                '& ~*': {
+                    [vars.animFocusBlur]      : ccssProps.animFocus,
+                },
+            }),
+            stateBlur({
+                '& ~*': {
+                    [vars.animFocusBlur]      : ccssProps.animBlur,
+                },
+            }),
+        ]}),
+    ],
+}]};
+
+const labelStates = {
+    // customize the label's text color:
+    [vars.labelColor]: ecssProps.color,
 
 
 
@@ -245,71 +319,234 @@ const states = {extend:[ Controls.states, { // copy Control's states
     // specific states:
     extend:[
         stateCheckClear({
-            [vars.filterCheckClear]           : cssProps.filterClear,
+            [vars.filterCheckClear]        : cssProps.filterClear,
+
+            '& :nth-child(1n+2)': { // transfer the check/clear state to the second element(s):
+                [vars.filterActivePassive] : icssProps.filterActive,
+            },
         }),
         stateCheck({
-            [vars.animCheckClear]             : cssProps.animCheck,
+            [vars.animCheckClear]          : cssProps.animCheck,
+
+            '& :nth-child(1n+2)': { // transfer the check/clear state to the second element(s):
+                [vars.animActivePassive]   : icssProps.animActive,
+            },
         }),
         stateClear({
-            [vars.animCheckClear]             : cssProps.animClear,
+            [vars.animCheckClear]          : cssProps.animClear,
+
+            '& :nth-child(1n+2)': { // transfer the check/clear state to the second element(s):
+                [vars.animActivePassive]   : icssProps.animPassive,
+            },
         }),
         stateNotCheckClear({ // hides the check if not [checking, checked, clearing]
-            '&::before': {
+            // the main "icon" element:
+            '& >:first-child::before': {
                 display: none,
             },
         }),
         {
-            '&:checked:not(.check)': // if ctrl was checked, disable first animation
+            '&.checked,&:checked:not(.check)': {extend:[ // if ctrl was checked, disable the animation
                 stateNoAnimStartup(),
-        },
-    ],
-}]};
 
+                {
+                    // the "label" element:
+                    '& >:nth-child(2)': {extend:[ // transfer the checked state to the second element(s):
+                        base_stateNoAnimStartup(),
+                    ]},
+                }
+            ]},
+        },
+
+
+
+        // disable (overwrite) focus state:
+        stateNotDisable({extend:[
+            stateFocus({
+                [vars.animFocusBlur] : undefined,
+            }),
+            stateBlur({
+                [vars.animFocusBlur] : undefined,
+            }),
+        ]}),
+    ],
+};
+
+const styleCheckbox = {
+    extend: [
+        Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
+        {
+            // fontSize       : undefined, // still needed for determining checkbox's size
+            fontFamily     : undefined,
+            fontWeight     : undefined,
+            fontStyle      : undefined,
+            textDecoration : undefined,
+            lineHeight     : undefined,
+        },
+        filterValidProps(cssProps), // apply our filtered cssProps
+        states,                     // apply our states
+    ],
+
+    indicatorSpacing: undefined, // delete
+
+    display   : 'inline-block',
+
+    // sizings:
+    width     : '1em',
+    height    : '1em',
+    boxSizing : 'border-box',
+    paddingX: 0, paddingY: 0,
+
+    // typo settings:
+    verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
+
+    '&:not(:last-child)': {
+        marginInlineEnd: cssProps.indicatorSpacing,
+    },
+
+
+
+    overflow: 'hidden',
+    '&::before': { // the main "icon" element:
+        extend: [
+            Icons.styles.main,
+            Icons.styles.img,
+        ],
+
+        content : '""',
+        display : 'block',
+        height  : '100%',
+        width   : '100%',
+
+        verticalAlign : undefined, // delete
+        
+        // forked from Bootstrap 5:
+        [vars.img]: `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3 6-6'/></svg>")}")`,
+        
+        
+        
+        // a custom css props for manipulating icon's animation(s):
+        anim: getVar(vars.animIconFn), // apply prop
+    },
+
+};
+const styleChkBtn = {
+    verticalAlign : 'baseline',
+
+
+
+    // the main "checkbox" element:
+    '& >:first-child': {
+        display: none, // hide the checkbox
+    },
+
+    // the "label" element:
+    '& >:nth-child(2)': {
+        extend: [
+            Buttons.styles.main, // copy styles from Button, including Button's cssProps & Button's states.
+            states,
+        ],
+    },
+};
 const styles = {
     main: {
         extend: [
-            Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
-            filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
+            Controls.styles.main, // copy styles from Control, including Control's cssProps & Control's states.
+            labelStates,
         ],
 
-        display   : 'inline-block',
-
-        // sizings:
-        width     : '1em',
-        height    : '1em',
-        boxSizing : 'border-box',
-        paddingX: 0, paddingY: 0,
-
-        // typo settings:
-        verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
+        // layout:
+        display       : 'inline-flex',
+        verticalAlign : 'text-bottom',
+        alignItems    : center,
+        flexWrap      : 'wrap',
 
 
 
-        overflow: 'hidden',
+        // a custom css props for manipulating label's text color.
+        color : getVar(vars.labelColor),
+
+
+
+        // removed:
+
+        // not needed a background:
+        backg        : undefined,
+
+        // not needed paddings & borders:
+        paddingX     : undefined,
+        paddingY     : undefined,
+        border       : undefined,
+        borderRadius : undefined,
+
+
+
+        // the dummy text content, for making height as line-height
         '&::before': {
-            extend: [
-                Icons.styles.main,
-                Icons.styles.img,
-            ],
-
-            content : '""',
-            display : 'block',
-            height  : '100%',
-            width   : '100%',
-
-            verticalAlign : undefined, // delete
+            content    : '"\xa0"', // &nbsp;
+            display    : 'inline',
             
-            // forked from Bootstrap 5:
-            [vars.img]: `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3 6-6'/></svg>")}")`,
-            
-            
-            
-            // a custom css props for manipulating icon's animation(s):
-            anim: getVar(vars.animIconFn), // apply prop
+            width      : 0,
+            overflow   : 'hidden',
+            visibility : 'hidden',
         },
+
+
+
+        // the main "checkbox" element:
+        '& >:first-child': styleCheckbox,
     },
+
+    chkBtn: { '&:not(._)': { // force to win conflict with main
+        extend: [
+            styleChkBtn,
+        ],
+    }},
+
+    chkBtnOutline: { '&:not(._)': { // force to win conflict with main
+        extend: [
+            styleChkBtn,
+            stateNotCheck({
+                // the "label" element:
+                '& >:nth-child(2)': {
+                    extend: [
+                        Buttons.styles.btnOutline,
+                    ],
+                },
+            }),
+        ],
+    }}, 
+
+    gradient: { '&:not(._)': { // force to win conflict with main
+        // the main "checkbox" element & "label" element:
+        '& >*': {
+            extend: [
+                // copy the themes from Element:
+                Elements.styles.gradient,
+            ],
+        },
+    }},
 };
+
+defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
+    extend: [
+        // copy the themes from Control:
+        (Controls.styles as any)[themeProp],
+    ],
+
+
+    // customize the label's text color:
+    [vars.labelColor] : (colors as any)[`${theme}Cont`],
+
+
+    // transfers the theme to the sibling elements:
+    '& ~*': {
+        extend: [
+            // copy the themes from Control:
+            (Controls.styles as any)[themeProp],
+        ],
+    },
+}));
 
 const useStyles = createUseStyles(styles);
 export { states, styles, useStyles };
@@ -329,8 +566,8 @@ export function useVariantCheck(props: VariantCheck, styles: Record<string, stri
 export const themeDefaults: {[btnStyle: string]: (string|undefined)} = {
     default    : 'primary',
     switch     : 'primary',
-    btn        : 'secondary',
-    btnOutline : 'secondary',
+    btn        : 'primary',
+    btnOutline : 'primary',
 };
 export function useVariantThemeDefault(props: VariantCheck) {
     return () => {
@@ -344,21 +581,19 @@ export interface Props
         VariantCheck
 {
     text?     : string
-    children? : React.ReactNode
 
     checked?  : boolean
     onChange? : React.ChangeEventHandler<HTMLInputElement>
 }
 export default function Button(props: Props) {
     const styles         =          useStyles();
-    const ctrlStyles     = Controls.useStyles();
     const elmStyles      = Elements.useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
     const variThemeDef   =          useVariantThemeDefault(props);
-    const variTheme      = Elements.useVariantTheme(props, ctrlStyles, variThemeDef);
-    const variGradient   = Elements.useVariantGradient(props, elmStyles);
-    const variButton     =          useVariantCheck(props, styles);
+    const variTheme      = Elements.useVariantTheme(props, styles, variThemeDef);
+    const variGradient   = Elements.useVariantGradient(props, styles);
+    const variCheck      =          useVariantCheck(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
@@ -369,30 +604,25 @@ export default function Button(props: Props) {
     
 
     return (
-        <input className={[
+        <label className={[
                 styles.main,
 
                 variSize.class,
-                variTheme.class,
+                (props.theme ? variTheme.class : null), // if uses default theme => dont apply theme on the <label>
                 variGradient.class,
-                variButton.class,
+                variCheck.class,
 
-                stateEnbDis.class,
+                stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateLeave.class,
-                stateFocusBlur.class,
+                // stateFocusBlur.class,
                 stateActPass.class,
-                stateChkClr.class,
+                stateChkClr.class ?? (stateChkClr.checked ? 'checked' : null),
             ].join(' ')}
-
-            type='checkbox'
-
-            disabled={stateEnbDis.disabled}
-            checked={stateChkClr.checked}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
-            onFocus={stateFocusBlur.handleFocus}
-            onBlur={stateFocusBlur.handleBlur}
+            // onFocus={stateFocusBlur.handleFocus}
+            // onBlur={stateFocusBlur.handleBlur}
             onMouseDown={stateActPass.handleMouseDown}
             onKeyDown={stateActPass.handleKeyDown}
             onMouseUp={stateActPass.handleMouseUp}
@@ -400,11 +630,44 @@ export default function Button(props: Props) {
             onAnimationEnd={(e) => {
                 stateEnbDis.handleAnimationEnd(e);
                 stateLeave.handleAnimationEnd(e);
-                stateFocusBlur.handleAnimationEnd(e);
+                // stateFocusBlur.handleAnimationEnd(e);
                 stateActPass.handleAnimationEnd(e);
-                stateChkClr.handleAnimationEnd(e);
             }}
-            onChange={props.onChange}
-        />
+        >
+            <input className={[
+                    // variSize.class,
+                    (!props.theme ? variTheme.class : null), // if use theme, inherit theme from <label>, otherwise define default theme here
+                    // variGradient.class,
+
+                    // stateEnbDis.class,
+                    // stateLeave.class,
+                    stateFocusBlur.class,
+                    // stateActPass.class,
+                ].join(' ')}
+
+                type='checkbox'
+
+                disabled={stateEnbDis.disabled}
+                checked={stateChkClr.checked}
+            
+                // onMouseEnter={stateLeave.handleMouseEnter}
+                // onMouseLeave={stateLeave.handleMouseLeave}
+                onFocus={stateFocusBlur.handleFocus}
+                onBlur={stateFocusBlur.handleBlur}
+                // onMouseDown={stateActPass.handleMouseDown}
+                // onKeyDown={stateActPass.handleKeyDown}
+                // onMouseUp={stateActPass.handleMouseUp}
+                // onKeyUp={stateActPass.handleKeyUp}
+                onAnimationEnd={(e) => {
+                    // stateEnbDis.handleAnimationEnd(e);
+                    // stateLeave.handleAnimationEnd(e);
+                    stateFocusBlur.handleAnimationEnd(e);
+                    // stateActPass.handleAnimationEnd(e);
+                    stateChkClr.handleAnimationEnd(e);
+                }}
+                onChange={props.onChange}
+            />
+            {props.text ? <span onAnimationEnd={stateChkClr.handleAnimationEndPress}>{props.text}</span> : undefined}
+        </label>
     );
 }
