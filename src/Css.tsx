@@ -10,6 +10,8 @@ export type LineHeight      = string | number
 
 export type Color           = string
 export type Background      = string |                   string[][]
+export type Image           = string |                   string[][]
+export type ImagePosition   = 'center' | 'left' | 'right' | 'top' | 'bottom'
 
 export type Opacity         = string | number
 
@@ -33,8 +35,8 @@ export type BoxShadow       = string | 0 |               (string|0)[][]
 
 export type Cursor          = string
 
-export type Orientation     = 'row' | 'row-reverse' | 'column' | 'column-reverse';
-export type WhiteSpace      = 'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces';
+export type Orientation     = 'row' | 'row-reverse' | 'column' | 'column-reverse'
+export type WhiteSpace      = 'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces'
 
 export type Gap             = string | 0
 

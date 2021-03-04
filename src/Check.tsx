@@ -50,17 +50,26 @@ export {
 
 
 export interface CssProps {
-    indicatorSpacing   : Css.Gap,
+    indicatorImg               : Css.Image
+    indicatorSpacing           : Css.Gap
+    
+    switchIndicatorImg         : Css.Image
+    switchBorderRadius         : Css.BorderRadius
 
-
+    
     // anim props:
 
-    filterClear        : Css.Filter
+    switchIndicatorImgPosCheck : Css.ImagePosition
+    switchIndicatorImgPosClear : Css.ImagePosition
+    switchIndicatorFilterCheck : Css.Filter
+    switchIndicatorFilterClear : Css.Filter
 
-    '@keyframes check' : Css.Keyframes
-    '@keyframes clear' : Css.Keyframes
-    animCheck          : Css.Animation
-    animClear          : Css.Animation
+    filterClear                : Css.Filter
+
+    '@keyframes check'         : Css.Keyframes
+    '@keyframes clear'         : Css.Keyframes
+    animCheck                  : Css.Animation
+    animClear                  : Css.Animation
 }
 // const unset   = 'unset';
 const none    = 'none';
@@ -95,18 +104,29 @@ const icssProps = Indicators.cssProps;
 const ccssProps = Controls.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    indicatorSpacing   : '0.3em',
-
-
-
+    // forked from Bootstrap 5:
+    indicatorImg               : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3 6-6'/></svg>")}")`,
+    indicatorSpacing           : '0.3em',
+    
+    // forked from Bootstrap 5:
+    switchIndicatorImg         : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#000'/></svg>")}")`,
+    switchBorderRadius         : '0.5em',
+    
+    
+    
     // anim props:
 
-    filterClear        : [['opacity(0%)']],
+    switchIndicatorImgPosCheck : 'right',
+    switchIndicatorImgPosClear : 'left',
+    switchIndicatorFilterCheck : [['brightness(100%)']],
+    switchIndicatorFilterClear : [['brightness(100%)']],
 
-    '@keyframes check' : keyframesCheck,
-    '@keyframes clear' : keyframesClear,
-    animCheck          : [['150ms', 'ease-out', 'both', keyframesCheck]],
-    animClear          : [['150ms', 'ease-out', 'both', keyframesClear]],
+    filterClear                : [['opacity(0%)']],
+
+    '@keyframes check'         : keyframesCheck,
+    '@keyframes clear'         : keyframesClear,
+    animCheck                  : [['150ms', 'ease-out', 'both', keyframesCheck]],
+    animClear                  : [['150ms', 'ease-out', 'both', keyframesClear]],
 };
 
 
@@ -390,7 +410,15 @@ const styleCheckbox = {
         states,                     // apply our states
     ],
 
-    indicatorSpacing: undefined, // delete
+    indicatorImg               : undefined, // delete
+    indicatorSpacing           : undefined, // delete
+
+    switchIndicatorImg         : undefined, // delete
+    switchIndicatorImgPosCheck : undefined, // delete
+    switchIndicatorImgPosClear : undefined, // delete
+    switchBorderRadius         : undefined, // delete
+    switchIndicatorFilterCheck : undefined, // delete
+    switchIndicatorFilterClear : undefined, // delete
 
     display   : 'inline-block',
 
@@ -421,10 +449,11 @@ const styleCheckbox = {
         height  : '100%',
         width   : '100%',
 
+        transition    : ecssProps.transition,
+
         verticalAlign : undefined, // delete
         
-        // forked from Bootstrap 5:
-        [vars.img]: `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3 6-6'/></svg>")}")`,
+        [vars.img]: cssProps.indicatorImg,
         
         
         
@@ -526,6 +555,50 @@ const styles = {
                     extend: [
                         Buttons.styles.btnOutline,
                     ],
+                },
+            }),
+        ],
+    }},
+
+    chkSwitch: { '&:not(._)': { // force to win conflict with main
+        // the main "checkbox" element:
+        '& >:first-child': {
+            width        : '2em',
+            borderRadius : cssProps.switchBorderRadius,
+
+
+
+            '&::before': { // the main "icon" element:
+                [vars.img]: cssProps.switchIndicatorImg,
+            },
+        },
+
+
+
+        // specific states:
+        extend:[
+            stateCheck({
+                [vars.filterCheckClear] : cssProps.switchIndicatorFilterCheck,
+
+                // the main "icon" element:
+                '& >:first-child::before': {
+                    maskPosition        : cssProps.switchIndicatorImgPosCheck,
+                    WebkitMaskPosition  : cssProps.switchIndicatorImgPosCheck,
+                },
+            }),
+            stateNotCheck({
+                [vars.filterCheckClear] : cssProps.switchIndicatorFilterClear,
+
+                // the main "icon" element:
+                '& >:first-child::before': {
+                    maskPosition        : cssProps.switchIndicatorImgPosClear,
+                    WebkitMaskPosition  : cssProps.switchIndicatorImgPosClear,
+                },
+            }),
+            stateNotCheckClear({ // hides the check if not [checking, checked, clearing]
+                // the main "icon" element:
+                '& >:first-child::before': {
+                    display: 'block',
                 },
             }),
         ],

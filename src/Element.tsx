@@ -115,10 +115,14 @@ const _cssProps: CssProps = {
     // anim props:
 
     transition        : [
-        ['background', '300ms', 'ease-out'],
-        ['color'     , '300ms', 'ease-out'],
-        ['border'    , '300ms', 'ease-out'],
-        ['font-size' , '300ms', 'ease-out'],
+        ['background'           , '300ms', 'ease-out'],
+        ['color'                , '300ms', 'ease-out'],
+        ['border'               , '300ms', 'ease-out'],
+        ['font-size'            , '300ms', 'ease-out'],
+        ['width'                , '300ms', 'ease-out'],
+        ['height'               , '300ms', 'ease-out'],
+        ['mask-position'        , '300ms', 'ease-out'],
+        ['-webkit-mask-position', '300ms', 'ease-out'],
     ],
 
     boxShadowNone     : [[0, 0, 'transparent']],
