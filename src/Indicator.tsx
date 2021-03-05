@@ -157,22 +157,22 @@ export const stateNotEnable            = (content: object) => ({
     }
 });
 export const stateDisable              = (content: object) => ({
-    '&:disabled,&.disabled,&.disable': { // :disabled or .disabled or .disable
+    '&.disable,&.disabled,&:disabled': { // .disable or .disabled or :disabled
         extend: [content]
     }
 });
 export const stateNotDisable           = (content: object) => ({
-    '&:not(:disabled):not(.disabled):not(.disable)': { // not-:disabled and not-.disabled and not-.disable
+    '&:not(.disable):not(.disabled):not(:disabled)': { // not-.disable and not-.disabled and not-:disabled
         extend: [content]
     }
 });
 export const stateEnableDisable        = (content: object) => ({
-    '&.enable,&:disabled,&.disabled,&.disable': { // .enable or :disabled or .disabled or .disable
+    '&.enable,&.disable,&.disabled,&:disabled': { // .enable or .disable or .disabled or :disabled
         extend: [content]
     }
 });
 export const stateNotEnableDisable     = (content: object) => ({
-    '&:not(.enable):not(:disabled):not(.disabled):not(.disable)': { // not-.enable and not-:disabled and not-.disabled and not-.disable
+    '&:not(.enable):not(.disable):not(.disabled):not(:disabled)': { // not-.enable and not-.disable and not-.disabled and not-:disabled
         extend: [content]
     }
 });
@@ -250,32 +250,35 @@ const states = {extend:[ Elements.states, { // copy Element's states
 
     // specific states:
     extend:[
-        stateEnableDisable({
+        stateEnableDisable({ // [enabling, disabling, disabled]
             [vars.filterEnableDisable]            : cssProps.filterDisable,
         }),
-        stateEnable({
+        stateEnable({ // [enabling]
             [vars.animEnableDisable]              : cssProps.animEnable,
         }),
-        stateDisable({
+        stateDisable({ // [disabling, disabled]
             [vars.animEnableDisable]              : cssProps.animDisable,
         }),
-        {
-            '&.disabled,&:disabled:not(.disable)' : {extend:[ // if ctrl was disabled programatically, disable first animation
+        { // [disabled]
+            '&.disabled,&:disabled:not(.disable)' : // if ctrl was disabled programatically, disable first animation
                 stateNoAnimStartup(),
-            ]},
         },
 
 
-        stateActivePassive({
+        stateActivePassive({ // [activating, actived, passivating]
             [vars.filterActivePassive]            : cssProps.filterActive,
         }),
-        stateActive({
+        stateActive({ // [activating, actived]
             [vars.animActivePassive]              : cssProps.animActive,
         }),
-        statePassive({
+        statePassive({ // [passivating]
             [vars.animActivePassive]              : cssProps.animPassive,
         }),
         {
+            // [actived]
+            '&.actived': // if indicator was activated programatically, disable the animation
+                stateNoAnimStartup(),
+
             '&.active,&.actived': { // if activated programmatically (not by user input)
                 // customize the anim:
                 [vars.animFn]: [
@@ -293,9 +296,6 @@ const states = {extend:[ Elements.states, { // copy Element's states
                     ],
                 },
             },
-            '&.actived': {extend:[ // if indicator was activated programatically, disable the animation
-                stateNoAnimStartup(),
-            ]},
         },
     ],
 }]};

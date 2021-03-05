@@ -319,56 +319,61 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
 
     // specific states:
     extend:[
-        stateEnableDisable({
-            [vars.filterEnableDisable]           : icssProps.filterDisable,
+        stateEnableDisable({ // [enabling, disabling, disabled]
+            [vars.filterEnableDisable]            : icssProps.filterDisable,
         }),
-        stateEnable({
-            [vars.animEnableDisable]             : icssProps.animEnable,
+        stateEnable({ // [enabling]
+            [vars.animEnableDisable]              : icssProps.animEnable,
         }),
-        stateDisable({
-            [vars.animEnableDisable]             : icssProps.animDisable,
+        stateDisable({ // [disabling, disabled]
+            [vars.animEnableDisable]              : icssProps.animDisable,
             cursor: cssProps.cursorDisable,
         }),
-        {
-            '&.disabled,&:disabled:not(.disable)': // if ctrl was disabled programatically, disable first animation
+        { // [disabled]
+            '&.disabled,&:disabled:not(.disable)' : // if ctrl was disabled programatically, disable first animation
                 stateNoAnimStartup(),
         },
 
 
+        stateHoverLeave({
+            [vars.filterHoverLeave]          : cssProps.filterHover,
+        }),
+        stateLeave({
+            [vars.animHoverLeave]            : cssProps.animLeave,
+        }),
+
+        stateFocusBlur({
+            [vars.boxShadowFocusBlur]        : getVar(vars.boxShadowFocusFn),
+        }),
+        stateBlur({
+            [vars.animFocusBlur]             : cssProps.animBlur,
+        }),
         stateNotDisable({extend:[
-            stateHoverLeave({
-                [vars.filterHoverLeave]          : cssProps.filterHover,
-            }),
+            // state hover & focus are possible when enabled
             stateHover({
                 [vars.animHoverLeave]            : cssProps.animHover,
-            }),
-            stateLeave({
-                [vars.animHoverLeave]            : cssProps.animLeave,
-            }),
-
-
-            stateFocusBlur({
-                [vars.boxShadowFocusBlur]        : getVar(vars.boxShadowFocusFn),
             }),
             stateFocus({
                 [vars.animFocusBlur]             : cssProps.animFocus,
             }),
-            stateBlur({
-                [vars.animFocusBlur]             : cssProps.animBlur,
-            }),
         ]}),
+        
 
 
-        stateActivePassive({
-            [vars.filterActivePassive]           : icssProps.filterActive,
+        stateActivePassive({ // [activating, actived, passivating]
+            [vars.filterActivePassive]            : icssProps.filterActive,
         }),
-        stateActive({
-            [vars.animActivePassive]             : icssProps.animActive,
+        stateActive({ // [activating, actived]
+            [vars.animActivePassive]              : icssProps.animActive,
         }),
-        statePassive({
-            [vars.animActivePassive]             : icssProps.animPassive,
+        statePassive({ // [passivating]
+            [vars.animActivePassive]              : icssProps.animPassive,
         }),
         {
+            // [actived]
+            '&.actived': // if ctrl was activated programatically, disable the animation
+                stateNoAnimStartup(),
+
             '&.active,&.actived': { // if activated programmatically (not by user input)
                 // customize the anim:
                 [vars.animFn]: [
@@ -390,15 +395,12 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
                     ],
                 },
             },
-            '&.actived': {extend:[ // if ctrl was activated programatically, disable the animation
-                stateNoAnimStartup(),
-            ]},
         },
         stateDisable({ '&:active:not(.active):not(.actived)': { // if disabled => cannot be activated by mouse/keyboard (but can be activated programatically)
             // supress activating by mouse/keyboard (:active)
             // but still responsive activating programatically (.active & .actived)
-            [vars.filterActivePassive]           : ecssProps.filterNone,
-            [vars.animActivePassive]             : ecssProps.animNone,
+            [vars.filterActivePassive]            : ecssProps.filterNone,
+            [vars.animActivePassive]              : ecssProps.animNone,
         }}),
     ],
 }]};

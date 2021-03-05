@@ -50,26 +50,31 @@ export {
 
 
 export interface CssProps {
-    indicatorImg               : Css.Image
-    indicatorSpacing           : Css.Gap
+    img                      : Css.Image
+    spacing                  : Css.Gap
     
-    switchIndicatorImg         : Css.Image
-    switchBorderRadius         : Css.BorderRadius
+    switchImg                : Css.Image
+    switchBorderRadius       : Css.BorderRadius
 
     
     // anim props:
 
-    switchIndicatorImgPosCheck : Css.ImagePosition
-    switchIndicatorImgPosClear : Css.ImagePosition
-    switchIndicatorFilterCheck : Css.Filter
-    switchIndicatorFilterClear : Css.Filter
+    filterCheck              : Css.Filter
+    filterClear              : Css.Filter
 
-    filterClear                : Css.Filter
+    switchFilterCheck        : Css.Filter
+    switchFilterClear        : Css.Filter
+    switchTransfCheck        : Css.Transform
+    switchTransfClear        : Css.Transform
 
-    '@keyframes check'         : Css.Keyframes
-    '@keyframes clear'         : Css.Keyframes
-    animCheck                  : Css.Animation
-    animClear                  : Css.Animation
+    '@keyframes check'       : Css.Keyframes
+    '@keyframes clear'       : Css.Keyframes
+    '@keyframes switchCheck' : Css.Keyframes
+    '@keyframes switchClear' : Css.Keyframes
+    animCheck                : Css.Animation
+    animClear                : Css.Animation
+    switchAnimCheck          : Css.Animation
+    switchAnimClear          : Css.Animation
 }
 // const unset   = 'unset';
 const none    = 'none';
@@ -82,68 +87,132 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     /**
      * a custom css props for manipulating icon's animation(s).
      */
-    animIconFn       : '--chk-animIconFn',
+    animIconFn          : '--chk-animIconFn',
 
     /**
      * a custom css props for manipulating label's text color.
      */
-    labelColor       : '--chk-labelColor',
+    labelColor          : '--chk-labelColor',
 
 
     // anim props:
 
-    filterCheckClear : '--chk-filterCheckClear',
-    animCheckClear   : '--chk-animCheckClear',
+    switchTransfIn      : '--chk-switchTransfIn',
+    switchTransfOut     : '--chk-switchTransfOut',
+
+    filterCheckClearIn  : '--chk-filterCheckClearIn',
+    filterCheckClearOut : '--chk-filterCheckClearOut',
+    animCheckClear      : '--chk-animCheckClear',
 });
 
 // re-defined later, we need to construct varProps first
-export const keyframesCheck = { from: undefined, to: undefined };
-export const keyframesClear = { from: undefined, to: undefined };
+export const keyframesCheck       = { from: undefined, to: undefined };
+export const keyframesClear       = { from: undefined, to: undefined };
+export const keyframesSwitchCheck = { from: undefined, to: undefined };
+export const keyframesSwitchClear = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 const icssProps = Indicators.cssProps;
 const ccssProps = Controls.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     // forked from Bootstrap 5:
-    indicatorImg               : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3 6-6'/></svg>")}")`,
-    indicatorSpacing           : '0.3em',
+    img                      : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3 6-6'/></svg>")}")`,
+    spacing                  : '0.3em',
     
     // forked from Bootstrap 5:
-    switchIndicatorImg         : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#000'/></svg>")}")`,
-    switchBorderRadius         : '0.5em',
+    switchImg                : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#000'/></svg>")}")`,
+    switchBorderRadius       : '0.5em',
     
     
     
     // anim props:
 
-    switchIndicatorImgPosCheck : 'right',
-    switchIndicatorImgPosClear : 'left',
-    switchIndicatorFilterCheck : [['brightness(100%)']],
-    switchIndicatorFilterClear : [['brightness(100%)']],
+    filterCheck              : [['opacity(100%)']],
+    filterClear              : [['opacity(0%)'  ]],
 
-    filterClear                : [['opacity(0%)']],
+    switchFilterCheck        : [['opacity(100%)']],
+    switchFilterClear        : [['opacity(50%)' ]],
+    switchTransfCheck        : [['translateX(0.5em)' ]],
+    switchTransfClear        : [['translateX(-0.5em)']],
 
-    '@keyframes check'         : keyframesCheck,
-    '@keyframes clear'         : keyframesClear,
-    animCheck                  : [['150ms', 'ease-out', 'both', keyframesCheck]],
-    animClear                  : [['150ms', 'ease-out', 'both', keyframesClear]],
+    '@keyframes check'       : keyframesCheck,
+    '@keyframes clear'       : keyframesClear,
+    '@keyframes switchCheck' : keyframesSwitchCheck,
+    '@keyframes switchClear' : keyframesSwitchClear,
+    animCheck                : [['150ms', 'ease-out', 'both', keyframesCheck]],
+    animClear                : [['150ms', 'ease-out', 'both', keyframesClear]],
+    switchAnimCheck          : [['200ms', 'ease-out', 'both', keyframesSwitchCheck]],
+    switchAnimClear          : [['200ms', 'ease-out', 'both', keyframesSwitchClear]],
 };
 
 
 
-Object.assign(keyframesClear, {
+Object.assign(keyframesCheck, {
     from: {
-        filter: none,
+        filter: [[
+            getVar(vars.filterCheckClearOut),
+        ]],
     },
     to: {
         filter: [[
-            getVar(vars.filterCheckClear),
+            getVar(vars.filterCheckClearIn),
         ]],
     }
 });
-Object.assign(keyframesCheck, {
-    from : keyframesClear.to,
-    to   : keyframesClear.from
+Object.assign(keyframesClear, {
+    from : keyframesCheck.to,
+    to   : keyframesCheck.from
+});
+
+Object.assign(keyframesSwitchCheck, {
+    from: {
+        filter: [[
+            getVar(vars.filterCheckClearOut),
+        ]],
+        transform: [[
+            getVar(vars.switchTransfOut),
+        ]],
+    },
+    '75%': {
+        transformOrigin: 'left',
+        transform: [[
+            'scaleX(1.1)',
+            getVar(vars.switchTransfIn),
+        ]],
+    },
+    to: {
+        filter: [[
+            getVar(vars.filterCheckClearIn),
+        ]],
+        transform: [[
+            getVar(vars.switchTransfIn),
+        ]],
+    },
+});
+Object.assign(keyframesSwitchClear, keyframesSwitchCheck, {
+    from: {
+        filter: [[
+            getVar(vars.filterCheckClearIn),
+        ]],
+        transform: [[
+            getVar(vars.switchTransfIn),
+        ]],
+    },
+    '75%': {
+        transformOrigin: 'right',
+        transform: [[
+            'scaleX(1.1)',
+            getVar(vars.switchTransfOut),
+        ]],
+    },
+    to: {
+        filter: [[
+            getVar(vars.filterCheckClearOut),
+        ]],
+        transform: [[
+            getVar(vars.switchTransfOut),
+        ]],
+    },
 });
 
 
@@ -305,20 +374,21 @@ const states = {extend:[ Controls.states, { // copy Control's states
     // specific states:
     extend:[
         // transfers the focus state to the "sibling" element(s):
+        stateFocusBlur({
+            '& ~*': {
+                [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
+            },
+        }),
+        stateBlur({
+            '& ~*': {
+                [vars.animFocusBlur]      : ccssProps.animBlur,
+            },
+        }),
         stateNotDisable({extend:[
-            stateFocusBlur({
-                '& ~*': {
-                    [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
-                },
-            }),
+            // state focus are possible when enabled
             stateFocus({
                 '& ~*': {
                     [vars.animFocusBlur]      : ccssProps.animFocus,
-                },
-            }),
-            stateBlur({
-                '& ~*': {
-                    [vars.animFocusBlur]      : ccssProps.animBlur,
                 },
             }),
         ]}),
@@ -333,52 +403,44 @@ const labelStates = {
 
     // all initial states are none:
 
-    [vars.filterCheckClear] : ecssProps.filterNone,
-    [vars.animCheckClear]   : ecssProps.animNone,
+    [vars.filterCheckClearIn]  : cssProps.filterCheck,
+    [vars.filterCheckClearOut] : cssProps.filterClear,
+    [vars.animCheckClear]      : ecssProps.animNone,
 
     // specific states:
     extend:[
-        stateCheckClear({
-            [vars.filterCheckClear]        : cssProps.filterClear,
-
+        stateCheckClear({ // [checking, checked, clearing]
             '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
                 [vars.filterActivePassive] : icssProps.filterActive,
             },
         }),
-        stateCheck({
+        stateCheck({ // [checking, checked]
             [vars.animCheckClear]          : cssProps.animCheck,
 
             '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
                 [vars.animActivePassive]   : icssProps.animActive,
             },
         }),
-        stateClear({
-            [vars.animCheckClear]          : cssProps.animClear,
-
+        stateClear({ // [clearing]
             '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
                 [vars.animActivePassive]   : icssProps.animPassive,
             },
         }),
-        stateNotCheckClear({ // hides the check if not [checking, checked, clearing]
-            // the main "icon" element:
-            '& >:first-child::before': {
-                display: none,
-            },
+        stateNotCheck({ // [not-checking, not-checked] => [clearing, cleared]
+            [vars.animCheckClear]          : cssProps.animClear,
         }),
-        {
-            '&.checked,&:checked:not(.check)': {extend:[ // if ctrl was checked, disable the animation
-                stateNoAnimStartup(),
-
-                {
-                    // the main "checkbox" element:
-                    '& >:first-child': stateNotFocusBlur({
-                        // the "sibling" element(s):
-                        '&~*': {extend:[ // transfer the checked state to the "sibling" element(s):
-                            base_stateNoAnimStartup(),
-                        ]},
-                    }),
-                }
-            ]},
+        stateNotCheckingClearing( // [not-checking, not-clearing]
+            stateNoAnimStartup()
+        ),
+        { // [cleared]
+            '&.checked,&:checked:not(.check)': { // if ctrl was checked, disable the animation
+                // the main "checkbox" element:
+                '& >:first-child': stateNotFocusBlur({ // still transfering the focus state to the "sibling" element(s):
+                    // the "sibling" element(s):
+                    '&~*': // transfer the checked state to the "sibling" element(s):
+                        base_stateNoAnimStartup(),
+                }),
+            },
         },
 
 
@@ -410,15 +472,11 @@ const styleCheckbox = {
         states,                     // apply our states
     ],
 
-    indicatorImg               : undefined, // delete
-    indicatorSpacing           : undefined, // delete
+    img                : undefined, // delete
+    spacing            : undefined, // delete
 
-    switchIndicatorImg         : undefined, // delete
-    switchIndicatorImgPosCheck : undefined, // delete
-    switchIndicatorImgPosClear : undefined, // delete
-    switchBorderRadius         : undefined, // delete
-    switchIndicatorFilterCheck : undefined, // delete
-    switchIndicatorFilterClear : undefined, // delete
+    switchImg          : undefined, // delete
+    switchBorderRadius : undefined, // delete
 
     display   : 'inline-block',
 
@@ -432,7 +490,7 @@ const styleCheckbox = {
     verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
 
     '&:not(:last-child)': {
-        marginInlineEnd: cssProps.indicatorSpacing,
+        marginInlineEnd: cssProps.spacing,
     },
 
 
@@ -449,11 +507,9 @@ const styleCheckbox = {
         height  : '100%',
         width   : '100%',
 
-        transition    : ecssProps.transition,
-
         verticalAlign : undefined, // delete
         
-        [vars.img]: cssProps.indicatorImg,
+        [vars.img]: cssProps.img,
         
         
         
@@ -569,37 +625,27 @@ const styles = {
 
 
             '&::before': { // the main "icon" element:
-                [vars.img]: cssProps.switchIndicatorImg,
+                [vars.img]: cssProps.switchImg,
             },
         },
 
 
 
+        // overwrite default animation:
+
+        [vars.filterCheckClearIn]  : cssProps.switchFilterCheck,
+        [vars.filterCheckClearOut] : cssProps.switchFilterClear,
+
+        [vars.switchTransfIn]      : cssProps.switchTransfCheck,
+        [vars.switchTransfOut]     : cssProps.switchTransfClear,
+
         // specific states:
         extend:[
-            stateCheck({
-                [vars.filterCheckClear] : cssProps.switchIndicatorFilterCheck,
-
-                // the main "icon" element:
-                '& >:first-child::before': {
-                    maskPosition        : cssProps.switchIndicatorImgPosCheck,
-                    WebkitMaskPosition  : cssProps.switchIndicatorImgPosCheck,
-                },
+            stateCheck({ // [checking, checked]
+                [vars.animCheckClear]      : cssProps.switchAnimCheck,
             }),
-            stateNotCheck({
-                [vars.filterCheckClear] : cssProps.switchIndicatorFilterClear,
-
-                // the main "icon" element:
-                '& >:first-child::before': {
-                    maskPosition        : cssProps.switchIndicatorImgPosClear,
-                    WebkitMaskPosition  : cssProps.switchIndicatorImgPosClear,
-                },
-            }),
-            stateNotCheckClear({ // hides the check if not [checking, checked, clearing]
-                // the main "icon" element:
-                '& >:first-child::before': {
-                    display: 'block',
-                },
+            stateNotCheck({ // [not-checking, not-checked] => [clearing, cleared]
+                [vars.animCheckClear]      : cssProps.switchAnimClear,
             }),
         ],
     }}, 
