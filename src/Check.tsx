@@ -49,6 +49,25 @@ export {
 
 
 
+export function escapeSvg(svg: string) {
+    const svgCopy = Array.from(svg);
+    const escapeChars: { [key: string]: string } = {
+        '<': '%3c',
+        '>': '%3e',
+        '#': '%23',
+        '(': '%28',
+        ')': '%29',
+    };
+    for (const index in svgCopy) {
+        const char = svgCopy[index];
+        if (char in escapeChars) svgCopy[index] = escapeChars[char];
+    }
+
+    return svgCopy.join('');
+}
+
+
+
 export interface CssProps {
     img                      : Css.Image
     spacing                  : Css.Gap
@@ -334,23 +353,6 @@ export function useStateCheckClear(props: Props) {
     };
 }
 
-function escapeSvg(svg: string) {
-    const svgCopy = Array.from(svg);
-    const escapeChars: { [key: string]: string } = {
-        '<': '%3c',
-        '>': '%3e',
-        '#': '%23',
-        '(': '%28',
-        ')': '%29',
-    };
-    for (const index in svgCopy) {
-        const char = svgCopy[index];
-        if (char in escapeChars) svgCopy[index] = escapeChars[char];
-    }
-
-    return svgCopy.join('');
-}
-
 
 
 const states = {extend:[ Controls.states, { // copy Control's states
@@ -374,16 +376,18 @@ const states = {extend:[ Controls.states, { // copy Control's states
     // specific states:
     extend:[
         // transfers the focus state to the "sibling" element(s):
-        stateFocusBlur({
-            '& ~*': {
-                [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
-            },
-        }),
-        stateBlur({
-            '& ~*': {
-                [vars.animFocusBlur]      : ccssProps.animBlur,
-            },
-        }),
+        {'&:not(._)':{extend:[ // force to win conflict with chkBtn**
+            stateFocusBlur({
+                '& ~*': {
+                    [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
+                },
+            }),
+            stateBlur({
+                '& ~*': {
+                    [vars.animFocusBlur]      : ccssProps.animBlur,
+                },
+            }),
+        ]}},
         stateNotDisable({extend:[
             // state focus are possible when enabled
             stateFocus({
@@ -686,7 +690,7 @@ export { states, styles, useStyles };
 
 
 
-type ChkStyle = 'switch' | 'btn' | 'btnOutline';
+export type ChkStyle = 'switch' | 'btn' | 'btnOutline';
 export interface VariantCheck {
     chkStyle?: ChkStyle
 }
@@ -717,8 +721,10 @@ export interface Props
 
     checked?  : boolean
     onChange? : React.ChangeEventHandler<HTMLInputElement>
+
+    value?    : string | ReadonlyArray<string> | number
 }
-export default function Button(props: Props) {
+export function CheckBase(styleMain: string | null, props: Props, inputType: string) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
 
@@ -739,6 +745,7 @@ export default function Button(props: Props) {
     const isBtnStyle = props.chkStyle?.startsWith('btn') || undefined;
     return (
         <label className={[
+                styleMain,
                 styles.main,
 
                 variSize.class,
@@ -779,7 +786,8 @@ export default function Button(props: Props) {
                     // stateActPass.class,
                 ].join(' ')}
 
-                type='checkbox'
+                type={inputType}
+                value={props.value}
 
                 disabled={stateEnbDis.disabled}
                 checked={stateChkClr.checked}
@@ -805,4 +813,7 @@ export default function Button(props: Props) {
             {props.text ? <span onAnimationEnd={stateChkClr.handleAnimationEndPress}>{props.text}</span> : undefined}
         </label>
     );
+}
+export default function Check(props: Props) {
+    return CheckBase(null, props, 'checkbox');
 }

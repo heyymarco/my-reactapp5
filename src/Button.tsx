@@ -209,7 +209,7 @@ export { states, styles2 as styles, useStyles };
 
 
 
-type BtnStyle = 'outline' | 'link' | 'outlineLink';
+export type BtnStyle = 'outline' | 'link' | 'outlineLink';
 export interface VariantButton {
     btnStyle?: BtnStyle
 }

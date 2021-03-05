@@ -2,10 +2,13 @@ import
     React, {
     useState }            from 'react';
 import Container from './Container';
-import Button from './Button';
-import ButtonIcon from './ButtonIcon';
+// import Button from './Button';
+// import ButtonIcon from './ButtonIcon';
+import type * as Checks from './Check';
 import Check from './Check';
-import Icon from './Icon';
+import Radio from './Radio';
+// import Icon from './Icon';
+import './CheckTestApp.css';
 
 import {JssProvider}             from 'react-jss'
 import { create as createJss }   from 'jss';
@@ -46,8 +49,6 @@ export default function App (props: any) {
 	const [active, 	   setActive    ] = useState(false);
 	const [focus, 	   setFocus     ] = useState(false);
 	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
-	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
-	const [chkStyle,   setChkStyle  ] = useState<'switch'|'btn'|'btnOutline'|undefined>(undefined);
 	const [check,      setCheck   ] = useState(false);
 
     const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,41 +66,56 @@ export default function App (props: any) {
 	const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSize((e.target.value || undefined) as ('sm'|'lg'|undefined));
 	}
-	const handleChangeTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined));
-	}
-	const handleChangeStyle = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setChkStyle((e.target.value || undefined) as ('switch'|'btn'|'btnOutline'|undefined));
-	}
 	const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCheck(e.target.checked);
 	}
 
 
+	const styles = [undefined,'switch','btn','btnOutline'];
+	const themes = ['primary','secondary','success','info','warning','danger','light'];
+
+	const [currentRadio, setCurrentRadio] = useState<string>('');
+	let indexRadio = 0;
     return (
         <JssProvider jss={jss}>
-            <Container>
-                <p>
-                    Hello
-                    <Button theme='primary' text='Hello' />
-                    Hello
-					<input type='checkbox'/>
-                    <Check text='Hello' theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
-						checked={check}
-						chkStyle={chkStyle}
-						onChange={handleChangeCheck}
-					/>
-                    <span>Hello</span>
-					<Check theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
-						checked={check}
-						chkStyle={chkStyle}
-						onChange={handleChangeCheck}
-					/>
-					Hello
-                    <ButtonIcon theme='primary' icon='checkbox' />
-                    Hello
-                    <Icon theme='primary' icon='checkbox' />
-                </p>
+            <Container style={{minHeight: '100vh'}}>
+				{
+					styles.map(style => (
+						<p key={style ?? 'none'} className='ctrlList'>
+							{
+								themes.map(theme => (
+									<Check key={theme ?? 'none'} text={theme ?? 'default'} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
+										checked={check}
+										onChange={handleChangeCheck}
+										chkStyle={style as Checks.ChkStyle}
+									/>
+								))
+							}
+						</p>
+					))
+				}
+
+				<hr style={{flexBasis: '100%'}} />
+
+				{
+					
+
+					styles.map(style => (
+						<p key={style ?? 'none'} className='ctrlList'>
+							{
+								themes.map(theme => (
+									<Radio key={indexRadio++} text={theme ?? 'default'} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
+										chkStyle={style as Checks.ChkStyle}
+
+										value={indexRadio}
+										checked={`${indexRadio}` === currentRadio}
+										onChange={(e) => setCurrentRadio(e.target.value)}
+									/>
+								))
+							}
+						</p>
+					))
+				}
 
 
                 <hr style={{flexBasis: '100%'}} />
@@ -158,46 +174,12 @@ export default function App (props: any) {
 						lg
 					</label>
 				</p>
-				<p>
-					Theme:
-					{
-						[undefined,'primary','secondary','success','info','warning','danger','light','dark'].map(t =>
-							<label key={t ?? ''}>
-								<input type='radio'
-									value={t}
-									checked={theme===t}
-									onChange={handleChangeTheme}
-								/>
-								{`${t}`}
-							</label>
-						)
-					}
-				</p>
-				<p>
-					Style:
-					{
-						[undefined,'switch','btn','btnOutline'].map(s =>
-							<label key={s ?? ''}>
-								<input type='radio'
-									value={s}
-									checked={chkStyle===s}
-									onChange={handleChangeStyle}
-								/>
-								{`${s}`}
-							</label>
-						)
-					}
-				</p>
 				<label>
 					<input type='checkbox'
 						checked={check}
 						onChange={handleChangeCheck}
 					/>
 					checked
-				</label>
-				<label onFocus={() => console.log('label focus')} onBlur={() => console.log('label blur')}>
-					<input type='checkbox' onFocus={() => console.log('chk focus')} onBlur={() => console.log('chk blur')} />
-					test focus
 				</label>
             </Container>
         </JssProvider>
