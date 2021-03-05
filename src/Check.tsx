@@ -355,8 +355,7 @@ export function useStateCheckClear(props: Props) {
 
 
 
-const states = {extend:[ Controls.states, { // copy Control's states
-
+const childStates = {extend:[ Controls.states, { // copy Control's states
     [vars.filterEnableDisable] : undefined, // ihnerit from <label>'s enable/disable
     [vars.animEnableDisable]   : undefined, // ihnerit from <label>'s enable/disable
 
@@ -365,9 +364,8 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     [vars.filterActivePassive] : undefined, // ihnerit from <label>'s active/passive
     [vars.animActivePassive]   : undefined, // ihnerit from <label>'s active/passive
-
-
-
+}]};
+const chkStates = {extend:[ childStates, { // copy child's states
     // customize the icon's anim:
     [vars.animIconFn]: [
         getVar(vars.animCheckClear),
@@ -398,8 +396,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
         ]}),
     ],
 }]};
-
-const labelStates = {
+const states = {
     // customize the label's text color:
     [vars.labelColor]: ecssProps.color,
 
@@ -461,7 +458,7 @@ const labelStates = {
     ],
 };
 
-const styleCheckbox = {
+const chkStyles = {
     extend: [
         Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
         {
@@ -473,7 +470,7 @@ const styleCheckbox = {
             lineHeight     : undefined,
         },
         filterValidProps(cssProps), // apply our filtered cssProps
-        states,                     // apply our states
+        chkStates,                  // apply our states
     ],
 
     img                : undefined, // delete
@@ -522,7 +519,7 @@ const styleCheckbox = {
     },
 
 };
-const styleChkBtn = {
+const chkBtnStyles = {
     verticalAlign : 'baseline',
 
 
@@ -547,7 +544,7 @@ const styleChkBtn = {
     '& >:nth-child(1n+2)': {
         extend: [
             Buttons.styles.main, // copy styles from Button, including Button's cssProps & Button's states.
-            states,
+            childStates,
         ],
     },
 };
@@ -555,7 +552,7 @@ const styles = {
     main: {
         extend: [
             Controls.styles.main, // copy styles from Control, including Control's cssProps & Control's states.
-            labelStates,
+            states,
         ],
 
         // layout:
@@ -597,18 +594,18 @@ const styles = {
 
 
         // the main "checkbox" element:
-        '& >:first-child': styleCheckbox,
+        '& >:first-child': chkStyles,
     },
 
     chkBtn: { '&:not(._)': { // force to win conflict with main
         extend: [
-            styleChkBtn,
+            chkBtnStyles,
         ],
     }},
 
     chkBtnOutline: { '&:not(._)': { // force to win conflict with main
         extend: [
-            styleChkBtn,
+            chkBtnStyles,
             stateNotCheck({
                 // the "sibling" element(s):
                 '& >:nth-child(1n+2)': {
@@ -686,7 +683,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 }));
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { childStates, chkStates, states, chkStyles, chkBtnStyles, styles, useStyles };
 
 
 

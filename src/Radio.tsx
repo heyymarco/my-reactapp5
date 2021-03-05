@@ -81,10 +81,7 @@ export { config, cssProps };
 
 
 
-const states = {extend:[ Checks.states, { // copy Control's states
-}]};
-
-const styleCheckbox = {
+const chkStyles = {
     extend: [
         filterValidProps(cssProps), // apply our filtered cssProps
     ],
@@ -99,21 +96,13 @@ const styleCheckbox = {
 };
 const styles = {
     main: {
-        extend: [
-            Checks.styles.main,         // copy styles from Check, including Check's cssProps & Check's states.
-            
-            states,                     // apply our states
-        ],
-
-
-
         // the main "checkbox" element:
-        '& >:first-child': styleCheckbox,
+        '& >:first-child': chkStyles,
     },
 };
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { chkStyles, styles, useStyles };
 
 
 
