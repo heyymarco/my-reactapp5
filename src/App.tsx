@@ -119,7 +119,7 @@ export default function App (props: any) {
 					<Button  theme='success'>Hello Button</Button>
 					Ipsum aliquam aperiam magni sint eum!
 				</Content>
-				<Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+				{/* <Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
 				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
 				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
@@ -263,7 +263,7 @@ export default function App (props: any) {
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
-				</Modal>
+				</Modal> */}
 				<hr style={{flexBasis: '100%'}} />
 				<label>
 					<input type='checkbox'

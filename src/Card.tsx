@@ -5,6 +5,8 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Contents       from './Content';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -25,6 +27,8 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -52,13 +56,7 @@ const unset   = 'unset';
 // const middle  = 'middle';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
-export const vars = Object.assign({}, Contents.vars, {
-    /**
-     * a custom css props for manipulating background(s) at outlined state.
-     */
-    backgOlFn : '--crd-backgOlFn',
-});
+export const vars = Contents.vars;
 
 // re-defined later, we need to construct varProps first
 const ecssProps = Elements.cssProps;
@@ -96,10 +94,7 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
-const states = {extend:[ Contents.states, { // copy Content's states
-    // customize the background(s) at outlined state:
-    [vars.backgOlFn]: 'transparent',
-}]};
+const states = Contents.states;
 
 const image = {
     display: 'block', // remove unecessary space to the next sibling
@@ -214,29 +209,7 @@ const styles = {
         }
     },
 
-    gradient: { '&:not(._)': { // force to win conflict with main
-        extend: [
-            // copy the themes from Content:
-            Contents.styles.gradient,
-        ],
-
-        // customize the backg at outlined state:
-        [vars.backgOlFn]: ecssProps.backgGrad,
-    }},
-    cardOutline: { // already have specific rule :not-active => always win conflict with main
-        extend:[
-            stateNotActive({
-                // apply the outlined-backg:
-                backg : getVar(vars.backgOlFn),
-        
-                // customize the text-color (foreground):
-                [vars.colorFn] : ccssProps.backgActive,
-        
-                // set border color = text-color:
-                borderColor    : getVar(vars.colorFn),
-            }),
-        ],
-    },
+    cardOutline: Elements.styles.outline,
 };
 
 const useStyles = createUseStyles(styles);
@@ -268,7 +241,7 @@ export default function ListGroup(props: Props) {
 
     const variSize       = Elements.useVariantSize(props, ctStyles);
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
-    const variGradient   = Elements.useVariantGradient(props, styles);
+    const variGradient   = Elements.useVariantGradient(props, ctStyles);
     const variCard       =          useVariantCard(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);

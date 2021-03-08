@@ -4,12 +4,13 @@ import './index.css';
 import App from './App';
 import ModalTestApp from './ModalTestApp';
 import CheckTestApp from './CheckTestApp';
+import InptTestApp from './InputTestApp';
 import JssTestApp from './JssTestApp';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <CheckTestApp />
+    <InptTestApp />
   </React.StrictMode>,
   document.getElementById('root')
 );

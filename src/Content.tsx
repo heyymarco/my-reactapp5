@@ -5,6 +5,8 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -24,6 +26,8 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -48,8 +52,6 @@ export interface CssProps {
 
     // anim props:
 
-    colorActive           : Css.Color
-    backgActive           : Css.Background
     filterActive          : Css.Filter
 
     '@keyframes active'   : Css.Keyframes
@@ -64,17 +66,26 @@ export interface CssProps {
 // const middle  = 'middle';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Indicators.vars, {
     /**
-     * a custom css props for manipulating foreground at active state.
+     * themed foreground color at active state.
      */
-    colorActiveFn      : '--ct-colorActiveFn',
+    activeColorTh : '--ct-activeColorTh',
 
     /**
-     * a custom css props for manipulating background(s) at active state.
+     * final foreground color at active state.
      */
-    backgActiveFn      : '--ct-backgActiveFn',
+    activeColorFn : '--ct-activeColorFn',
+
+    /**
+     * themed background color at active state.
+     */
+    activeBackgTh : '--ct-activeBackgTh',
+
+    /**
+     * final composite background(s) at active state.
+     */
+    activeBackgFn : '--ct-activeBackgFn',
 });
 
 // re-defined later, we need to construct varProps first
@@ -93,8 +104,6 @@ const _cssProps: CssProps = {
 
     // anim props:
 
-    colorActive           : ecssProps.color,
-    backgActive           : (colors.foregThin as string),
     filterActive          : ecssProps.filterNone,
 
     '@keyframes active'   : keyframesActive,
@@ -111,8 +120,8 @@ Object.assign(keyframesActive, {
         backg: getVar(vars.backgFn),
     }]},
     to: {extend:[ Indicators.keyframesActive.to, { // copy Indicator's keyframes
-        color: getVar(vars.colorActiveFn),
-        backg: getVar(vars.backgActiveFn),
+        color: getVar(vars.activeColorFn),
+        backg: getVar(vars.activeBackgFn),
     }]}
 });
 Object.assign(keyframesPassive, {
@@ -151,11 +160,20 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
 
 
 
-    // customize the foreground at active state:
-    [vars.colorActiveFn]: cssProps.colorActive,
+    // customize final foreground color at active state:
+    [vars.activeColorFn] : getVar(
+        vars.activeColorTh, // first  priority
+        vars.colorIfAct     // second priority
+    ),
 
-    // customize the background(s) at active state:
-    [vars.backgActiveFn]: cssProps.backgActive,
+    // customize final composite background(s) at active state:
+    [vars.activeBackgFn] : [
+        getVar(
+            vars.activeBackgTh, // first  priority
+            vars.backgIfAct     // second priority
+        ),
+        ecssProps.backg,
+    ],
 }]};
 
 const styles = {
@@ -166,18 +184,21 @@ const styles = {
             states,                     // apply our states
         ],
     },
-    gradient: { '&:not(._)': { // force to win conflict with main
+    gradient: {
         extend: [
             // copy the themes from Element:
             Elements.styles.gradient,
         ],
 
-        // customize the backg at active state:
-        [vars.backgActiveFn]: [ // active background with gradient
-            ecssProps.backgGrad,
-            cssProps.backgActive,
-        ],
-    }},
+        '&:not(._)': { // force to win conflict with main
+            // customize the backg at active state:
+            [vars.activeBackgFn]: [
+                ecssProps.backgGrad,
+                getVar(vars.activeBackgTh),
+                ecssProps.backg,
+            ],
+        },
+    },
 };
 
 const cssPropsAny = cssProps as any;
@@ -195,16 +216,28 @@ defineSizes(styles, (size, Size, sizeProp) => ({
 }));
 
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    // overwrite the backg & color props
-    // we ignore the backg & color if the theme applied
+    '&:not(._)': { // force to win conflict with states
+        // customize the backg & color
 
-    '--elm-color' : (colors as any)[`${theme}Cont`],
-    '--elm-backg' : (colors as any)[`${theme}Thin`],
+        // customize final foreground color with softer color:
+        [vars.colorTh]       : (colors as any)[`${theme}Cont`],
+
+        // customize themed background color with softer color:
+        [vars.backgTh]       : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
+        
+        
+        
+        // customize themed foreground color at active state:
+        [vars.activeColorTh] : (colors as any)[`${theme}Text`],
+        
+        // customize themed background color at active state:
+        [vars.activeBackgTh] : `linear-gradient(${themeColor},${themeColor})`,
 
 
-    // customize the backg & color at active state:
-    '--ct-colorActive' : (colors as any)[`${theme}Text`],
-    '--ct-backgActive' : themeColor,
+
+        // customize final foreground color at outlined state:
+        [vars.colorOl] : themeColor,
+    },
 }));
 
 const useStyles = createUseStyles(styles);

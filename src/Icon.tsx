@@ -6,6 +6,7 @@ import
 }                          from 'react';
 
 import * as Elements       from './Element';
+import { getVar }          from './Element';
 import Path                from 'path';
 import fontMaterial        from './Icon-font-material';
 
@@ -49,7 +50,6 @@ const none    = 'none';
 const normal    = 'normal';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
 export const vars = {
     img: '--ico-img',
 };

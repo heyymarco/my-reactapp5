@@ -8,10 +8,13 @@ import
 
 import * as Elements       from './Element';
 import {
+    getVar,
+
     filterValidProps, filterPrefixProps,
     
     defineSizes, defineThemes,
 }                          from './Element';
+import colors              from './colors';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -19,6 +22,8 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    getVar,
+    
     filterValidProps, filterPrefixProps,
 
     defineSizes, defineThemes,
@@ -46,8 +51,19 @@ export interface CssProps {
 // const inherit = 'inherit';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Elements.vars, {
+    /**
+     * active unthemed foreground color.
+     */
+    colorIfAct        : '--indi-colorIfAct',
+
+    /**
+     * active unthemed background color.
+     */
+    backgIfAct        : '--indi-backgIfAct',
+
+
+
     // anim props:
 
     filterEnableDisable : '--indi-filterEnableDisable',
@@ -229,6 +245,14 @@ export const stateNoAnimStartup = () =>
 
 
 const states = {extend:[ Elements.states, { // copy Element's states
+    // customize active unthemed foreground color:
+    [vars.colorIfAct] : colors.primaryText,
+
+    // customize active unthemed background color:
+    [vars.backgIfAct] : `linear-gradient(${colors.primary},${colors.primary})`,
+
+
+
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
@@ -270,6 +294,13 @@ const states = {extend:[ Elements.states, { // copy Element's states
         }),
         stateActive({ // [activating, actived]
             [vars.animActivePassive]              : cssProps.animActive,
+
+            extend:[
+                stateNotDisable({
+                    [vars.colorIf] : getVar(vars.colorIfAct),
+                    [vars.backgIf] : getVar(vars.backgIfAct),
+                }),
+            ],
         }),
         statePassive({ // [passivating]
             [vars.animActivePassive]              : cssProps.animPassive,

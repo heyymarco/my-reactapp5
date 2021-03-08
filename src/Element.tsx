@@ -63,22 +63,56 @@ export interface CssProps
 const inherit = 'inherit';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
+export const getVar = (name: string, fallback?: string) => fallback ? `var(${name},var(${fallback}))` : `var(${name})`;
 export const vars = {
     /**
-     * a custom css props for manipulating foreground.
+     * themed foreground color.
+     */
+    colorTh : '--elm-colorTh',
+
+    /**
+     * conditional unthemed foreground color.
+     */
+    colorIf : '--elm-colorIf',
+
+    /**
+     * final foreground color.
      */
     colorFn : '--elm-colorFn',
 
     /**
-     * a custom css props for manipulating background(s).
+     * themed background color.
+     */
+    backgTh : '--elm-backgTh',
+
+    /**
+     * conditional unthemed background color.
+     */
+    backgIf : '--elm-backgIf',
+
+    /**
+     * final composite background(s).
      */
     backgFn : '--elm-backgFn',
 
+
+
     /**
-     * custom css props for manipulating animation(s).
+     * final foreground color at outlined state.
      */
-    animFn  : '--elm-animFn',
+    colorOl   : '--elm-colorOl',
+
+    /**
+     * final composite background(s) at outlined state.
+     */
+    backgOl   : '--elm-backgOl',
+
+
+
+    /**
+     * final composite animation(s).
+     */
+    animFn    : '--elm-animFn',
 };
 
 // re-defined later, we need to construct varProps first
@@ -95,7 +129,7 @@ const _cssProps: CssProps = {
     lineHeight        : inherit,
 
     color             : 'currentColor',
-    backg             : colors.backgThin as string,
+    backg             : 'transparent',
     backgGrad         : [['linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(0,0,0, 0.2))', 'border-box']],
 
     opacity           : 1,
@@ -152,7 +186,7 @@ export { config, cssProps };
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Check|Clear|Hover|Leave|Focus|Blur)$|^(@)|backgGrad|anim|orientation|align/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Check|Clear|Hover|Leave|Focus|Blur)$|^(@)|color|backg|backgGrad|anim|orientation|align/).test(key)) continue;
         cssPropsCopy[key] = value;
     }
     return cssPropsCopy;
@@ -167,14 +201,39 @@ export const filterPrefixProps = <TCssProps,>(cssProps: TCssProps, prefix: strin
 }
 
 const states = {
-    // customize the foreg:
-    [vars.colorFn]: cssProps.color,
+    // customize conditional unthemed foreground color:
+    [vars.colorIf] : cssProps.color,
 
-    // customize the backg:
-    [vars.backgFn]: cssProps.backg,
+    // customize final foreground color:
+    [vars.colorFn] : getVar(
+        vars.colorTh, // first  priority
+        vars.colorIf  // second priority
+    ),
 
-    // customize the anim:
-    [vars.animFn]: [
+    // customize conditional unthemed background color:
+    [vars.backgIf] : `linear-gradient(transparent,transparent)`,
+
+    // customize final composite background(s):
+    [vars.backgFn] : [
+        getVar(
+            vars.backgTh, // first  priority
+            vars.backgIf  // second priority
+        ),
+        cssProps.backg,
+    ],
+
+
+
+    // customize final foreground color at outlined state:
+    [vars.colorOl] : cssProps.color,
+
+    // customize final composite background(s) at outlined state:
+    [vars.backgOl] : 'transparent',
+
+
+
+    // customize final composite animation(s):
+    [vars.animFn]  : [
         cssProps.anim,
     ],
 };
@@ -188,22 +247,42 @@ const styles = {
 
 
 
-        // a custom css props for manipulating foreground:
-        color: getVar(vars.colorFn),    // apply prop
+        // apply final foreground color:
+        color : getVar(vars.colorFn),
 
-        // a custom css props for manipulating background(s):
-        backg: getVar(vars.backgFn),    // apply prop
+        // apply final composite background(s):
+        backg : getVar(vars.backgFn),
 
-        // a custom css props for manipulating animation(s):
-        anim: getVar(vars.animFn),      // apply prop
+
+
+        // apply final composite animation(s):
+        anim  : getVar(vars.animFn),
     },
-    gradient: { '&:not(._)': { // force to win conflict with main
-        // customize the backg:
-        [vars.backgFn]: [
-            cssProps.backgGrad,
-            cssProps.backg,
-        ],
-    }},
+    outline: {
+        // apply final foreground color at outlined state:
+        color       : getVar(vars.colorOl),
+
+        // apply final composite background(s) at outlined state:
+        backg       : getVar(vars.backgOl),
+
+        // set border color = text-color:
+        borderColor : getVar(vars.colorOl),
+    },
+    gradient: {
+        '&:not(._)': { // force to win conflict with states
+            // customize final composite background(s):
+            [vars.backgFn] : [
+                cssProps.backgGrad,
+                getVar(vars.backgTh, vars.backgIf),
+                cssProps.backg,
+            ],
+
+
+
+            // customize final composite background(s) at outlined state:
+            [vars.backgOl] : cssProps.backgGrad,
+        },
+    },
 };
 
 export function defineSizes(styles: object, handler: ((size: string, Size: string, sizeProp: string) => object), sizes = ['sm', 'lg']) {
@@ -231,11 +310,20 @@ export function defineThemes(styles: object, handler: ((theme: string, Theme: st
     }
 }
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    // overwrite the backg & color props
-    // we ignore the backg & color if the theme applied
+    '&:not(._)': { // force to win conflict with states
+        // customize the backg & color
 
-    '--elm-color' : (colors as any)[`${theme}Text`],
-    '--elm-backg' : themeColor,
+        // customize final foreground color:
+        [vars.colorTh] : (colors as any)[`${theme}Text`],
+
+        // customize themed background color:
+        [vars.backgTh] : `linear-gradient(${themeColor},${themeColor})`,
+
+
+
+        // customize final foreground color at outlined state:
+        [vars.colorOl] : themeColor,
+    },
 }));
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);

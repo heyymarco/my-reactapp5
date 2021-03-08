@@ -5,6 +5,8 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Controls       from './Control';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
@@ -28,6 +30,8 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
@@ -62,15 +66,9 @@ const center  = 'center';
 // const middle  = 'middle';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
-export const vars = Object.assign({}, Controls.vars, {
-    /**
-     * a custom css props for manipulating background(s) at outlined state.
-     */
-    backgOlFn : '--btn-backgOlFn',
-});
+export const vars = Controls.vars;
 
-const ecssProps = Elements.cssProps;
+// const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     orientation : 'row',
@@ -99,11 +97,15 @@ export { config, cssProps };
 
 
 
-const states = {extend:[ Controls.states, { // copy Control's states
-    // customize the background(s) at outlined state:
-    [vars.backgOlFn]: 'transparent',
-}]};
+const states = Controls.states;
 
+const linkStyles = {
+    textDecoration : 'underline',
+    lineHeight     : 1,
+
+    padding        : spacers.xs,
+    borderRadius   : border.radiuses.sm,
+};
 const styles = {
     main: {
         extend: [
@@ -124,69 +126,30 @@ const styles = {
 
         userSelect     : none, // disable selecting button's text
     },
-    gradient: { '&:not(._)': { // force to win conflict with main
-        extend: [
-            // copy the themes from Element:
-            Elements.styles.gradient,
-        ],
-
-        // customize the backg at outlined state:
-        [vars.backgOlFn]: ecssProps.backgGrad,
-    }},
-    btnOutline: { // already have specific rule :not-active => always win conflict with main
+    btnOutline: Controls.styles.outline,
+    btnLink: {
         extend:[
-            stateNotActive({
-                '&:not(:hover):not(:focus), &:disabled,&.disabled': {
-                    // apply the outlined-backg:
-                    backg          : getVar(vars.backgOlFn),
-
-                    // customize the text-color (foreground):
-                    [vars.colorFn] : ecssProps.backg,
-
-                    // set border color = text-color:
-                    borderColor    : getVar(vars.colorFn),
-                },
-            }),
+            Elements.styles.outline,
         ],
-    },
-    btnLink: { '&:not(._)': { // force to win conflict with main
-        // apply the outlined-backg:
-        backg          : getVar(vars.backgOlFn),
-
-        // customize the text-color (foreground):
-        [vars.colorFn] : ecssProps.backg,
 
         // hide the border:
         borderColor    : 'transparent',
 
 
 
-        // link properties:
-        textDecoration : 'underline',
-        lineHeight     : 1,
-
-        padding        : spacers.xs,
-        borderRadius   : border.radiuses.sm,
-    }},
-    btnOutlineLink: { '&:not(._)': { // force to win conflict with main
-        // apply the outlined-backg:
-        backg          : getVar(vars.backgOlFn),
-
-        // customize the text-color (foreground):
-        [vars.colorFn] : ecssProps.backg,
-
-        // set border color = text-color:
-        borderColor    : getVar(vars.colorFn),
+        // apply linkStyles & force to win conflict with main
+        '&:not(._)': linkStyles,
+    },
+    btnOutlineLink: {
+        extend:[
+            Elements.styles.outline,
+        ],
 
 
 
-        // link properties:
-        textDecoration : 'underline',
-        lineHeight     : 1,
-
-        padding        : spacers.xs,
-        borderRadius   : border.radiuses.sm,
-    }},
+        // apply linkStyles & force to win conflict with main
+        '&:not(._)': linkStyles,
+    },
 };
 
 const cssPropsAny = cssProps as any;
@@ -246,12 +209,13 @@ export interface Props
 }
 export default function Button(props: Props) {
     const styles         =          useStyles();
+    const elmStyles      = Elements.useStyles();
     const ctrlStyles     = Controls.useStyles();
 
     const variSize       = Elements.useVariantSize(props, styles);
     const variThemeDef   =          useVariantThemeDefault(props);
     const variTheme      = Elements.useVariantTheme(props, ctrlStyles, variThemeDef);
-    const variGradient   = Elements.useVariantGradient(props, styles);
+    const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variButton     =          useVariantButton(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);

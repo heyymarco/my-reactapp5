@@ -5,6 +5,8 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Contents       from './Content';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -25,6 +27,8 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -48,7 +52,6 @@ export interface CssProps {
 // const middle  = 'middle';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Contents.vars, {
     /**
      * (internal use) Forwards anim to children element.
@@ -140,12 +143,14 @@ const styles = {
             } // main child elements
         }, // wrapper element
     },
-    gradient: { '& >li >.lg-wrapper:not(._)': { // force to win conflict with main child element
-        extend: [
-            // copy the themes from Content:
-            Contents.styles.gradient,
-        ],
-    }},
+    gradient: {
+        '& >li >.lg-wrapper': {
+            extend: [
+                // copy the themes from Content:
+                Contents.styles.gradient,
+            ],
+        },
+    },
 };
 
 const useStyles = createUseStyles(styles);

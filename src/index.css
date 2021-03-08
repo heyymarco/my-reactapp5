@@ -6,7 +6,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background: linear-gradient(45deg, lightBlue, lightGreen);
+  /* background: linear-gradient(45deg, lightBlue, lightGreen); */
+  /* background: url("./dark-concrete-texture-background-seamless.svg") */
 }
 
 code {

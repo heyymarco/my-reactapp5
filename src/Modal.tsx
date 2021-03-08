@@ -11,6 +11,8 @@ import
     Card,
     * as Cards             from './Card';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -36,6 +38,8 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
@@ -74,7 +78,6 @@ const center  = 'center';
 // const middle  = 'middle';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Contents.vars, {
     /**
      * custom css props for manipulating animation(s).

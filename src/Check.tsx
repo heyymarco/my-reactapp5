@@ -10,6 +10,8 @@ import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import * as Controls       from './Control';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
@@ -34,6 +36,8 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
@@ -101,15 +105,14 @@ const none    = 'none';
 const center  = 'center';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     /**
-     * a custom css props for manipulating icon's animation(s).
+     * final composite animation(s) at the "icon" element.
      */
-    animIconFn          : '--chk-animIconFn',
+    iconAnimFn          : '--chk-iconAnimFn',
 
     /**
-     * a custom css props for manipulating label's text color.
+     * foreground color for the label.
      */
     labelColor          : '--chk-labelColor',
 
@@ -292,9 +295,10 @@ export const stateNoAnimStartup = () =>
             stateNotActivatingPassivating(
                 stateNotHoverLeave(
                     stateNotFocusBlur({
-                        // the main "icon" element:
-                        '& >:first-child::before': {
-                            animationDuration: [['0ms'], '!important'],
+                        [chkElm]: {
+                            [iconElm]: {
+                                animationDuration: [['0ms'], '!important'],
+                            },
                         },
                     })
                 )
@@ -355,7 +359,22 @@ export function useStateCheckClear(props: Props) {
 
 
 
-const childStates = {extend:[ Controls.states, { // copy Control's states
+const chkElm  = '& >:first-child';
+const iconElm = '&::before';
+const nextElm = '& >:nth-child(1n+2)';
+
+const childFocusableStates = {extend:[ Controls.states, { // copy Control's states
+    [vars.colorTh]             : undefined, // ihnerit from <label>'s theme
+    [vars.colorIf]             : undefined, // ihnerit from <label>'s theme
+    [vars.colorFn]             : undefined, // ihnerit from <label>'s theme
+    [vars.backgTh]             : undefined, // ihnerit from <label>'s theme
+    [vars.backgIf]             : undefined, // ihnerit from <label>'s theme
+    [vars.backgFn]             : undefined, // ihnerit from <label>'s theme
+    [vars.colorOl]             : undefined, // ihnerit from <label>'s theme
+    [vars.backgOl]             : undefined, // ihnerit from <label>'s theme
+    [vars.boxShadowFocusFn]    : undefined, // ihnerit from <label>'s theme
+
+
     [vars.filterEnableDisable] : undefined, // ihnerit from <label>'s enable/disable
     [vars.animEnableDisable]   : undefined, // ihnerit from <label>'s enable/disable
 
@@ -365,40 +384,44 @@ const childStates = {extend:[ Controls.states, { // copy Control's states
     [vars.filterActivePassive] : undefined, // ihnerit from <label>'s active/passive
     [vars.animActivePassive]   : undefined, // ihnerit from <label>'s active/passive
 }]};
-const chkStates = {extend:[ childStates, { // copy child's states
-    // customize the icon's anim:
-    [vars.animIconFn]: [
-        getVar(vars.animCheckClear),
-    ],
-
+const childInheritStates = {extend:[ childFocusableStates, { // copy childFocusableStates
+    [vars.boxShadowFocusBlur]  : undefined, // ihnerit from <checkbox>'s focus/blur
+    [vars.animFocusBlur]       : undefined, // ihnerit from <checkbox>'s focus/blur
+}]};
+const chkStates = {extend:[ childFocusableStates, { // copy childFocusableStates
     // specific states:
     extend:[
-        // transfers the focus state to the "sibling" element(s):
-        {'&:not(._)':{extend:[ // force to win conflict with chkBtn**
-            stateFocusBlur({
-                '& ~*': {
-                    [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
-                },
-            }),
-            stateBlur({
-                '& ~*': {
-                    [vars.animFocusBlur]      : ccssProps.animBlur,
-                },
-            }),
-        ]}},
+        // transfers the focus state to the "next" element(s):
+        stateFocusBlur({
+            '& ~*': {
+                [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
+            },
+        }),
+        stateBlur({
+            '& ~*': {
+                [vars.animFocusBlur]      : ccssProps.animBlur,
+            },
+        }),
         stateNotDisable({extend:[
             // state focus are possible when enabled
             stateFocus({
                 '& ~*': {
-                    [vars.animFocusBlur]      : ccssProps.animFocus,
+                    [vars.animFocusBlur]  : ccssProps.animFocus,
                 },
             }),
         ]}),
     ],
 }]};
 const states = {
-    // customize the label's text color:
+    // customize foreground color for the label:
     [vars.labelColor]: ecssProps.color,
+
+
+
+    // customize final composite animation(s) at the "icon" element:
+    [vars.iconAnimFn]: [
+        getVar(vars.animCheckClear),
+    ],
 
 
 
@@ -411,19 +434,19 @@ const states = {
     // specific states:
     extend:[
         stateCheckClear({ // [checking, checked, clearing]
-            '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
+            [nextElm]: { // transfer the check/clear state to the "next" element(s):
                 [vars.filterActivePassive] : icssProps.filterActive,
             },
         }),
         stateCheck({ // [checking, checked]
             [vars.animCheckClear]          : cssProps.animCheck,
 
-            '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
+            [nextElm]: { // transfer the check/clear state to the "next" element(s):
                 [vars.animActivePassive]   : icssProps.animActive,
             },
         }),
         stateClear({ // [clearing]
-            '& :nth-child(1n+2)': { // transfer the check/clear state to the "sibling" element(s):
+            [nextElm]: { // transfer the check/clear state to the "next" element(s):
                 [vars.animActivePassive]   : icssProps.animPassive,
             },
         }),
@@ -435,8 +458,7 @@ const states = {
         ),
         { // [cleared]
             '&.checked,&:checked:not(.check)': { // if ctrl was checked, disable the animation
-                // the main "checkbox" element:
-                '& >:first-child': stateNotFocusBlur({ // still transfering the focus state to the "sibling" element(s):
+                [chkElm]: stateNotFocusBlur({ // still transfering the focus state to the "sibling" element(s):
                     // the "sibling" element(s):
                     '&~*': // transfer the checked state to the "sibling" element(s):
                         base_stateNoAnimStartup(),
@@ -497,7 +519,8 @@ const chkStyles = {
 
 
     overflow: 'hidden',
-    '&::before': { // the main "icon" element:
+
+    [iconElm]: {
         extend: [
             Icons.styles.main,
             Icons.styles.img,
@@ -514,38 +537,79 @@ const chkStyles = {
         
         
         
-        // a custom css props for manipulating icon's animation(s):
-        anim: getVar(vars.animIconFn), // apply prop
+        // apply final composite animation(s) at the "icon" element:
+        anim: getVar(vars.iconAnimFn),
     },
 
 };
 const chkBtnStyles = {
-    verticalAlign : 'baseline',
+    '&:not(._)': { // force to win conflict with states
+        verticalAlign : 'baseline',
+    },
 
 
 
-    // the main "checkbox" element:
-    '& >:first-child': {
-        // display: none, // hide the checkbox // causes focus doesn't work anymore
+    [chkElm]: {
+        '&:not(._)': { // force to win conflict with states
+            // display: none, // hide the checkbox // causes focus doesn't work anymore
+    
+            // hiding the checkbox while still preserving focus working
+            opacity: 0,
+            width: 0, height: 0, border: 0,
+            marginInlineEnd: 0,
 
-        // hiding the checkbox while still preserving focus working
-        opacity: 0,
-        width: 0, height: 0, border: 0,
-        marginInlineEnd: 0,
+            // turn off animations:
+            // anim: none, // still needed the anim focus/blur
+        },
 
-        // turn off animations:
-        // anim: none, // still needed the anim focus/blur
-        '&::before': { // the main "icon" element:
-            anim: none,
+        
+        [iconElm]: {
+            '&:not(._)': { // force to win conflict with states
+                // turn off animations:
+                anim: none,
+            },
         },
     },
 
-    // the "sibling" element(s):
-    '& >:nth-child(1n+2)': {
+
+    [nextElm]: {
         extend: [
             Buttons.styles.main, // copy styles from Button, including Button's cssProps & Button's states.
-            childStates,
+            childInheritStates,
         ],
+    },
+};
+const chkSwitchStyles = {
+    '&:not(._)': { // force to win conflict with states
+        // overwrite default animation:
+        [vars.filterCheckClearIn]     : cssProps.switchFilterCheck,
+        [vars.filterCheckClearOut]    : cssProps.switchFilterClear,
+
+        [vars.switchTransfIn]         : cssProps.switchTransfCheck,
+        [vars.switchTransfOut]        : cssProps.switchTransfClear,
+
+        // specific states:
+        extend:[
+            stateCheck({ // [checking, checked]
+                [vars.animCheckClear] : cssProps.switchAnimCheck,
+            }),
+            stateNotCheck({ // [not-checking, not-checked] => [clearing, cleared]
+                [vars.animCheckClear] : cssProps.switchAnimClear,
+            }),
+        ],
+    },
+
+
+    [chkElm]: {
+        '&:not(._)': { // force to win conflict with states
+            width        : '2em',
+            borderRadius : cssProps.switchBorderRadius,
+
+
+            [iconElm]: { // force to win conflict with states, :not(._) after pseudo-elm is invalid, so we use parent's :not(._)
+                [vars.img]: cssProps.switchImg,
+            },
+        },
     },
 };
 const styles = {
@@ -563,7 +627,7 @@ const styles = {
 
 
 
-        // a custom css props for manipulating label's text color.
+        // apply foreground color for the label:
         color : getVar(vars.labelColor),
 
 
@@ -593,73 +657,22 @@ const styles = {
 
 
 
-        // the main "checkbox" element:
-        '& >:first-child': chkStyles,
+        [chkElm]: chkStyles,
     },
 
-    chkBtn: { '&:not(._)': { // force to win conflict with main
-        extend: [
-            chkBtnStyles,
-        ],
-    }},
+    chkBtn: chkBtnStyles,
 
-    chkBtnOutline: { '&:not(._)': { // force to win conflict with main
+    chkBtnOutline: {
         extend: [
             chkBtnStyles,
+
             stateNotCheck({
-                // the "sibling" element(s):
-                '& >:nth-child(1n+2)': {
-                    extend: [
-                        Buttons.styles.btnOutline,
-                    ],
-                },
+                [nextElm]: Buttons.styles.btnOutline,
             }),
         ],
-    }},
+    },
 
-    chkSwitch: { '&:not(._)': { // force to win conflict with main
-        // the main "checkbox" element:
-        '& >:first-child': {
-            width        : '2em',
-            borderRadius : cssProps.switchBorderRadius,
-
-
-
-            '&::before': { // the main "icon" element:
-                [vars.img]: cssProps.switchImg,
-            },
-        },
-
-
-
-        // overwrite default animation:
-
-        [vars.filterCheckClearIn]  : cssProps.switchFilterCheck,
-        [vars.filterCheckClearOut] : cssProps.switchFilterClear,
-
-        [vars.switchTransfIn]      : cssProps.switchTransfCheck,
-        [vars.switchTransfOut]     : cssProps.switchTransfClear,
-
-        // specific states:
-        extend:[
-            stateCheck({ // [checking, checked]
-                [vars.animCheckClear]      : cssProps.switchAnimCheck,
-            }),
-            stateNotCheck({ // [not-checking, not-checked] => [clearing, cleared]
-                [vars.animCheckClear]      : cssProps.switchAnimClear,
-            }),
-        ],
-    }}, 
-
-    gradient: { '&:not(._)': { // force to win conflict with main
-        // the main "checkbox" element & "label" element:
-        '& >*': {
-            extend: [
-                // copy the themes from Button:
-                Buttons.styles.gradient,
-            ],
-        },
-    }},
+    chkSwitch: chkSwitchStyles,
 };
 
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
@@ -669,21 +682,14 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     ],
 
 
-    // customize the label's text color:
-    [vars.labelColor] : (colors as any)[`${theme}Cont`],
-
-
-    // transfers the theme to the "sibling" element(s):
-    '& ~*': {
-        extend: [
-            // copy the themes from Control:
-            (Controls.styles as any)[themeProp],
-        ],
+    '&:not(._)': { // force to win conflict with states
+        // customize the label's text color:
+        [vars.labelColor] : (colors as any)[`${theme}Cont`],
     },
 }));
 
 const useStyles = createUseStyles(styles);
-export { childStates, chkStates, states, chkStyles, chkBtnStyles, styles, useStyles };
+export { childInheritStates, chkStates, states, chkStyles, chkBtnStyles, styles, useStyles };
 
 
 
@@ -728,7 +734,7 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
     const variSize       = Elements.useVariantSize(props, elmStyles);
     const variThemeDef   =          useVariantThemeDefault(props);
     const variTheme      = Elements.useVariantTheme(props, styles, variThemeDef);
-    const variGradient   = Elements.useVariantGradient(props, styles);
+    const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variCheck      =          useVariantCheck(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);

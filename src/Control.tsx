@@ -9,6 +9,8 @@ import
 import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
 
     filterValidProps, filterPrefixProps,
@@ -26,6 +28,8 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
 
     filterValidProps, filterPrefixProps,
@@ -62,10 +66,9 @@ export interface CssProps {
 // const inherit = 'inherit';
 
 // internal css vars:
-const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Indicators.vars, {
     /**
-     * a custom css props for manipulating a box-shadow at focused state.
+     * final box-shadow at focused state.
      */
     boxShadowFocusFn    : '--ctrl-boxShadowFocusFn',
 
@@ -282,13 +285,31 @@ export const stateNoAnimStartup = () =>
 
 
 const states = {extend:[ Elements.states, { // not copy from Indicator's states because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
-    // TODO: activate this code:
-    // a custom css props for manipulating a box-shadow at focused state:
-    // [vars.boxShadowFocusFn]: [[ // set default value
-    //     cssProps.boxShadowFocus,
-    //     'rgba(128, 128, 128, 0.5)',
-    // ]],
-    // boxShadow: getVar(vars.boxShadowFocusFn), // not apply yet
+    // overwrite from Element (replace with inactive (secondary) color):
+
+    // customize conditional unthemed foreground color:
+    [vars.colorIf]    : colors.secondaryText,
+
+    // customize conditional unthemed background color:
+    [vars.backgIf] : `linear-gradient(${colors.secondary},${colors.secondary})`,
+
+
+
+    // copied from Indicator (replace with active (primary) color):
+
+    // customize active unthemed foreground color:
+    [vars.colorIfAct] : colors.primaryText,
+
+    // customize active unthemed background color:
+    [vars.backgIfAct] : `linear-gradient(${colors.primary},${colors.primary})`,
+
+
+
+    // customize final box-shadow at focused state:
+    [vars.boxShadowFocusFn]: [[
+        cssProps.boxShadowFocus,
+        colors.primaryTransp,
+    ]],
 
 
 
@@ -335,26 +356,31 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
         },
 
 
-        stateHoverLeave({
-            [vars.filterHoverLeave]          : cssProps.filterHover,
-        }),
         stateLeave({
-            [vars.animHoverLeave]            : cssProps.animLeave,
+            [vars.filterHoverLeave]               : cssProps.filterHover,
+            [vars.animHoverLeave]                 : cssProps.animLeave,
         }),
 
         stateFocusBlur({
-            [vars.boxShadowFocusBlur]        : getVar(vars.boxShadowFocusFn),
+            [vars.boxShadowFocusBlur]             : getVar(vars.boxShadowFocusFn),
         }),
         stateBlur({
-            [vars.animFocusBlur]             : cssProps.animBlur,
+            [vars.animFocusBlur]                  : cssProps.animBlur,
         }),
         stateNotDisable({extend:[
             // state hover & focus are possible when enabled
             stateHover({
-                [vars.animHoverLeave]            : cssProps.animHover,
+                [vars.filterHoverLeave]           : cssProps.filterHover,
+                [vars.animHoverLeave]             : cssProps.animHover,
+
+                [vars.colorIf] : getVar(vars.colorIfAct),
+                [vars.backgIf] : getVar(vars.backgIfAct),
             }),
             stateFocus({
-                [vars.animFocusBlur]             : cssProps.animFocus,
+                [vars.animFocusBlur]              : cssProps.animFocus,
+
+                [vars.colorIf] : getVar(vars.colorIfAct),
+                [vars.backgIf] : getVar(vars.backgIfAct),
             }),
         ]}),
         
@@ -365,6 +391,13 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
         }),
         stateActive({ // [activating, actived]
             [vars.animActivePassive]              : icssProps.animActive,
+
+            extend:[
+                stateNotDisable({
+                    [vars.colorIf] : getVar(vars.colorIfAct),
+                    [vars.backgIf] : getVar(vars.backgIfAct),
+                }),
+            ],
         }),
         statePassive({ // [passivating]
             [vars.animActivePassive]              : icssProps.animPassive,
@@ -414,6 +447,14 @@ const styles = {
             states,                     // apply our states
         ],
     },
+    outline: {
+        extend:[
+            stateNotActive({
+                '&:not(:hover):not(:focus), &:disabled,&.disabled':
+                    Elements.styles.outline,
+            }),
+        ],
+    },
 };
 
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
@@ -423,11 +464,13 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     ],
 
 
-    // customize the box-shadow at focused state:
-    [vars.boxShadowFocusFn]: [[
-        cssProps.boxShadowFocus,
-        (colors as any)[`${theme}Transp`],
-    ]],
+    '&:not(._)': { // force to win conflict with states
+        // customize final box-shadow at focused state:
+        [vars.boxShadowFocusFn]: [[
+            cssProps.boxShadowFocus,
+            (colors as any)[`${theme}Transp`],
+        ]],
+    },
 }));
 
 const useStyles = createUseStyles(styles);
@@ -454,13 +497,19 @@ export function useStateLeave(stateEnableDisable: {enabled:boolean}) {
         if (hasHover) return; // already has hover => action is not required
 
         if (leaving) setLeaving(false); // stop leaving anim
-        setHasHover(true);              // mark has hover
+
+        // hovering only possible if element is enabled:
+        if (stateEnableDisable.enabled) setHasHover(true); // mark has hover
     }
     const handleLeaving = () => {
         if (leaving) return; // already being leaving => action is not required
 
-        if (hasHover) setHasHover(false); // mark has leave
-        setLeaving(true);                 // start leaving anim
+        if (hasHover) {
+            setHasHover(false); // mark has leave
+
+            // leaving only possible if was hovered:
+            setLeaving(true); // start leaving anim
+        } // if
     }
     const handleIdle = () => {
         // clean up expired animations
@@ -515,14 +564,20 @@ export function useStateFocusBlur(props: Props, stateEnableDisable: {enabled:boo
         if (hasFocus) return; // already has focus => action is not required
 
         if (blurring) setBlurring(false); // stop blurring anim
-        setHasFocus(true);                // mark has focus
+
+        // focusing only possible if element is enabled:
+        if (stateEnableDisable.enabled) setHasFocus(true); // mark has focus
     }
     const handleBlurring = () => {
         if (focused) return; // already beed focused programatically => cannot be blurred by mouse/keyboard
         if (blurring) return; // already being blurring => action is not required
 
-        if (hasFocus) setHasFocus(false); // mark has blur
-        setBlurring(true);                // start blurring anim
+        if (hasFocus) {
+            setHasFocus(false); // mark has blur
+
+            // blurring only possible if was focused:
+            setBlurring(true); // start blurring anim
+        } // if
     }
     const handleIdle = () => {
         // clean up expired animations

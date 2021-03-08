@@ -2,6 +2,8 @@ import type * as Css       from './Css';
 
 import * as Checks         from './Check';
 import {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
@@ -25,6 +27,8 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    getVar,
+    
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
@@ -54,7 +58,6 @@ export interface CssProps {
 // const center  = 'center';
 
 // internal css vars:
-// const getVar = (name: string) => `var(${name})`;
 export const vars = Object.assign({}, Checks.vars, {
 });
 
