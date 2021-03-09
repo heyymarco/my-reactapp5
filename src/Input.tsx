@@ -4,7 +4,7 @@ import React               from 'react';
 
 import * as Elements       from './Element';
 import * as Controls       from './Control';
-import * as ContControls   from './ContentControl';
+import * as EditControls   from './EditControl';
 import {
     getVar,
     
@@ -20,7 +20,7 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-}                          from './ContentControl';
+}                          from './EditControl';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -57,7 +57,7 @@ export interface CssProps {
 // const middle  = 'middle';
 
 // internal css vars:
-export const vars = ContControls.vars;
+export const vars = EditControls.vars;
 
 // const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
@@ -80,12 +80,12 @@ export { config, cssProps };
 
 
 
-const states = ContControls.states;
+const states = EditControls.states;
 
 const styles = {
     main: {
         extend: [
-            ContControls.styles.main,   // copy styles from ContControl, including ContControl's cssProps & ContControl's states.
+            EditControls.styles.main,   // copy styles from EditControl, including EditControl's cssProps & EditControl's states.
             filterValidProps(cssProps), // apply our filtered cssProps
             states,                     // apply our states
         ],
@@ -122,18 +122,19 @@ export function useVariantInput(props: VariantInput, styles: Record<string, stri
 
 export interface Props
     extends
-        ContControls.Props,
+        EditControls.Props,
         VariantInput
 {
-    defaultValue?        : string
+    defaultValue? : string | number | ReadonlyArray<string>
+    type?         : Css.InputType
 }
 export default function Input(props: Props) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
-    const contCtrlStyles = ContControls.useStyles();
+    const editCtrlStyles = EditControls.useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, contCtrlStyles);
+    const variTheme      = Elements.useVariantTheme(props, editCtrlStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variInput      =          useVariantInput(props, styles);
 
@@ -159,7 +160,7 @@ export default function Input(props: Props) {
 
             disabled={stateEnbDis.disabled}
 
-            type='text'
+            type={props.type}
             defaultValue={props.defaultValue}
         
             onMouseEnter={stateLeave.handleMouseEnter}

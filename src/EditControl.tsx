@@ -73,7 +73,7 @@ const _cssProps: CssProps = {
 // convert _cssProps => varProps => cssProps:
 const collection = new JssVarCollection(
     /*cssProps :*/ _cssProps as { [index: string]: any },
-    /*config   :*/ { varPrefix: 'cctrl'}
+    /*config   :*/ { varPrefix: 'ectrl'}
 );
 const config   = collection.config;
 const cssProps = collection.varProps as typeof _cssProps;
@@ -150,7 +150,7 @@ export interface Props
         Controls.Props
 {
 }
-export default function ContentControl(props: Props) {
+export default function EditControl(props: Props) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
 

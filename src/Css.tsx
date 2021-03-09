@@ -42,3 +42,6 @@ export type Gap             = string | 0
 
 
 export type AlignItems      = 'center' | 'start' | 'end' | 'stretch'
+
+export type InputTextLike   = 'text'|'number'|'email'|'tel'|'password'|'search'|'url'|'date'|'time'|'datetime-local'|'week'|'month'
+export type InputType       = InputTextLike | 'color'|'file'|'range'
