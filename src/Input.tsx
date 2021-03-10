@@ -100,7 +100,8 @@ const styles = {
         '--elm-backgGrad': cssProps.backgGrad,
         
         // appearance settings:
-        display  : 'block',
+        display    : 'flex',
+        alignItems : 'center',
 
         // typo settings:
         verticalAlign  : 'baseline',
@@ -202,6 +203,7 @@ export default function Input(props: Props) {
                 type={props.type ?? 'text'}
                 defaultValue={props.defaultValue}
             />
+            
         </span>
     );
     // return (

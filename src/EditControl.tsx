@@ -60,6 +60,8 @@ export interface CssProps {
 
 
     // anim props:
+    backgValid             : Css.Background
+    backgInvalid           : Css.Background
 
     '@keyframes valid'     : Css.Keyframes
     '@keyframes unvalid'   : Css.Keyframes
@@ -78,8 +80,7 @@ export interface CssProps {
 
 // internal css vars:
 export const vars = Object.assign({}, Controls.vars, Icons.vars, {
-    backgVal         : '--ectrl-backgVal',
-    backgInv         : '--ectrl-backgInv',
+    backgValInv      : '--ectrl-backgValInv',
 
 
     // anim props:
@@ -89,8 +90,8 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
 });
 
 // re-defined later, we need to construct varProps first
-export const keyframesValid     = { from: undefined, '1%': undefined, to: undefined };
-export const keyframesUnvalid   = { from: undefined, '1%': undefined, to: undefined };
+export const keyframesValid     = { from: undefined, to: undefined };
+export const keyframesUnvalid   = { from: undefined, to: undefined };
 export const keyframesInvalid   = { from: undefined, to: undefined };
 export const keyframesUninvalid = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
@@ -102,6 +103,8 @@ const _cssProps: CssProps = {
 
 
     // anim props:
+    backgValid             : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#000' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/></svg>")}")`,
+    backgInvalid           : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#000' d='M7.3,6.31,5,4,7.28,1.71a.7.7,0,1,0-1-1L4,3,1.71.72a.7.7,0,1,0-1,1L3,4,.7,6.31a.7.7,0,0,0,1,1L4,5,6.31,7.3A.7.7,0,0,0,7.3,6.31Z'/></svg>")}")`,
 
     '@keyframes valid'     : keyframesValid,
     '@keyframes unvalid'   : keyframesUnvalid,
@@ -117,37 +120,20 @@ const _cssProps: CssProps = {
 
 Object.assign(keyframesValid, {
     from: {
-        backg: [
-            'linear-gradient(transparent,transparent) right',
-            getVar(vars.backgFn),
-        ],
     },
-    '1%': {
-        backg: [
-            `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#000' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/></svg>")}") right/1em no-repeat content-box`,
-            getVar(vars.backgFn),
-        ],
-    },
+    to: {
+    }
 });
-keyframesValid.to = keyframesValid['1%'];
 Object.assign(keyframesUnvalid, {
     from : keyframesValid.to,
-    '1%' : keyframesValid['1%'],
     to   : keyframesValid.from
 });
 
 Object.assign(keyframesInvalid, {
     from: {
-        backg: [
-            'linear-gradient(transparent, transparent) right no-repeat content-box',
-            getVar(vars.backgFn),
-        ],
     },
     to: {
-        backg: [
-            `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#000' d='M7.3,6.31,5,4,7.28,1.71a.7.7,0,1,0-1-1L4,3,1.71.72a.7.7,0,1,0-1,1L3,4,.7,6.31a.7.7,0,0,0,1,1L4,5,6.31,7.3A.7.7,0,0,0,7.3,6.31Z'/></svg>")}") right no-repeat content-box`,
-            getVar(vars.backgFn),
-        ],
+        transform: 'none',
     }
 });
 Object.assign(keyframesUninvalid, {
@@ -291,10 +277,8 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     // all initial states are none:
 
-    [vars.backgVal]         : 'linear-gradient(transparent,transparent)',
+    [vars.backgValInv]      : 'linear-gradient(transparent,transparent)',
     [vars.animValUnval]     : ecssProps.animNone,
-
-    [vars.backgInv]         : 'linear-gradient(transparent,transparent)',
     [vars.animInvalUninval] : ecssProps.animNone,
 
     // specific states:
@@ -330,9 +314,9 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
 
         // stateValidUnvalid({
-        //     [vars.backgVal]         : cssProps.backgValid,
         // }),
         stateValid({
+            [vars.backgValInv]      : cssProps.backgValid,
             [vars.animValUnval]     : cssProps.animValid,
         }),
         stateUnvalid({
@@ -340,9 +324,9 @@ const states = {extend:[ Controls.states, { // copy Control's states
         }),
 
         // stateInvalidUninvalid({
-        //     [vars.backgInv]         : cssProps.backgInvalid,
         // }),
         stateInvalid({
+            [vars.backgValInv]      : cssProps.backgInvalid,
             [vars.animInvalUninval] : cssProps.animInvalid,
         }),
         stateUninvalid({
@@ -369,7 +353,16 @@ const styles = {
             content : '""',
             display : 'inline-block',
 
-            [vars.img]: `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#000' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/></svg>")}")`,
+            height                 : '1em',     // follow parent text height
+            width                  : '1.25em',  // make sure the icon's image ratio is 1.25 or less
+            marginInlineStart      : '-1.25em', // cancel-out icon's width with negative margin, so it doen't take up space
+            maskPosition           : 'right',   // align to right
+            '-webkit-maskPosition' : 'right',   // align to right
+            pointerEvents          : 'none',    // just an overlayed element, no mouse interaction
+
+
+            [vars.img] : getVar(vars.backgValInv),
+            backg      : getVar(vars.colorOl),
         },
     },
 };
