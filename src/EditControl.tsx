@@ -84,10 +84,44 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     backgValInv      : '--ectrl-backgValInv',
 
 
+
+    /**
+     * valid-state foreground color.
+     */
+    colorIfVal          : '--indi-colorIfVal',
+
+    /**
+     * valid-state background color.
+     */
+    backgIfVal          : '--indi-backgIfVal',
+
+    /**
+     * valid-state foreground color at outlined state.
+     */
+    outlineColorIfVal   : '--indi-outlineColorIfVal',
+
+
+    /**
+     * invalid-state foreground color.
+     */
+    colorIfInv          : '--indi-colorIfInv',
+
+    /**
+     * invalid-state background color.
+     */
+    backgIfInv          : '--indi-backgIfInv',
+
+    /**
+     * invalid-state foreground color at outlined state.
+     */
+    outlineColorIfInv   : '--indi-outlineColorIfInv',
+
+
+
     // anim props:
 
-    animValUnval     : '--ectrl-animValUnval',
-    animInvalUninval : '--ectrl-animInvalUninval',
+    animValUnval : '--ectrl-animValUnval',
+    animInvUninv : '--ectrl-animInvUninv',
 });
 
 // re-defined later, we need to construct varProps first
@@ -111,10 +145,10 @@ const _cssProps: CssProps = {
     '@keyframes unvalid'   : keyframesUnvalid,
     '@keyframes invalid'   : keyframesInvalid,
     '@keyframes uninvalid' : keyframesUninvalid,
-    animValid              : [['3000ms', 'ease-out', 'both', keyframesValid    ]],
-    animUnvalid            : [['3000ms',  'ease-out', 'both', keyframesUnvalid  ]],
-    animInvalid            : [['3000ms',  'ease-out', 'both', keyframesInvalid  ]],
-    animUninvalid          : [['3000ms', 'ease-out', 'both', keyframesUninvalid]],
+    animValid              : [['500ms',  'ease-out', 'both', keyframesValid    ]],
+    animUnvalid            : [['100ms',  'ease-out', 'both', keyframesUnvalid  ]],
+    animInvalid            : [['1000ms', 'ease-out', 'both', keyframesInvalid  ]],
+    animUninvalid          : [['100ms',  'ease-out', 'both', keyframesUninvalid]],
 };
 
 
@@ -123,6 +157,7 @@ Object.assign(keyframesValid, {
     from: {
     },
     to: {
+        transform: 'none',
     }
 });
 Object.assign(keyframesUnvalid, {
@@ -133,13 +168,27 @@ Object.assign(keyframesUnvalid, {
 Object.assign(keyframesInvalid, {
     from: {
     },
+    '10%, 90%': {
+        transform: 'translate3d(-1px, 0, 0)',
+    },
+    '20%, 80%': {
+        transform: 'translate3d(2px, 0, 0)',
+    },
+    '30%, 50%, 70%': {
+        transform: 'translate3d(-4px, 0, 0)',
+    },
+    '40%, 60%': {
+        transform: 'translate3d(4px, 0, 0)',
+    },
     to: {
         transform: 'none',
     }
 });
 Object.assign(keyframesUninvalid, {
-    from : keyframesInvalid.to,
-    to   : keyframesInvalid.from
+    from: {
+    },
+    to: {
+    }
 });
 
 
@@ -263,11 +312,23 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
 
 
+    // valid colors:
+    [vars.colorIfVal]        : colors.successCont,
+    [vars.backgIfVal]        : `linear-gradient(${colors.successThin},${colors.successThin})`,
+    [vars.outlineColorIfVal] : colors.success,
+
+    // invalid colors:
+    [vars.colorIfInv]        : colors.dangerCont,
+    [vars.backgIfInv]        : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
+    [vars.outlineColorIfInv] : colors.danger,
+
+
+
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
         getVar(vars.animValUnval),
-        getVar(vars.animInvalUninval),
+        getVar(vars.animInvUninv),
         getVar(vars.animEnableDisable), // 1st : ctrl must be enable
         getVar(vars.animHoverLeave),    // 2nd : cursor hovered over ctrl
         getVar(vars.animFocusBlur),     // 3rd : ctrl got focused (can interrupt hover/leave)
@@ -278,9 +339,9 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     // all initial states are none:
 
-    [vars.backgValInv]      : 'linear-gradient(transparent,transparent)',
-    [vars.animValUnval]     : ecssProps.animNone,
-    [vars.animInvalUninval] : ecssProps.animNone,
+    [vars.backgValInv]  : 'linear-gradient(transparent,transparent)',
+    [vars.animValUnval] : ecssProps.animNone,
+    [vars.animInvUninv] : ecssProps.animNone,
 
     // specific states:
     extend:[
@@ -290,7 +351,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
                 [vars.animFn]: [
                     ecssProps.anim,
                     getVar(vars.animValUnval),
-                    getVar(vars.animInvalUninval),
+                    getVar(vars.animInvUninv),
                     getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
                     getVar(vars.animHoverLeave),    // 2nd : cursor leaved
                     getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus (can interrupt hover/leave)
@@ -302,7 +363,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
                     [vars.animFn]: [
                         ecssProps.anim,
                         getVar(vars.animValUnval),
-                        getVar(vars.animInvalUninval),
+                        getVar(vars.animInvUninv),
                         getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
                         getVar(vars.animHoverLeave),    // 2nd : cursor leaved, should not happened, move to low priority
                         getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus, might happened programaticaly, move to low priority (can interrupt hover/leave)
@@ -319,6 +380,11 @@ const states = {extend:[ Controls.states, { // copy Control's states
         stateValid({
             [vars.backgValInv]      : cssProps.backgValid,
             [vars.animValUnval]     : cssProps.animValid,
+
+            // apply valid colors:
+            [vars.colorIfIf]        : getVar(vars.colorIfVal),
+            [vars.backgIfIf]        : getVar(vars.backgIfVal),
+            [vars.outlineColorIfIf] : getVar(vars.outlineColorIfVal),
         }),
         stateUnvalid({
             [vars.animValUnval]     : cssProps.animUnvalid,
@@ -328,10 +394,15 @@ const states = {extend:[ Controls.states, { // copy Control's states
         // }),
         stateInvalid({
             [vars.backgValInv]      : cssProps.backgInvalid,
-            [vars.animInvalUninval] : cssProps.animInvalid,
+            [vars.animInvUninv]     : cssProps.animInvalid,
+
+            // apply invalid colors:
+            [vars.colorIfIf]        : getVar(vars.colorIfInv),
+            [vars.backgIfIf]        : getVar(vars.backgIfInv),
+            [vars.outlineColorIfIf] : getVar(vars.outlineColorIfInv),
         }),
         stateUninvalid({
-            [vars.animInvalUninval] : cssProps.animUninvalid,
+            [vars.animInvUninv]     : cssProps.animUninvalid,
         }),
     ],
 }]};

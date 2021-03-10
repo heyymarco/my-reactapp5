@@ -348,12 +348,15 @@ const nextElm = '& >:nth-child(1n+2)';
 
 const childFocusableStates = {extend:[ Controls.states, { // copy Control's states
     [vars.colorTh]             : undefined, // ihnerit from <label>'s theme
+    [vars.colorIfIf]           : undefined, // ihnerit from <label>'s theme
     [vars.colorIf]             : undefined, // ihnerit from <label>'s theme
     [vars.colorFn]             : undefined, // ihnerit from <label>'s theme
     [vars.backgTh]             : undefined, // ihnerit from <label>'s theme
+    [vars.backgIfIf]           : undefined, // ihnerit from <label>'s theme
     [vars.backgIf]             : undefined, // ihnerit from <label>'s theme
     [vars.backgFn]             : undefined, // ihnerit from <label>'s theme
     [vars.outlineColorTh]      : undefined, // ihnerit from <label>'s theme
+    [vars.outlineColorIfIf]    : undefined, // ihnerit from <label>'s theme
     [vars.outlineColorIf]      : undefined, // ihnerit from <label>'s theme
     [vars.outlineColorFn]      : undefined, // ihnerit from <label>'s theme
     [vars.outlineBackgFn]      : undefined, // ihnerit from <label>'s theme

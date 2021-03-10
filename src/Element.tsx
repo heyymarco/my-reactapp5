@@ -82,37 +82,47 @@ export interface CssProps
 const inherit = 'inherit';
 
 // internal css vars:
-export const getVar = (name: string, fallback?: string) => fallback ? `var(${name},var(${fallback}))` : `var(${name})`;
+export const getVar = (name: string, fallback1?: string, fallback2?: string) => fallback1 ? (fallback2 ? `var(${name},var(${fallback1},var(${fallback2})))` : `var(${name},var(${fallback1}))`) : `var(${name})`;
 export const vars = {
     /**
      * themed foreground color.
      */
-    colorTh : '--elm-colorTh',
+    colorTh   : '--elm-colorTh',
+
+    /**
+     * conditional foreground color.
+     */
+    colorIfIf : '--elm-colorIfIf',
 
     /**
      * conditional unthemed foreground color.
      */
-    colorIf : '--elm-colorIf',
+    colorIf   : '--elm-colorIf',
 
     /**
      * final foreground color.
      */
-    colorFn : '--elm-colorFn',
+    colorFn   : '--elm-colorFn',
 
     /**
      * themed background color.
      */
-    backgTh : '--elm-backgTh',
+    backgTh   : '--elm-backgTh',
+
+    /**
+     * conditional background color.
+     */
+    backgIfIf : '--elm-backgIfIf',
 
     /**
      * conditional unthemed background color.
      */
-    backgIf : '--elm-backgIf',
+    backgIf   : '--elm-backgIf',
 
     /**
      * final composite background(s).
      */
-    backgFn : '--elm-backgFn',
+    backgFn   : '--elm-backgFn',
 
 
 
@@ -120,6 +130,11 @@ export const vars = {
      * themed foreground color at outlined state.
      */
     outlineColorTh   : '--elm-outlineColorTh',
+
+    /**
+     * conditional foreground color at outlined state.
+     */
+    outlineColorIfIf : '--elm-outlineColorIfIf',
 
     /**
      * conditional unthemed foreground color at outlined state.
@@ -236,8 +251,9 @@ const states = {
 
     // customize final foreground color:
     [vars.colorFn] : getVar(
-        vars.colorTh, // first  priority
-        vars.colorIf  // second priority
+        vars.colorIfIf, // first  priority
+        vars.colorTh,   // second priority
+        vars.colorIf    // third  priority
     ),
 
     // customize conditional unthemed background color:
@@ -246,8 +262,9 @@ const states = {
     // customize final composite background(s):
     [vars.backgFn] : [
         getVar(
-            vars.backgTh, // first  priority
-            vars.backgIf  // second priority
+            vars.backgIfIf, // first  priority
+            vars.backgTh,   // second priority
+            vars.backgIf    // third  priority
         ),
         cssProps.backg,
     ],
@@ -259,8 +276,9 @@ const states = {
 
     // customize final foreground color at outlined state:
     [vars.outlineColorFn] : getVar(
-        vars.outlineColorTh, // first  priority
-        vars.outlineColorIf  // second priority
+        vars.outlineColorIfIf, // first  priority
+        vars.outlineColorTh,   // second priority
+        vars.outlineColorIf    // third  priority
     ),
 
     // customize final composite background(s) at outlined state:
@@ -311,8 +329,9 @@ const styles = {
                 cssProps.backgGrad,
 
                 getVar(
-                    vars.backgTh, // first  priority
-                    vars.backgIf  // second priority
+                    vars.backgIfIf, // first  priority
+                    vars.backgTh,   // second priority
+                    vars.backgIf    // third  priority
                 ),
                 cssProps.backg,
             ],

@@ -305,7 +305,7 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
     // customize active unthemed background color:
     [vars.backgIfAct] : `linear-gradient(${colors.primary},${colors.primary})`,
 
-    // customize active conditional unthemed foreground color at outlined state:
+    // customize active unthemed foreground color at outlined state:
     [vars.outlineColorIfAct] : colors.primary,
 
 
