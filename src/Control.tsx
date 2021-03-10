@@ -9,6 +9,7 @@ import
 import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -28,6 +29,7 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -585,6 +587,11 @@ export function useStateFocusBlur(props: Props, stateEnableDisable: {enabled:boo
         if (blurring) setBlurring(false);
     }
     return {
+        /**
+         * partially/fully focus
+        */
+        focus  : hasFocus,
+
         class: blurring ? 'blur' : ((focused && stateEnableDisable.enabled) ? 'focus' : null),
         handleFocus        : handleFocus,
         handleBlur         : handleBlurring,

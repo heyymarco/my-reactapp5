@@ -2,6 +2,7 @@ import type * as Css       from './Css';
 
 import * as Checks         from './Check';
 import {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -16,8 +17,6 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-
-    escapeSvg,
 }                          from './Check';
 import * as border         from './borders';
 
@@ -27,6 +26,7 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -41,8 +41,6 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-
-    escapeSvg,
 };
 
 

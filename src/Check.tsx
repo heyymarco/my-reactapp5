@@ -10,6 +10,7 @@ import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import * as Controls       from './Control';
 import {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -36,6 +37,7 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -50,25 +52,6 @@ export {
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
 };
-
-
-
-export function escapeSvg(svg: string) {
-    const svgCopy = Array.from(svg);
-    const escapeChars: { [key: string]: string } = {
-        '<': '%3c',
-        '>': '%3e',
-        '#': '%23',
-        '(': '%28',
-        ')': '%29',
-    };
-    for (const index in svgCopy) {
-        const char = svgCopy[index];
-        if (char in escapeChars) svgCopy[index] = escapeChars[char];
-    }
-
-    return svgCopy.join('');
-}
 
 
 

@@ -8,6 +8,7 @@ import
 
 import * as Elements       from './Element';
 import {
+    escapeSvg,
     getVar,
 
     filterValidProps, filterPrefixProps,
@@ -22,6 +23,7 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    escapeSvg,
     getVar,
     
     filterValidProps, filterPrefixProps,

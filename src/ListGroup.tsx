@@ -5,6 +5,7 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Contents       from './Content';
 import {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -27,6 +28,7 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -144,12 +146,7 @@ const styles = {
         }, // wrapper element
     },
     gradient: {
-        '& >li >.lg-wrapper': {
-            extend: [
-                // copy the themes from Content:
-                Contents.styles.gradient,
-            ],
-        },
+        '& >li >.lg-wrapper': Contents.styles.gradient,
     },
 };
 

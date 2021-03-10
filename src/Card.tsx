@@ -5,6 +5,7 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Contents       from './Content';
 import {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -27,6 +28,7 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,

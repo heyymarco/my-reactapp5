@@ -6,6 +6,7 @@ import * as Elements       from './Element';
 import * as Controls       from './Control';
 import * as EditControls   from './EditControl';
 import {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -20,7 +21,9 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
+    useStateValidInvalid,
 }                          from './EditControl';
+import stripOuts           from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -29,6 +32,7 @@ import { pascalCase }      from 'pascal-case';
 
 
 export {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -43,6 +47,7 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
+    useStateValidInvalid,
 };
 
 
@@ -59,7 +64,7 @@ export interface CssProps {
 // internal css vars:
 export const vars = EditControls.vars;
 
-// const ecssProps = Elements.cssProps;
+const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     backgGrad         : [['linear-gradient(180deg, rgba(0,0,0, 0.2), rgba(255,255,255, 0.2))', 'border-box']],
@@ -80,6 +85,8 @@ export { config, cssProps };
 
 
 
+const inpElm  = '& >:first-child';
+
 const states = EditControls.states;
 
 const styles = {
@@ -93,14 +100,31 @@ const styles = {
         '--elm-backgGrad': cssProps.backgGrad,
         
         // appearance settings:
-        display        : 'block',
-        fallbacks: [
-            {width: '-webkit-fill-available'},
-            {width: '-moz-available'}
-        ],
+        display  : 'block',
 
         // typo settings:
         verticalAlign  : 'baseline',
+
+
+        [inpElm]: {
+            extend: [
+                stripOuts.control,
+            ],
+
+            // appearance settings:
+            display  : 'inherit',
+            marginX  : [['calc(0px -', ecssProps.paddingX, ')']],
+            marginY  : [['calc(0px -', ecssProps.paddingY, ')']],
+            paddingX : ecssProps.paddingX,
+            paddingY : ecssProps.paddingY,
+
+
+            // strip out prop [size]:
+            fallbacks: [
+                {width: '-webkit-fill-available'},
+                {width: '-moz-available'},
+            ],
+        },
     },
     inpOutline: Controls.styles.outline,
 };
@@ -141,11 +165,12 @@ export default function Input(props: Props) {
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
+    const stateValInval  = useStateValidInvalid(props);
 
     
 
     return (
-        <input className={[
+        <span className={[
                 styles.main,
 
                 variSize.class,
@@ -153,25 +178,62 @@ export default function Input(props: Props) {
                 variGradient.class,
                 variInput.class,
 
-                stateEnbDis.class,
+                stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateLeave.class,
-                stateFocusBlur.class,
+                stateFocusBlur.class ?? (stateFocusBlur.focus ? 'focus' : null),
+                stateValInval.class,
             ].join(' ')}
-
-            disabled={stateEnbDis.disabled}
-
-            type={props.type}
-            defaultValue={props.defaultValue}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
-            onFocus={stateFocusBlur.handleFocus}
-            onBlur={stateFocusBlur.handleBlur}
             onAnimationEnd={(e) => {
                 stateEnbDis.handleAnimationEnd(e);
                 stateLeave.handleAnimationEnd(e);
                 stateFocusBlur.handleAnimationEnd(e);
+                stateValInval.handleAnimationEnd(e);
             }}
-        />
+        >
+            <input
+                disabled={stateEnbDis.disabled}
+
+                onFocus={stateFocusBlur.handleFocus}
+                onBlur={stateFocusBlur.handleBlur}
+    
+                type={props.type ?? 'text'}
+                defaultValue={props.defaultValue}
+            />
+        </span>
     );
+    // return (
+    //     <input className={[
+    //             styles.main,
+
+    //             variSize.class,
+    //             variTheme.class,
+    //             variGradient.class,
+    //             variInput.class,
+
+    //             stateEnbDis.class,
+    //             stateLeave.class,
+    //             stateFocusBlur.class,
+    //             stateValInval.class,
+    //         ].join(' ')}
+
+    //         disabled={stateEnbDis.disabled}
+
+    //         type={props.type ?? 'text'}
+    //         defaultValue={props.defaultValue}
+        
+    //         onMouseEnter={stateLeave.handleMouseEnter}
+    //         onMouseLeave={stateLeave.handleMouseLeave}
+    //         onFocus={stateFocusBlur.handleFocus}
+    //         onBlur={stateFocusBlur.handleBlur}
+    //         onAnimationEnd={(e) => {
+    //             stateEnbDis.handleAnimationEnd(e);
+    //             stateLeave.handleAnimationEnd(e);
+    //             stateFocusBlur.handleAnimationEnd(e);
+    //             stateValInval.handleAnimationEnd(e);
+    //         }}
+    //     />
+    // );
 }

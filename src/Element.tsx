@@ -19,6 +19,25 @@ import { camelCase }       from 'camel-case';
 
 
 
+export function escapeSvg(svg: string) {
+    const svgCopy = Array.from(svg);
+    const escapeChars: { [key: string]: string } = {
+        '<': '%3c',
+        '>': '%3e',
+        '#': '%23',
+        '(': '%28',
+        ')': '%29',
+    };
+    for (const index in svgCopy) {
+        const char = svgCopy[index];
+        if (char in escapeChars) svgCopy[index] = escapeChars[char];
+    }
+
+    return svgCopy.join('');
+}
+
+
+
 export interface CssProps
     extends typoBase.CssProps {
 
@@ -150,6 +169,7 @@ const _cssProps: CssProps = {
 
     transition        : [
         ['background' , '300ms', 'ease-out'],
+        ['background-size' , '300ms', 'ease-out'],
         ['color'      , '300ms', 'ease-out'],
         ['border'     , '300ms', 'ease-out'],
         ['font-size'  , '300ms', 'ease-out'],
@@ -186,7 +206,7 @@ export { config, cssProps };
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
-        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Check|Clear|Hover|Leave|Focus|Blur)$|^(@)|color|backg|backgGrad|anim|orientation|align/).test(key)) continue;
+        if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Check|Clear|Hover|Leave|Focus|Blur|Valid|Unvalid|Invalid|Uninvalid)$|^(@)|color|backg|backgGrad|anim|orientation|align/).test(key)) continue;
         cssPropsCopy[key] = value;
     }
     return cssPropsCopy;
@@ -211,7 +231,7 @@ const states = {
     ),
 
     // customize conditional unthemed background color:
-    [vars.backgIf] : `linear-gradient(transparent,transparent)`,
+    [vars.backgIf] : 'linear-gradient(transparent,transparent)',
 
     // customize final composite background(s):
     [vars.backgFn] : [
@@ -273,7 +293,11 @@ const styles = {
             // customize final composite background(s):
             [vars.backgFn] : [
                 cssProps.backgGrad,
-                getVar(vars.backgTh, vars.backgIf),
+
+                getVar(
+                    vars.backgTh, // first  priority
+                    vars.backgIf  // second priority
+                ),
                 cssProps.backg,
             ],
 

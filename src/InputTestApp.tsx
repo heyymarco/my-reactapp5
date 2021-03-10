@@ -44,20 +44,17 @@ const jss = createJss().setup({plugins:[
 export default function App (props: any) {
     const [enableGrad, setEnableGrad] = useState(false);
 	const [enable,     setEnable    ] = useState(true);
-	const [active, 	   setActive    ] = useState(false);
 	const [focus, 	   setFocus     ] = useState(false);
 	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
 	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
 	const [inpStyle,   setInpStyle  ] = useState<'outline'|undefined>(undefined);
+	const [isValid,    setIsValid   ] = useState<boolean|undefined>(undefined);
 
     const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnableGrad(e.target.checked);
 	}
 	const handleChangeEnable = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnable(e.target.checked);
-	}
-	const handleChangeActive = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setActive(e.target.checked);
 	}
 	const handleChangeFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFocus(e.target.checked);
@@ -71,12 +68,16 @@ export default function App (props: any) {
 	const handleChangeInpStyle = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInpStyle((e.target.value || undefined) as ('outline'|undefined));
 	}
+	const handleChangeIsValid = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setIsValid((e.target.value === '') ? undefined : !!(+e.target.value));
+	}
 
 
 	return (
         <JssProvider jss={jss}>
             <Container style={{minHeight: '100vh'}}>
-				<Input defaultValue={theme ?? 'default'} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
+				Hello
+				<Input defaultValue={theme ?? 'default'} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} isValid={isValid} focus={focus}
 					inpStyle={inpStyle as Inputs.InpStyle}
 				/>
 
@@ -95,13 +96,6 @@ export default function App (props: any) {
 						onChange={handleChangeEnable}
 					/>
 					enabled
-				</label>
-				<label>
-					<input type='checkbox'
-						checked={active}
-						onChange={handleChangeActive}
-					/>
-					active
 				</label>
 				<label>
 					<input type='checkbox'
@@ -163,6 +157,22 @@ export default function App (props: any) {
 									onChange={handleChangeInpStyle}
 								/>
 								{`${s}`}
+							</label>
+						)
+					}
+				</p>
+				
+				<p>
+					IsValid:
+					{
+						[undefined, true, false].map(v =>
+							<label key={v ? 1 : ((v===false) ? 0 : -1)}>
+								<input type='radio'
+									value={v ? 1 : ((v===false) ? 0 : undefined)}
+									checked={isValid===v}
+									onChange={handleChangeIsValid}
+								/>
+								{`${v ? 'valid' : ((v === false) ? 'invalid' : 'unset')}`}
 							</label>
 						)
 					}

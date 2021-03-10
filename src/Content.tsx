@@ -5,6 +5,7 @@ import React               from 'react';
 import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -26,6 +27,7 @@ import JssVarCollection    from './jss-var-collection';
 
 
 export {
+    escapeSvg,
     getVar,
     
     stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
@@ -192,9 +194,13 @@ const styles = {
 
         '&:not(._)': { // force to win conflict with main
             // customize the backg at active state:
-            [vars.activeBackgFn]: [
+            [vars.activeBackgFn] : [
                 ecssProps.backgGrad,
-                getVar(vars.activeBackgTh),
+
+                getVar(
+                    vars.activeBackgTh, // first  priority
+                    vars.backgIfAct     // second priority
+                ),
                 ecssProps.backg,
             ],
         },
