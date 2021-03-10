@@ -353,8 +353,14 @@ const childFocusableStates = {extend:[ Controls.states, { // copy Control's stat
     [vars.backgTh]             : undefined, // ihnerit from <label>'s theme
     [vars.backgIf]             : undefined, // ihnerit from <label>'s theme
     [vars.backgFn]             : undefined, // ihnerit from <label>'s theme
-    [vars.colorOl]             : undefined, // ihnerit from <label>'s theme
-    [vars.backgOl]             : undefined, // ihnerit from <label>'s theme
+    [vars.outlineColorTh]      : undefined, // ihnerit from <label>'s theme
+    [vars.outlineColorIf]      : undefined, // ihnerit from <label>'s theme
+    [vars.outlineColorFn]      : undefined, // ihnerit from <label>'s theme
+    [vars.outlineBackgFn]      : undefined, // ihnerit from <label>'s theme
+
+    [vars.colorIfAct]          : undefined, // ihnerit from <label>'s theme
+    [vars.backgIfAct]          : undefined, // ihnerit from <label>'s theme
+
     [vars.boxShadowFocusFn]    : undefined, // ihnerit from <label>'s theme
 
 

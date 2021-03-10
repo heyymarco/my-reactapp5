@@ -57,12 +57,17 @@ export const vars = Object.assign({}, Elements.vars, {
     /**
      * active unthemed foreground color.
      */
-    colorIfAct        : '--indi-colorIfAct',
+    colorIfAct          : '--indi-colorIfAct',
 
     /**
      * active unthemed background color.
      */
-    backgIfAct        : '--indi-backgIfAct',
+    backgIfAct          : '--indi-backgIfAct',
+
+    /**
+     * active conditional unthemed foreground color at outlined state.
+     */
+    outlineColorIfAct   : '--indi-outlineColorIfAct',
 
 
 
@@ -248,10 +253,13 @@ export const stateNoAnimStartup = () =>
 
 const states = {extend:[ Elements.states, { // copy Element's states
     // customize active unthemed foreground color:
-    [vars.colorIfAct] : colors.primaryText,
+    [vars.colorIfAct]        : colors.primaryText,
 
     // customize active unthemed background color:
-    [vars.backgIfAct] : `linear-gradient(${colors.primary},${colors.primary})`,
+    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
+
+    // customize active conditional unthemed foreground color at outlined state:
+    [vars.outlineColorIfAct] : colors.primary,
 
 
 
@@ -299,8 +307,9 @@ const states = {extend:[ Elements.states, { // copy Element's states
 
             extend:[
                 stateNotDisable({
-                    [vars.colorIf] : getVar(vars.colorIfAct),
-                    [vars.backgIf] : getVar(vars.backgIfAct),
+                    [vars.colorIf]        : getVar(vars.colorIfAct),
+                    [vars.backgIf]        : getVar(vars.backgIfAct),
+                    [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
                 }),
             ],
         }),

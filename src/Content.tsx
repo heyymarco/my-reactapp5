@@ -225,24 +225,24 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     '&:not(._)': { // force to win conflict with states
         // customize the backg & color
 
-        // customize final foreground color with softer color:
-        [vars.colorTh]       : (colors as any)[`${theme}Cont`],
+        // customize themed foreground color with softer color:
+        [vars.colorTh]        : (colors as any)[`${theme}Cont`],
 
         // customize themed background color with softer color:
-        [vars.backgTh]       : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
+        [vars.backgTh]        : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
         
+
+
+        // customize themed foreground color at outlined state:
+        [vars.outlineColorTh] : themeColor,
         
+
         
         // customize themed foreground color at active state:
-        [vars.activeColorTh] : (colors as any)[`${theme}Text`],
+        [vars.activeColorTh]  : (colors as any)[`${theme}Text`],
         
         // customize themed background color at active state:
-        [vars.activeBackgTh] : `linear-gradient(${themeColor},${themeColor})`,
-
-
-
-        // customize final foreground color at outlined state:
-        [vars.colorOl] : themeColor,
+        [vars.activeBackgTh]  : `linear-gradient(${themeColor},${themeColor})`,
     },
 }));
 

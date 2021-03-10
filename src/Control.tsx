@@ -305,6 +305,9 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
     // customize active unthemed background color:
     [vars.backgIfAct] : `linear-gradient(${colors.primary},${colors.primary})`,
 
+    // customize active conditional unthemed foreground color at outlined state:
+    [vars.outlineColorIfAct] : colors.primary,
+
 
 
     // customize final box-shadow at focused state:
@@ -375,14 +378,16 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
                 [vars.filterHoverLeave]           : cssProps.filterHover,
                 [vars.animHoverLeave]             : cssProps.animHover,
 
-                [vars.colorIf] : getVar(vars.colorIfAct),
-                [vars.backgIf] : getVar(vars.backgIfAct),
+                [vars.colorIf]        : getVar(vars.colorIfAct),
+                [vars.backgIf]        : getVar(vars.backgIfAct),
+                [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
             }),
             stateFocus({
                 [vars.animFocusBlur]              : cssProps.animFocus,
 
-                [vars.colorIf] : getVar(vars.colorIfAct),
-                [vars.backgIf] : getVar(vars.backgIfAct),
+                [vars.colorIf]        : getVar(vars.colorIfAct),
+                [vars.backgIf]        : getVar(vars.backgIfAct),
+                [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
             }),
         ]}),
         
@@ -396,8 +401,9 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
 
             extend:[
                 stateNotDisable({
-                    [vars.colorIf] : getVar(vars.colorIfAct),
-                    [vars.backgIf] : getVar(vars.backgIfAct),
+                    [vars.colorIf]        : getVar(vars.colorIfAct),
+                    [vars.backgIf]        : getVar(vars.backgIfAct),
+                    [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
                 }),
             ],
         }),

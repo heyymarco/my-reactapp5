@@ -117,14 +117,24 @@ export const vars = {
 
 
     /**
+     * themed foreground color at outlined state.
+     */
+    outlineColorTh   : '--elm-outlineColorTh',
+
+    /**
+     * conditional unthemed foreground color at outlined state.
+     */
+    outlineColorIf   : '--elm-outlineColorIf',
+
+    /**
      * final foreground color at outlined state.
      */
-    colorOl   : '--elm-colorOl',
+    outlineColorFn   : '--elm-outlineColorFn',
 
     /**
      * final composite background(s) at outlined state.
      */
-    backgOl   : '--elm-backgOl',
+    outlineBackgFn   : '--elm-outlineBackgFn',
 
 
 
@@ -244,11 +254,17 @@ const states = {
 
 
 
+    // customize conditional unthemed foreground color at outlined state:
+    [vars.outlineColorIf] : cssProps.color,
+
     // customize final foreground color at outlined state:
-    [vars.colorOl] : cssProps.color,
+    [vars.outlineColorFn] : getVar(
+        vars.outlineColorTh, // first  priority
+        vars.outlineColorIf  // second priority
+    ),
 
     // customize final composite background(s) at outlined state:
-    [vars.backgOl] : 'transparent',
+    [vars.outlineBackgFn] : 'transparent',
 
 
 
@@ -280,13 +296,13 @@ const styles = {
     },
     outline: {
         // apply final foreground color at outlined state:
-        color       : getVar(vars.colorOl),
+        color       : getVar(vars.outlineColorFn),
 
         // apply final composite background(s) at outlined state:
-        backg       : getVar(vars.backgOl),
+        backg       : getVar(vars.outlineBackgFn),
 
         // set border color = text-color:
-        borderColor : getVar(vars.colorOl),
+        borderColor : getVar(vars.outlineColorFn),
     },
     gradient: {
         '&:not(._)': { // force to win conflict with states
@@ -304,7 +320,7 @@ const styles = {
 
 
             // customize final composite background(s) at outlined state:
-            [vars.backgOl] : cssProps.backgGrad,
+            [vars.outlineBackgFn] : cssProps.backgGrad,
         },
     },
 };
@@ -337,7 +353,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     '&:not(._)': { // force to win conflict with states
         // customize the backg & color
 
-        // customize final foreground color:
+        // customize themed foreground color:
         [vars.colorTh] : (colors as any)[`${theme}Text`],
 
         // customize themed background color:
@@ -345,8 +361,8 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 
 
 
-        // customize final foreground color at outlined state:
-        [vars.colorOl] : themeColor,
+        // customize themed foreground color at outlined state:
+        [vars.outlineColorTh] : themeColor,
     },
 }));
 

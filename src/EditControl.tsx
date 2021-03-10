@@ -7,6 +7,7 @@ import
 }                          from 'react';
 
 import * as Elements       from './Element';
+import * as Contents       from './Content';
 import * as Controls       from './Control';
 import {
     escapeSvg,
@@ -254,10 +255,10 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     // overwrite from Control (replace with softer active (primary) color):
 
-    // customize active unthemed foreground color:
+    // customize active unthemed foreground color with softer color:
     [vars.colorIfAct] : colors.primaryCont,
 
-    // customize active unthemed background color:
+    // customize active unthemed background color with softer color:
     [vars.backgIfAct] : `linear-gradient(${colors.primaryThin},${colors.primaryThin})`,
 
 
@@ -362,7 +363,7 @@ const styles = {
 
 
             [vars.img] : getVar(vars.backgValInv),
-            backg      : getVar(vars.colorOl),
+            backg      : getVar(vars.outlineColorFn),
         },
     },
 };
@@ -371,18 +372,10 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     extend: [
         // copy the themes from Control:
         (Controls.styles as any)[themeProp],
+
+        // then overwrite the themes from Content:
+        (Contents.styles as any)[themeProp],
     ],
-
-
-    '&:not(._)': { // force to win conflict with states
-        // customize the backg & color
-
-        // customize final foreground color with softer color:
-        [vars.colorTh]       : (colors as any)[`${theme}Cont`],
-
-        // customize themed background color with softer color:
-        [vars.backgTh]       : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
-    },
 }));
 
 const useStyles = createUseStyles(styles);
