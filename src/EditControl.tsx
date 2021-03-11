@@ -165,18 +165,23 @@ const _cssProps: CssProps = {
 
 Object.assign(keyframesValid, {
     from: {
+        backg: colors.success,
     },
     to: {
-        transform: 'none',
+        backg: getVar(vars.backgFn),
     }
 });
 Object.assign(keyframesUnvalid, {
-    from : keyframesValid.to,
-    to   : keyframesValid.from
+    from: {
+    },
+    to: {
+        '--noop': 'unval',
+    }
 });
 
 Object.assign(keyframesInvalid, {
     from: {
+        backg: colors.danger,
     },
     '10%, 90%': {
         transform: 'translate3d(-1px, 0, 0)',
@@ -192,12 +197,14 @@ Object.assign(keyframesInvalid, {
     },
     to: {
         transform: 'none',
+        backg: getVar(vars.backgFn),
     }
 });
 Object.assign(keyframesUninvalid, {
     from: {
     },
     to: {
+        '--noop': 'uninval',
     }
 });
 
@@ -216,6 +223,11 @@ export { config, cssProps };
 
 
 
+export const stateValidating                = (content: object) => ({
+    '&.val': {
+        extend: [content]
+    }
+});
 export const stateValid                     = (content: object) => ({
     '&.val,&.vald': {
         extend: [content]
@@ -226,7 +238,7 @@ export const stateNotValid                  = (content: object) => ({
         extend: [content]
     }
 });
-export const stateUnvalid                   = (content: object) => ({
+export const stateUnvalidating              = (content: object) => ({
     '&.unval': {
         extend: [content]
     }
@@ -252,6 +264,11 @@ export const stateNotValidatingUnvalidating = (content: object) => ({
     }
 });
 
+export const stateInvalidating                  = (content: object) => ({
+    '&.inv': {
+        extend: [content]
+    }
+});
 export const stateInvalid                       = (content: object) => ({
     '&.inv,&.invd': {
         extend: [content]
@@ -262,7 +279,7 @@ export const stateNotInvalid                    = (content: object) => ({
         extend: [content]
     }
 });
-export const stateUninvalid                     = (content: object) => ({
+export const stateUninvalidating                = (content: object) => ({
     '&.uninv': {
         extend: [content]
     }
@@ -387,11 +404,11 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
 
 
-        // stateValidUnvalid({
-        // }),
+        stateValidating({
+            [vars.animValUnval]       : cssProps.animValid,
+        }),
         stateValid({
             [vars.backgValInv]        : cssProps.backgValid,
-            [vars.animValUnval]       : cssProps.animValid,
 
             // apply valid colors:
             [vars.colorIfIf]          : getVar(vars.colorIfVal),
@@ -399,15 +416,15 @@ const states = {extend:[ Controls.states, { // copy Control's states
             [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfVal),
             [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfVal),
         }),
-        stateUnvalid({
+        stateUnvalidating({
             [vars.animValUnval]       : cssProps.animUnvalid,
         }),
 
-        // stateInvalidUninvalid({
-        // }),
+        stateInvalidating({
+            [vars.animInvUninv]       : cssProps.animInvalid,
+        }),
         stateInvalid({
             [vars.backgValInv]        : cssProps.backgInvalid,
-            [vars.animInvUninv]       : cssProps.animInvalid,
 
             // apply invalid colors:
             [vars.colorIfIf]          : getVar(vars.colorIfInv),
@@ -415,7 +432,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
             [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfInv),
             [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfInv),
         }),
-        stateUninvalid({
+        stateUninvalidating({
             [vars.animInvUninv]       : cssProps.animUninvalid,
         }),
     ],
