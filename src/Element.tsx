@@ -129,27 +129,27 @@ export const vars = {
     /**
      * themed foreground color at outlined state.
      */
-    outlineColorTh   : '--elm-outlineColorTh',
+    colorOutlineTh   : '--elm-colorOutlineTh',
 
     /**
      * conditional foreground color at outlined state.
      */
-    outlineColorIfIf : '--elm-outlineColorIfIf',
+    colorOutlineIfIf : '--elm-colorOutlineIfIf',
 
     /**
      * conditional unthemed foreground color at outlined state.
      */
-    outlineColorIf   : '--elm-outlineColorIf',
+    colorOutlineIf   : '--elm-colorOutlineIf',
 
     /**
      * final foreground color at outlined state.
      */
-    outlineColorFn   : '--elm-outlineColorFn',
+    colorOutlineFn   : '--elm-colorOutlineFn',
 
     /**
      * final composite background(s) at outlined state.
      */
-    outlineBackgFn   : '--elm-outlineBackgFn',
+    backgOutlineFn   : '--elm-backgOutlineFn',
 
 
 
@@ -272,17 +272,17 @@ const states = {
 
 
     // customize conditional unthemed foreground color at outlined state:
-    [vars.outlineColorIf] : cssProps.color,
+    [vars.colorOutlineIf] : cssProps.color,
 
     // customize final foreground color at outlined state:
-    [vars.outlineColorFn] : getVar(
-        vars.outlineColorIfIf, // first  priority
-        vars.outlineColorTh,   // second priority
-        vars.outlineColorIf    // third  priority
+    [vars.colorOutlineFn] : getVar(
+        vars.colorOutlineIfIf, // first  priority
+        vars.colorOutlineTh,   // second priority
+        vars.colorOutlineIf    // third  priority
     ),
 
     // customize final composite background(s) at outlined state:
-    [vars.outlineBackgFn] : 'transparent',
+    [vars.backgOutlineFn] : 'transparent',
 
 
 
@@ -314,13 +314,13 @@ const styles = {
     },
     outline: {
         // apply final foreground color at outlined state:
-        color       : getVar(vars.outlineColorFn),
+        color       : getVar(vars.colorOutlineFn),
 
         // apply final composite background(s) at outlined state:
-        backg       : getVar(vars.outlineBackgFn),
+        backg       : getVar(vars.backgOutlineFn),
 
         // set border color = text-color:
-        borderColor : getVar(vars.outlineColorFn),
+        borderColor : getVar(vars.colorOutlineFn),
     },
     gradient: {
         '&:not(._)': { // force to win conflict with states
@@ -339,7 +339,7 @@ const styles = {
 
 
             // customize final composite background(s) at outlined state:
-            [vars.outlineBackgFn] : cssProps.backgGrad,
+            [vars.backgOutlineFn] : cssProps.backgGrad,
         },
     },
 };
@@ -369,20 +369,18 @@ export function defineThemes(styles: object, handler: ((theme: string, Theme: st
     }
 }
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    '&:not(._)': { // force to win conflict with states
-        // customize the backg & color
+    // customize the backg & color
 
-        // customize themed foreground color:
-        [vars.colorTh] : (colors as any)[`${theme}Text`],
+    // customize themed foreground color:
+    [vars.colorTh] : (colors as any)[`${theme}Text`],
 
-        // customize themed background color:
-        [vars.backgTh] : `linear-gradient(${themeColor},${themeColor})`,
-
+    // customize themed background color:
+    [vars.backgTh] : `linear-gradient(${themeColor},${themeColor})`,
 
 
-        // customize themed foreground color at outlined state:
-        [vars.outlineColorTh] : themeColor,
-    },
+
+    // customize themed foreground color at outlined state:
+    [vars.colorOutlineTh] : themeColor,
 }));
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);

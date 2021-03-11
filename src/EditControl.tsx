@@ -81,10 +81,6 @@ export interface CssProps {
 
 // internal css vars:
 export const vars = Object.assign({}, Controls.vars, Icons.vars, {
-    backgValInv      : '--ectrl-backgValInv',
-
-
-
     /**
      * valid-state foreground color.
      */
@@ -98,7 +94,12 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     /**
      * valid-state foreground color at outlined state.
      */
-    outlineColorIfVal   : '--indi-outlineColorIfVal',
+    colorOutlineIfVal   : '--indi-colorOutlineIfVal',
+
+    /**
+     * valid-state box-shadow at focused state.
+     */
+    boxShadowFocusIfVal : '--indi-boxShadowFocusIfVal',
 
 
     /**
@@ -114,7 +115,16 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     /**
      * invalid-state foreground color at outlined state.
      */
-    outlineColorIfInv   : '--indi-outlineColorIfInv',
+    colorOutlineIfInv   : '--indi-colorOutlineIfInv',
+
+    /**
+     * invalid-state box-shadow at focused state.
+     */
+    boxShadowFocusIfInv : '--indi-boxShadowFocusIfInv',
+
+
+    
+    backgValInv       : '--ectrl-backgValInv',
 
 
 
@@ -313,14 +323,16 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
 
     // valid colors:
-    [vars.colorIfVal]        : colors.successCont,
-    [vars.backgIfVal]        : `linear-gradient(${colors.successThin},${colors.successThin})`,
-    [vars.outlineColorIfVal] : colors.success,
+    [vars.colorIfVal]          : colors.successCont,
+    [vars.backgIfVal]          : `linear-gradient(${colors.successThin},${colors.successThin})`,
+    [vars.colorOutlineIfVal]   : colors.success,
+    [vars.boxShadowFocusIfVal] : colors.successTransp,
 
     // invalid colors:
-    [vars.colorIfInv]        : colors.dangerCont,
-    [vars.backgIfInv]        : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
-    [vars.outlineColorIfInv] : colors.danger,
+    [vars.colorIfInv]          : colors.dangerCont,
+    [vars.backgIfInv]          : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
+    [vars.colorOutlineIfInv]   : colors.danger,
+    [vars.boxShadowFocusIfInv] : colors.dangerTransp,
 
 
 
@@ -378,31 +390,33 @@ const states = {extend:[ Controls.states, { // copy Control's states
         // stateValidUnvalid({
         // }),
         stateValid({
-            [vars.backgValInv]      : cssProps.backgValid,
-            [vars.animValUnval]     : cssProps.animValid,
+            [vars.backgValInv]        : cssProps.backgValid,
+            [vars.animValUnval]       : cssProps.animValid,
 
             // apply valid colors:
-            [vars.colorIfIf]        : getVar(vars.colorIfVal),
-            [vars.backgIfIf]        : getVar(vars.backgIfVal),
-            [vars.outlineColorIfIf] : getVar(vars.outlineColorIfVal),
+            [vars.colorIfIf]          : getVar(vars.colorIfVal),
+            [vars.backgIfIf]          : getVar(vars.backgIfVal),
+            [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfVal),
+            [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfVal),
         }),
         stateUnvalid({
-            [vars.animValUnval]     : cssProps.animUnvalid,
+            [vars.animValUnval]       : cssProps.animUnvalid,
         }),
 
         // stateInvalidUninvalid({
         // }),
         stateInvalid({
-            [vars.backgValInv]      : cssProps.backgInvalid,
-            [vars.animInvUninv]     : cssProps.animInvalid,
+            [vars.backgValInv]        : cssProps.backgInvalid,
+            [vars.animInvUninv]       : cssProps.animInvalid,
 
             // apply invalid colors:
-            [vars.colorIfIf]        : getVar(vars.colorIfInv),
-            [vars.backgIfIf]        : getVar(vars.backgIfInv),
-            [vars.outlineColorIfIf] : getVar(vars.outlineColorIfInv),
+            [vars.colorIfIf]          : getVar(vars.colorIfInv),
+            [vars.backgIfIf]          : getVar(vars.backgIfInv),
+            [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfInv),
+            [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfInv),
         }),
         stateUninvalid({
-            [vars.animInvUninv]     : cssProps.animUninvalid,
+            [vars.animInvUninv]       : cssProps.animUninvalid,
         }),
     ],
 }]};
@@ -434,7 +448,7 @@ const styles = {
 
 
             [vars.img] : getVar(vars.backgValInv),
-            backg      : getVar(vars.outlineColorFn),
+            backg      : getVar(vars.colorOutlineFn),
         },
     },
 };

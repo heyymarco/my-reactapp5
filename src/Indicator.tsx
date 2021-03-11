@@ -67,7 +67,7 @@ export const vars = Object.assign({}, Elements.vars, {
     /**
      * active unthemed foreground color at outlined state.
      */
-    outlineColorIfAct   : '--indi-outlineColorIfAct',
+    colorOutlineIfAct   : '--indi-colorOutlineIfAct',
 
 
 
@@ -259,7 +259,7 @@ const states = {extend:[ Elements.states, { // copy Element's states
     [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
 
     // customize active unthemed foreground color at outlined state:
-    [vars.outlineColorIfAct] : colors.primary,
+    [vars.colorOutlineIfAct] : colors.primary,
 
 
 
@@ -309,7 +309,7 @@ const states = {extend:[ Elements.states, { // copy Element's states
                 stateNotDisable({
                     [vars.colorIf]        : getVar(vars.colorIfAct),
                     [vars.backgIf]        : getVar(vars.backgIfAct),
-                    [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
+                    [vars.colorOutlineIf] : getVar(vars.colorOutlineIfAct),
                 }),
             ],
         }),

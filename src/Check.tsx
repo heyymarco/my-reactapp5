@@ -92,12 +92,12 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     /**
      * final composite animation(s) at the "icon" element.
      */
-    iconAnimFn          : '--chk-iconAnimFn',
+    animIconFn          : '--chk-animIconFn',
 
     /**
      * foreground color for the label.
      */
-    labelColor          : '--chk-labelColor',
+    colorLabel          : '--chk-colorLabel',
 
 
     // anim props:
@@ -355,11 +355,11 @@ const childFocusableStates = {extend:[ Controls.states, { // copy Control's stat
     [vars.backgIfIf]           : undefined, // ihnerit from <label>'s theme
     [vars.backgIf]             : undefined, // ihnerit from <label>'s theme
     [vars.backgFn]             : undefined, // ihnerit from <label>'s theme
-    [vars.outlineColorTh]      : undefined, // ihnerit from <label>'s theme
-    [vars.outlineColorIfIf]    : undefined, // ihnerit from <label>'s theme
-    [vars.outlineColorIf]      : undefined, // ihnerit from <label>'s theme
-    [vars.outlineColorFn]      : undefined, // ihnerit from <label>'s theme
-    [vars.outlineBackgFn]      : undefined, // ihnerit from <label>'s theme
+    [vars.colorOutlineTh]      : undefined, // ihnerit from <label>'s theme
+    [vars.colorOutlineIfIf]    : undefined, // ihnerit from <label>'s theme
+    [vars.colorOutlineIf]      : undefined, // ihnerit from <label>'s theme
+    [vars.colorOutlineFn]      : undefined, // ihnerit from <label>'s theme
+    [vars.backgOutlineFn]      : undefined, // ihnerit from <label>'s theme
 
     [vars.colorIfAct]          : undefined, // ihnerit from <label>'s theme
     [vars.backgIfAct]          : undefined, // ihnerit from <label>'s theme
@@ -406,12 +406,12 @@ const chkStates = {extend:[ childFocusableStates, { // copy childFocusableStates
 }]};
 const states = {
     // customize foreground color for the label:
-    [vars.labelColor]: ecssProps.color,
+    [vars.colorLabel]: ecssProps.color,
 
 
 
     // customize final composite animation(s) at the "icon" element:
-    [vars.iconAnimFn]: [
+    [vars.animIconFn]: [
         getVar(vars.animCheckClear),
     ],
 
@@ -530,7 +530,7 @@ const chkStyles = {
         
         
         // apply final composite animation(s) at the "icon" element:
-        anim: getVar(vars.iconAnimFn),
+        anim: getVar(vars.animIconFn),
     },
 
 };
@@ -620,7 +620,7 @@ const styles = {
 
 
         // apply foreground color for the label:
-        color : getVar(vars.labelColor),
+        color : getVar(vars.colorLabel),
 
 
 
@@ -676,7 +676,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 
     '&:not(._)': { // force to win conflict with states
         // customize the label's text color:
-        [vars.labelColor] : (colors as any)[`${theme}Cont`],
+        [vars.colorLabel] : (colors as any)[`${theme}Cont`],
     },
 }));
 

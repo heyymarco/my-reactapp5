@@ -61,7 +61,7 @@ const unset   = 'unset';
 export const vars = Contents.vars;
 
 // re-defined later, we need to construct varProps first
-const ecssProps = Elements.cssProps;
+// const ecssProps = Elements.cssProps;
 const ccssProps = Contents.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {

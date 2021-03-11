@@ -70,6 +70,21 @@ export interface CssProps {
 // internal css vars:
 export const vars = Object.assign({}, Indicators.vars, {
     /**
+     * themed box-shadow at focused state.
+     */
+    boxShadowFocusTh    : '--ctrl-boxShadowFocusTh',
+
+    /**
+     * conditional box-shadow at focused state.
+     */
+    boxShadowFocusIfIf  : '--ctrl-boxShadowFocusIfIf',
+
+    /**
+     * conditional unthemed box-shadow at focused state.
+     */
+    boxShadowFocusIf    : '--ctrl-boxShadowFocusIf',
+
+    /**
      * final box-shadow at focused state.
      */
     boxShadowFocusFn    : '--ctrl-boxShadowFocusFn',
@@ -306,14 +321,21 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
     [vars.backgIfAct] : `linear-gradient(${colors.primary},${colors.primary})`,
 
     // customize active unthemed foreground color at outlined state:
-    [vars.outlineColorIfAct] : colors.primary,
+    [vars.colorOutlineIfAct] : colors.primary,
 
 
+
+    // customize conditional unthemed box-shadow at focused state:
+    [vars.boxShadowFocusIf]: colors.primaryTransp,
 
     // customize final box-shadow at focused state:
     [vars.boxShadowFocusFn]: [[
         cssProps.boxShadowFocus,
-        colors.primaryTransp,
+        getVar(
+            vars.boxShadowFocusIfIf, // first  priority
+            vars.boxShadowFocusTh,   // second priority
+            vars.boxShadowFocusIf    // third  priority
+        )
     ]],
 
 
@@ -380,14 +402,14 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
 
                 [vars.colorIf]        : getVar(vars.colorIfAct),
                 [vars.backgIf]        : getVar(vars.backgIfAct),
-                [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
+                [vars.colorOutlineIf] : getVar(vars.colorOutlineIfAct),
             }),
             stateFocus({
                 [vars.animFocusBlur]              : cssProps.animFocus,
 
                 [vars.colorIf]        : getVar(vars.colorIfAct),
                 [vars.backgIf]        : getVar(vars.backgIfAct),
-                [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
+                [vars.colorOutlineIf] : getVar(vars.colorOutlineIfAct),
             }),
         ]}),
         
@@ -403,7 +425,7 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
                 stateNotDisable({
                     [vars.colorIf]        : getVar(vars.colorIfAct),
                     [vars.backgIf]        : getVar(vars.backgIfAct),
-                    [vars.outlineColorIf] : getVar(vars.outlineColorIfAct),
+                    [vars.colorOutlineIf] : getVar(vars.colorOutlineIfAct),
                 }),
             ],
         }),
@@ -472,13 +494,8 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     ],
 
 
-    '&:not(._)': { // force to win conflict with states
-        // customize final box-shadow at focused state:
-        [vars.boxShadowFocusFn]: [[
-            cssProps.boxShadowFocus,
-            (colors as any)[`${theme}Transp`],
-        ]],
-    },
+    // customize themed box-shadow at focused state:
+    [vars.boxShadowFocusTh]: (colors as any)[`${theme}Transp`],
 }));
 
 const useStyles = createUseStyles(styles);

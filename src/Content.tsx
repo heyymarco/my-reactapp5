@@ -72,22 +72,22 @@ export const vars = Object.assign({}, Indicators.vars, {
     /**
      * themed foreground color at active state.
      */
-    activeColorTh : '--ct-activeColorTh',
+    colorActiveTh : '--ct-colorActiveTh',
 
     /**
      * final foreground color at active state.
      */
-    activeColorFn : '--ct-activeColorFn',
+    colorActiveFn : '--ct-colorActiveFn',
 
     /**
      * themed background color at active state.
      */
-    activeBackgTh : '--ct-activeBackgTh',
+    backgActiveTh : '--ct-backgActiveTh',
 
     /**
      * final composite background(s) at active state.
      */
-    activeBackgFn : '--ct-activeBackgFn',
+    backgActiveFn : '--ct-backgActiveFn',
 });
 
 // re-defined later, we need to construct varProps first
@@ -122,8 +122,8 @@ Object.assign(keyframesActive, {
         backg: getVar(vars.backgFn),
     }]},
     to: {extend:[ Indicators.keyframesActive.to, { // copy Indicator's keyframes
-        color: getVar(vars.activeColorFn),
-        backg: getVar(vars.activeBackgFn),
+        color: getVar(vars.colorActiveFn),
+        backg: getVar(vars.backgActiveFn),
     }]}
 });
 Object.assign(keyframesPassive, {
@@ -163,15 +163,15 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
 
 
     // customize final foreground color at active state:
-    [vars.activeColorFn] : getVar(
-        vars.activeColorTh, // first  priority
+    [vars.colorActiveFn] : getVar(
+        vars.colorActiveTh, // first  priority
         vars.colorIfAct     // second priority
     ),
 
     // customize final composite background(s) at active state:
-    [vars.activeBackgFn] : [
+    [vars.backgActiveFn] : [
         getVar(
-            vars.activeBackgTh, // first  priority
+            vars.backgActiveTh, // first  priority
             vars.backgIfAct     // second priority
         ),
         ecssProps.backg,
@@ -194,11 +194,11 @@ const styles = {
 
         '&:not(._)': { // force to win conflict with main
             // customize the backg at active state:
-            [vars.activeBackgFn] : [
+            [vars.backgActiveFn] : [
                 ecssProps.backgGrad,
 
                 getVar(
-                    vars.activeBackgTh, // first  priority
+                    vars.backgActiveTh, // first  priority
                     vars.backgIfAct     // second priority
                 ),
                 ecssProps.backg,
@@ -222,28 +222,26 @@ defineSizes(styles, (size, Size, sizeProp) => ({
 }));
 
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    '&:not(._)': { // force to win conflict with states
-        // customize the backg & color
+    // customize the backg & color
 
-        // customize themed foreground color with softer color:
-        [vars.colorTh]        : (colors as any)[`${theme}Cont`],
+    // customize themed foreground color with softer color:
+    [vars.colorTh]        : (colors as any)[`${theme}Cont`],
 
-        // customize themed background color with softer color:
-        [vars.backgTh]        : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
-        
+    // customize themed background color with softer color:
+    [vars.backgTh]        : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
+    
 
 
-        // customize themed foreground color at outlined state:
-        [vars.outlineColorTh] : themeColor,
-        
+    // customize themed foreground color at outlined state:
+    [vars.colorOutlineTh] : themeColor,
+    
 
-        
-        // customize themed foreground color at active state:
-        [vars.activeColorTh]  : (colors as any)[`${theme}Text`],
-        
-        // customize themed background color at active state:
-        [vars.activeBackgTh]  : `linear-gradient(${themeColor},${themeColor})`,
-    },
+    
+    // customize themed foreground color at active state:
+    [vars.colorActiveTh]  : (colors as any)[`${theme}Text`],
+    
+    // customize themed background color at active state:
+    [vars.backgActiveTh]  : `linear-gradient(${themeColor},${themeColor})`,
 }));
 
 const useStyles = createUseStyles(styles);
