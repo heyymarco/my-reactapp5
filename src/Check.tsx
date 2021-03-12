@@ -370,6 +370,7 @@ const iconElm        = '&::before';
 const nextElm        = '& >:nth-child(1n+2)';
 const selfAndNextElm = '&,& ~*';
 
+const fnVars = Controls.fnVars; // copy Control's fnVars
 const chkStates = {
     // specific states:
     extend:[
@@ -401,49 +402,9 @@ const chkStates = {
 
 
 
-    // because we redefine the animFocusBlur on the chkElm =>
-    // we should redefine the animFn here:
-    [selfAndNextElm]: {
-        // customize final foreground color:
-        [vars.colorFn] : getVar(
-            vars.colorIfIf, // first  priority
-            vars.colorTh,   // second priority
-            vars.colorIf    // third  priority
-        ),
-
-        // customize final composite background(s):
-        [vars.backgFn] : [
-            getVar(
-                vars.backgGradTg,
-                vars.backgNo
-            ),
-            getVar(
-                vars.backgIfIf, // first  priority
-                vars.backgTh,   // second priority
-                vars.backgIf    // third  priority
-            ),
-            ecssProps.backg,
-        ],
-
-        // customize final foreground color at outlined state:
-        [vars.colorOutlineFn] : getVar(
-            vars.colorOutlineIfIf, // first  priority
-            vars.colorOutlineTh,   // second priority
-            vars.colorOutlineIf    // third  priority
-        ),
-
-
-
-        [vars.animFn]: [
-            ecssProps.anim,
-            getVar(vars.animEnableDisable), // 1st : ctrl must be enable
-            getVar(vars.animHoverLeave),    // 2nd : cursor hovered over ctrl
-            getVar(vars.animFocusBlur),     // 3rd : ctrl got focused (can interrupt hover/leave)
-            getVar(vars.animActivePassive), // 4th : ctrl got pressed (can interrupt focus/blur)
-        ],
-    },
-
-    //TODO: define the another 2 [vars.animFn] here
+    // because we redefine the props above target on the [selfAndNextElm] =>
+    // we should redefine the fnVars here:
+    [selfAndNextElm]: fnVars,
 };
 const states = {extend:[ Controls.states, { // copy Control's states
     [nextElm]: {
@@ -533,19 +494,27 @@ const states = {extend:[ Controls.states, { // copy Control's states
     ],
 }]};
 
+const inheritStyles = {
+    fontSize           : undefined, // inherit
+    fontFamily         : undefined, // inherit
+    fontWeight         : undefined, // inherit
+    fontStyle          : undefined, // inherit
+    textDecoration     : undefined, // inherit
+    lineHeight         : undefined, // inherit
+
+    opacity            : undefined, // inherit
+    transition         : 'inherit',
+    filter             : undefined, // inherit
+    color              : 'inherit',
+
+    cursor             : 'inherit',
+};
 const chkStyles = {
     extend: [
         Controls.styles.basic,      // copy styles from Control
+        inheritStyles,              // force some props inherited from parent
         filterValidProps(cssProps), // apply our filtered cssProps
     ],
-
-    // not needed setting typos, just inherit from parent:
-    fontSize           : undefined, // delete
-    fontFamily         : undefined, // delete
-    fontWeight         : undefined, // delete
-    fontStyle          : undefined, // delete
-    textDecoration     : undefined, // delete
-    lineHeight         : undefined, // delete
 
     img                : undefined, // delete
     spacing            : undefined, // delete
@@ -597,16 +566,16 @@ const chkStyles = {
 const styles = {
     basic: {
         extend: [
-            Elements.styles.basic, // copy styles from Element
+            Controls.styles.basic, // copy styles from Control
         ],
 
-        backg        : undefined, // delete
-        paddingX     : undefined, // delete
-        paddingY     : undefined, // delete
-        border       : undefined, // delete
-        borderRadius : undefined, // delete
-        boxShadow    : undefined, // delete
-        anim         : undefined, // delete
+        backg         : undefined, // delete
+        paddingX      : undefined, // delete
+        paddingY      : undefined, // delete
+        border        : undefined, // delete
+        borderRadius  : undefined, // delete
+        boxShadow     : undefined, // delete
+        anim          : undefined, // delete
 
         // layout:
         display       : 'inline-flex',
@@ -679,6 +648,7 @@ const styles = {
         [nextElm]: {
             extend: [
                 Buttons.styles.basic, // copy styles from Button
+                inheritStyles,        // force some props inherited from parent
             ],
         },
     },
@@ -729,7 +699,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 }));
 
 const useStyles = createUseStyles(styles);
-export { chkStates, states, chkStyles, styles, useStyles };
+export { fnVars, chkStates, states, chkStyles, styles, useStyles };
 
 
 

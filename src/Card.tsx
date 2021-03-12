@@ -244,11 +244,12 @@ export interface Props
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
+    const elmStyles      = Elements.useStyles();
     const ctStyles       = Contents.useStyles();
 
     const variSize       = Elements.useVariantSize(props, ctStyles);
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
-    const variGradient   = Elements.useVariantGradient(props, ctStyles);
+    const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variCard       =          useVariantCard(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);

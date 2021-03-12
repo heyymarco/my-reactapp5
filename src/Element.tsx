@@ -254,22 +254,13 @@ export const filterPrefixProps = <TCssProps,>(cssProps: TCssProps, prefix: strin
     return cssPropsCopy;
 }
 
-const states = {
-    // customize conditional unthemed foreground color:
-    [vars.colorIf] : cssProps.color,
-
+const fnVars = {
     // customize final foreground color:
     [vars.colorFn] : getVar(
         vars.colorIfIf, // first  priority
         vars.colorTh,   // second priority
         vars.colorIf    // third  priority
     ),
-
-    // customize none background.
-    [vars.backgNo] : 'linear-gradient(transparent,transparent)',
-
-    // customize conditional unthemed background color:
-    [vars.backgIf] : getVar(vars.backgNo),
 
     // customize final composite background(s):
     [vars.backgFn] : [
@@ -286,9 +277,6 @@ const states = {
     ],
 
 
-
-    // customize conditional unthemed foreground color at outlined state:
-    [vars.colorOutlineIf] : cssProps.color,
 
     // customize final foreground color at outlined state:
     [vars.colorOutlineFn] : getVar(
@@ -308,6 +296,30 @@ const states = {
     // customize final composite animation(s):
     [vars.animFn]  : [
         cssProps.anim,
+    ],
+};
+
+const states = {
+    // customize conditional unthemed foreground color:
+    [vars.colorIf] : cssProps.color,
+
+
+
+    // customize none background.
+    [vars.backgNo] : 'linear-gradient(transparent,transparent)',
+
+    // customize conditional unthemed background color:
+    [vars.backgIf] : getVar(vars.backgNo),
+
+
+
+    // customize conditional unthemed foreground color at outlined state:
+    [vars.colorOutlineIf] : cssProps.color,
+
+
+
+    extend: [
+        fnVars,
     ],
 };
 
@@ -391,7 +403,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 const useStyles = createUseStyles(styles2);
-export { states, styles2 as styles, useStyles };
+export { fnVars, states, styles2 as styles, useStyles };
 
 
 

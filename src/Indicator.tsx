@@ -261,20 +261,37 @@ export const stateNoAnimStartup = () =>
 
 
 
-const states = {extend:[ Elements.states, { // copy Element's states
-    // define active (primary) colors:
-    [vars.colorIfAct]        : colors.primaryText,
-    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
-    [vars.colorOutlineIfAct] : colors.primary,
-
-
-
+const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
         getVar(vars.animEnableDisable), // 1st : ctrl must be enable
         getVar(vars.animActivePassive), // 4th : ctrl got pressed
     ],
+
+    '&.active,&.actived': { // if activated programmatically (not by user input)
+        // customize the anim:
+        [vars.animFn]: [
+            ecssProps.anim,
+            getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
+            getVar(vars.animEnableDisable), // 4th : ctrl enable/disable
+        ],
+
+        '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
+            // customize the anim:
+            [vars.animFn]: [
+                ecssProps.anim,
+                getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
+                getVar(vars.animActivePassive), // 4th : ctrl deactivated programatically, move to moderate priority
+            ],
+        },
+    },
+}]};
+const states = {extend:[ Elements.states, { // copy Element's states
+    // define active (primary) colors:
+    [vars.colorIfAct]        : colors.primaryText,
+    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
+    [vars.colorOutlineIfAct] : colors.primary,
 
 
 
@@ -323,25 +340,11 @@ const states = {extend:[ Elements.states, { // copy Element's states
             // [actived]
             '&.actived': // if activated programmatically (not by user input), disable the animation
                 stateNoAnimStartup(),
-
-            '&.active,&.actived': { // if activated programmatically (not by user input)
-                // customize the anim:
-                [vars.animFn]: [
-                    ecssProps.anim,
-                    getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
-                    getVar(vars.animEnableDisable), // 4th : ctrl enable/disable
-                ],
-
-                '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
-                    // customize the anim:
-                    [vars.animFn]: [
-                        ecssProps.anim,
-                        getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
-                        getVar(vars.animActivePassive), // 4th : ctrl deactivated programatically, move to moderate priority
-                    ],
-                },
-            },
         },
+
+
+
+        fnVars,
     ],
 }]};
 
@@ -361,7 +364,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 

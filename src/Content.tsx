@@ -146,22 +146,7 @@ export { config, cssProps };
 
 
 
-const states = {extend:[ Indicators.states, { // copy Indicator's states
-    extend:[
-        // change the Indicator's behavior when in active state:
-        stateActivePassive({
-            [vars.filterActivePassive] : cssProps.filterActive, // override Indicator's filter active
-        }),
-        stateActive({
-            [vars.animActivePassive]   : cssProps.animActive,   // override Indicator's anim active
-        }),
-        statePassivating({
-            [vars.animActivePassive]   : cssProps.animPassive,  // override Indicator's anim passive
-        }),
-    ],
-
-
-
+const fnVars = {extend:[ Indicators.fnVars, { // copy Indicator's fnVars
     // customize final foreground color at active state:
     [vars.colorActiveFn] : getVar(
         vars.colorActiveTh, // first  priority
@@ -179,6 +164,24 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
             vars.backgIfAct     // second priority
         ),
         ecssProps.backg,
+    ],
+}]};
+const states = {extend:[ Indicators.states, { // copy Indicator's states
+    extend:[
+        // change the Indicator's behavior when in active state:
+        stateActivePassive({
+            [vars.filterActivePassive] : cssProps.filterActive, // override Indicator's filter active
+        }),
+        stateActive({
+            [vars.animActivePassive]   : cssProps.animActive,   // override Indicator's anim active
+        }),
+        statePassivating({
+            [vars.animActivePassive]   : cssProps.animPassive,  // override Indicator's anim passive
+        }),
+
+
+
+        fnVars,
     ],
 }]};
 
@@ -235,7 +238,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 }));
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 

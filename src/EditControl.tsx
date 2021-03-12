@@ -305,6 +305,44 @@ export const stateNotInvalidatingUninvalidating = (content: object) => ({
 
 const iconElm = '&::after';
 
+const fnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
+    // customize the anim:
+    [vars.animFn]: [
+        ecssProps.anim,
+        getVar(vars.animValUnval),
+        getVar(vars.animInvUninv),
+        getVar(vars.animEnableDisable), // 1st : ctrl must be enable
+        getVar(vars.animHoverLeave),    // 2nd : cursor hovered over ctrl
+        getVar(vars.animFocusBlur),     // 3rd : ctrl got focused (can interrupt hover/leave)
+        getVar(vars.animActivePassive), // 4th : ctrl got pressed (can interrupt focus/blur)
+    ],
+
+    '&.active,&.actived': { // if activated programmatically (not by user input)
+        // customize the anim:
+        [vars.animFn]: [
+            ecssProps.anim,
+            getVar(vars.animValUnval),
+            getVar(vars.animInvUninv),
+            getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
+            getVar(vars.animHoverLeave),    // 2nd : cursor leaved
+            getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus (can interrupt hover/leave)
+            getVar(vars.animEnableDisable), // 4th : ctrl enable/disable (can interrupt focus/blur)
+        ],
+
+        '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
+            // customize the anim:
+            [vars.animFn]: [
+                ecssProps.anim,
+                getVar(vars.animValUnval),
+                getVar(vars.animInvUninv),
+                getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
+                getVar(vars.animHoverLeave),    // 2nd : cursor leaved, should not happened, move to low priority
+                getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus, might happened programaticaly, move to low priority (can interrupt hover/leave)
+                getVar(vars.animActivePassive), // 4th : ctrl deactivated programatically, move to moderate priority (can interrupt focus/blur)
+            ],
+        },
+    },
+}]};
 const states = {extend:[ Controls.states, { // copy Control's states
     // supress activating by mouse/keyboard (:active)
     // but still responsive activating programatically (.active & .actived)
@@ -341,19 +379,6 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
 
 
-    // customize the anim:
-    [vars.animFn]: [
-        ecssProps.anim,
-        getVar(vars.animValUnval),
-        getVar(vars.animInvUninv),
-        getVar(vars.animEnableDisable), // 1st : ctrl must be enable
-        getVar(vars.animHoverLeave),    // 2nd : cursor hovered over ctrl
-        getVar(vars.animFocusBlur),     // 3rd : ctrl got focused (can interrupt hover/leave)
-        getVar(vars.animActivePassive), // 4th : ctrl got pressed (can interrupt focus/blur)
-    ],
-
-
-
     // all initial states are none:
 
     [vars.backgValInv]  : getVar(vars.backgNo),
@@ -362,36 +387,6 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     // specific states:
     extend:[
-        {
-            '&.active,&.actived': { // if activated programmatically (not by user input)
-                // customize the anim:
-                [vars.animFn]: [
-                    ecssProps.anim,
-                    getVar(vars.animValUnval),
-                    getVar(vars.animInvUninv),
-                    getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
-                    getVar(vars.animHoverLeave),    // 2nd : cursor leaved
-                    getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus (can interrupt hover/leave)
-                    getVar(vars.animEnableDisable), // 4th : ctrl enable/disable (can interrupt focus/blur)
-                ],
-
-                '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
-                    // customize the anim:
-                    [vars.animFn]: [
-                        ecssProps.anim,
-                        getVar(vars.animValUnval),
-                        getVar(vars.animInvUninv),
-                        getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
-                        getVar(vars.animHoverLeave),    // 2nd : cursor leaved, should not happened, move to low priority
-                        getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus, might happened programaticaly, move to low priority (can interrupt hover/leave)
-                        getVar(vars.animActivePassive), // 4th : ctrl deactivated programatically, move to moderate priority (can interrupt focus/blur)
-                    ],
-                },
-            },
-        },
-
-
-
         stateValidating({
             [vars.animValUnval]       : cssProps.animValid,
         }),
@@ -423,6 +418,10 @@ const states = {extend:[ Controls.states, { // copy Control's states
         stateUninvalidating({
             [vars.animInvUninv]       : cssProps.animUninvalid,
         }),
+
+
+
+        fnVars,
     ],
 }]};
 
@@ -474,7 +473,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 }));
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 

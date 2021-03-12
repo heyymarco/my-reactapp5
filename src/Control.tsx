@@ -306,23 +306,7 @@ export const stateNoAnimStartup = () =>
 
 
 
-const states = {extend:[ Elements.states, { // not copy from Indicator's states because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
-    // apply inactive (secondary) colors:
-    [vars.colorIf]           : colors.secondaryText,
-    [vars.backgIf]           : `linear-gradient(${colors.secondary},${colors.secondary})`,
-    [vars.colorOutlineIf]    : colors.secondary,
-
-    // define active (primary) colors:
-    [vars.colorIfAct]        : colors.primaryText,
-    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
-    [vars.colorOutlineIfAct] : colors.primary,
-
-    // focus boxShadow initial is active (primary) colors:
-    // no inactive (secondary) focus boxShadow
-    [vars.boxShadowFocusIf]  : colors.primaryTransp,
-
-
-
+const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     // customize final box-shadow at focused state:
     [vars.boxShadowFocusFn]: [[
         cssProps.boxShadowFocus,
@@ -343,6 +327,43 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
         getVar(vars.animFocusBlur),     // 3rd : ctrl got focused (can interrupt hover/leave)
         getVar(vars.animActivePassive), // 4th : ctrl got pressed (can interrupt focus/blur)
     ],
+
+    '&.active,&.actived': { // if activated programmatically (not by user input)
+        // customize the anim:
+        [vars.animFn]: [
+            ecssProps.anim,
+            getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
+            getVar(vars.animHoverLeave),    // 2nd : cursor leaved
+            getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus (can interrupt hover/leave)
+            getVar(vars.animEnableDisable), // 4th : ctrl enable/disable (can interrupt focus/blur)
+        ],
+
+        '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
+            // customize the anim:
+            [vars.animFn]: [
+                ecssProps.anim,
+                getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
+                getVar(vars.animHoverLeave),    // 2nd : cursor leaved, should not happened, move to low priority
+                getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus, might happened programaticaly, move to low priority (can interrupt hover/leave)
+                getVar(vars.animActivePassive), // 4th : ctrl deactivated programatically, move to moderate priority (can interrupt focus/blur)
+            ],
+        },
+    },
+}]};
+const states = {extend:[ Elements.states, { // not copy from Indicator's states because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
+    // apply inactive (secondary) colors:
+    [vars.colorIf]           : colors.secondaryText,
+    [vars.backgIf]           : `linear-gradient(${colors.secondary},${colors.secondary})`,
+    [vars.colorOutlineIf]    : colors.secondary,
+
+    // define active (primary) colors:
+    [vars.colorIfAct]        : colors.primaryText,
+    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
+    [vars.colorOutlineIfAct] : colors.primary,
+
+    // focus boxShadow initial is active (primary) colors:
+    // no inactive (secondary) focus boxShadow
+    [vars.boxShadowFocusIf]  : colors.primaryTransp,
 
 
 
@@ -429,36 +450,11 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
             // [actived]
             '&.actived': // // if activated programmatically (not by user input), disable the animation
                 stateNoAnimStartup(),
-
-            '&.active,&.actived': { // if activated programmatically (not by user input)
-                // customize the anim:
-                [vars.animFn]: [
-                    ecssProps.anim,
-                    getVar(vars.animActivePassive), // 1st : ctrl already pressed, move to the least priority
-                    getVar(vars.animHoverLeave),    // 2nd : cursor leaved
-                    getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus (can interrupt hover/leave)
-                    getVar(vars.animEnableDisable), // 4th : ctrl enable/disable (can interrupt focus/blur)
-                ],
-
-                '&.disabled,&:disabled:not(.disable)': { // if ctrl was disabled programatically
-                    // customize the anim:
-                    [vars.animFn]: [
-                        ecssProps.anim,
-                        getVar(vars.animEnableDisable), // 1st : ctrl already disabled, move to the least priority
-                        getVar(vars.animHoverLeave),    // 2nd : cursor leaved, should not happened, move to low priority
-                        getVar(vars.animFocusBlur),     // 3rd : ctrl lost focus, might happened programaticaly, move to low priority (can interrupt hover/leave)
-                        getVar(vars.animActivePassive), // 4th : ctrl deactivated programatically, move to moderate priority (can interrupt focus/blur)
-                    ],
-                },
-            },
         },
-        // TODO: clean up this ununsed code below:
-        // stateDisable({ '&:active:not(.active):not(.actived)': { // if disabled => cannot be activated by mouse/keyboard (but can be activated programatically)
-        //     // supress activating by mouse/keyboard (:active)
-        //     // but still responsive activating programatically (.active & .actived)
-        //     [vars.filterActivePassive]            : ecssProps.filterNone,
-        //     [vars.animActivePassive]              : ecssProps.animNone,
-        // }}),
+
+
+
+        fnVars,
     ],
 }]};
 
@@ -498,7 +494,7 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
 }));
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 
