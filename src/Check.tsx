@@ -652,6 +652,15 @@ const styles = {
             ],
         },
     },
+    chkBtnOutline: {
+        extend: [
+            'chkBtn',
+
+            stateNotCheck({
+                [nextElm]: Controls.styles.outline,
+            }),
+        ],
+    },
     chkSwitch: {
         '&:not(._)': { // force to win conflict with states
             // overwrite default animation:
@@ -684,6 +693,13 @@ const styles = {
                 },
             },
         },
+    },
+    chkSwitchOutline: {
+        extend: [
+            'chkSwitch',
+        ],
+
+        [chkElm]: Controls.styles.outline,
     },
 };
 
