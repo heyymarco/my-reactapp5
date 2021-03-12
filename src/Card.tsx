@@ -8,8 +8,8 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterPrefixProps,
@@ -31,8 +31,8 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterPrefixProps,
@@ -156,11 +156,10 @@ const cardItem = {
 };
 
 const styles = {
-    main: {
+    basic: {
         extend: [
-            Contents.styles.main,       // copy styles from Content, including Content's cssProps & Content's states.
+            Contents.styles.basic,      // copy styles from Content
             filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
         ],
 
         display: 'flex',
@@ -175,6 +174,12 @@ const styles = {
         minWidth: 0, // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
         wordWrap: 'break-word',
         backgroundClip: 'border-box',
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+            states,  // apply our states
+        ],
     },
     header: {
         extend: [
@@ -247,7 +252,7 @@ export default function ListGroup(props: Props) {
     const variCard       =          useVariantCard(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);
-    const stateActPass   = useStateActivePassive(props);
+    const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
     
     

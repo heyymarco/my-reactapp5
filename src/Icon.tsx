@@ -120,7 +120,7 @@ const customFont = {
 };
 
 const styles = {
-    main: {
+    basic: {
         extend: [
             Elements.filterValidProps(cssProps),
         ],
@@ -133,6 +133,11 @@ const styles = {
         size          : undefined, // delete
         height        : cssProps.size,
         width         : 'min-content',
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+        ],
     },
     '@font-face': [
         Object.assign({

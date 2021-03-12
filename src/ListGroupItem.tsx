@@ -1,8 +1,8 @@
 import React               from 'react';
 
 import {
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -15,8 +15,8 @@ import {
 
 
 export {
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -36,7 +36,7 @@ export interface Props {
 };
 export default function ListGroupItem(props: Props) {
     const stateEnbDis    = useStateEnableDisable(props);
-    const stateActPass   = useStateActivePassive(props);
+    const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
 
 

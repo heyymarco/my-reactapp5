@@ -87,42 +87,52 @@ export const vars = {
     /**
      * themed foreground color.
      */
-    colorTh   : '--elm-colorTh',
+    colorTh     : '--elm-colorTh',
 
     /**
      * conditional foreground color.
      */
-    colorIfIf : '--elm-colorIfIf',
+    colorIfIf   : '--elm-colorIfIf',
 
     /**
      * conditional unthemed foreground color.
      */
-    colorIf   : '--elm-colorIf',
+    colorIf     : '--elm-colorIf',
 
     /**
      * final foreground color.
      */
-    colorFn   : '--elm-colorFn',
+    colorFn     : '--elm-colorFn',
+
+    /**
+     * none background.
+     */
+    backgNo     : '--elm-backgNo',
 
     /**
      * themed background color.
      */
-    backgTh   : '--elm-backgTh',
+    backgTh     : '--elm-backgTh',
 
     /**
      * conditional background color.
      */
-    backgIfIf : '--elm-backgIfIf',
+    backgIfIf   : '--elm-backgIfIf',
 
     /**
      * conditional unthemed background color.
      */
-    backgIf   : '--elm-backgIf',
+    backgIf     : '--elm-backgIf',
 
     /**
      * final composite background(s).
      */
-    backgFn   : '--elm-backgFn',
+    backgFn     : '--elm-backgFn',
+
+    /**
+     * background gradient.
+     */
+    backgGradTg : '--elm-backgGradTg',
 
 
 
@@ -194,7 +204,6 @@ const _cssProps: CssProps = {
 
     transition        : [
         ['background' , '300ms', 'ease-out'],
-        ['background-size' , '300ms', 'ease-out'],
         ['color'      , '300ms', 'ease-out'],
         ['border'     , '300ms', 'ease-out'],
         ['font-size'  , '300ms', 'ease-out'],
@@ -256,11 +265,18 @@ const states = {
         vars.colorIf    // third  priority
     ),
 
+    // customize none background.
+    [vars.backgNo] : 'linear-gradient(transparent,transparent)',
+
     // customize conditional unthemed background color:
-    [vars.backgIf] : 'linear-gradient(transparent,transparent)',
+    [vars.backgIf] : getVar(vars.backgNo),
 
     // customize final composite background(s):
     [vars.backgFn] : [
+        getVar(
+            vars.backgGradTg,
+            vars.backgNo
+        ),
         getVar(
             vars.backgIfIf, // first  priority
             vars.backgTh,   // second priority
@@ -282,7 +298,10 @@ const states = {
     ),
 
     // customize final composite background(s) at outlined state:
-    [vars.backgOutlineFn] : 'transparent',
+    [vars.backgOutlineFn] : getVar(
+        vars.backgGradTg,
+        vars.backgNo
+    ),
 
 
 
@@ -293,10 +312,9 @@ const states = {
 };
 
 const styles = {
-    main: {
+    basic: {
         extend: [
             filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
         ],
 
 
@@ -307,40 +325,30 @@ const styles = {
         // apply final composite background(s):
         backg : getVar(vars.backgFn),
 
-
-
         // apply final composite animation(s):
         anim  : getVar(vars.animFn),
     },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+            states,  // apply our states
+        ],
+    },
     outline: {
-        // apply final foreground color at outlined state:
-        color       : getVar(vars.colorOutlineFn),
-
-        // apply final composite background(s) at outlined state:
-        backg       : getVar(vars.backgOutlineFn),
-
-        // set border color = text-color:
-        borderColor : getVar(vars.colorOutlineFn),
+        '&:not(._)': { // force to win conflict with main
+            // apply final foreground color at outlined state:
+            color       : getVar(vars.colorOutlineFn),
+    
+            // apply final composite background(s) at outlined state:
+            backg       : getVar(vars.backgOutlineFn),
+    
+            // set border color = text-color:
+            borderColor : getVar(vars.colorOutlineFn),
+        },
     },
     gradient: {
-        '&:not(._)': { // force to win conflict with states
-            // customize final composite background(s):
-            [vars.backgFn] : [
-                cssProps.backgGrad,
-
-                getVar(
-                    vars.backgIfIf, // first  priority
-                    vars.backgTh,   // second priority
-                    vars.backgIf    // third  priority
-                ),
-                cssProps.backg,
-            ],
-
-
-
-            // customize final composite background(s) at outlined state:
-            [vars.backgOutlineFn] : cssProps.backgGrad,
-        },
+        // customize background gradient:
+        [vars.backgGradTg]: cssProps.backgGrad,
     },
 };
 
@@ -372,12 +380,10 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     // customize the backg & color
 
     // customize themed foreground color:
-    [vars.colorTh] : (colors as any)[`${theme}Text`],
+    [vars.colorTh]        : (colors as any)[`${theme}Text`],
 
     // customize themed background color:
-    [vars.backgTh] : `linear-gradient(${themeColor},${themeColor})`,
-
-
+    [vars.backgTh]        : `linear-gradient(${themeColor},${themeColor})`,
 
     // customize themed foreground color at outlined state:
     [vars.colorOutlineTh] : themeColor,

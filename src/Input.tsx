@@ -9,10 +9,10 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -35,10 +35,10 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -90,11 +90,10 @@ const inpElm  = '& >:first-child';
 const states = EditControls.states;
 
 const styles = {
-    main: {
+    basic: {
         extend: [
-            EditControls.styles.main,   // copy styles from EditControl, including EditControl's cssProps & EditControl's states.
+            EditControls.styles.basic,  // copy styles from EditControl
             filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
         ],
 
         '--elm-backgGrad': cssProps.backgGrad,
@@ -126,6 +125,12 @@ const styles = {
                 {width: '-moz-available'},
             ],
         },
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+            states,  // apply our states
+        ],
     },
     inpOutline: Controls.styles.outline,
 };
@@ -203,7 +208,7 @@ export default function Input(props: Props) {
                 type={props.type ?? 'text'}
                 defaultValue={props.defaultValue}
             />
-            
+
         </span>
     );
     // return (

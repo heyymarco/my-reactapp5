@@ -71,7 +71,7 @@ export default function App (props: any) {
 	}
 
 
-	const styles = [undefined,'switch','btn','btnOutline'];
+	const styles = [undefined,'outline','switch','switchOutline','btn','btnOutline'];
 	const themes = [undefined,'primary','secondary','success','info','warning','danger','light','dark'];
 
 	const [currentRadio, setCurrentRadio] = useState<string>('');

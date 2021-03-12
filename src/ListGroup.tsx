@@ -8,8 +8,8 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -31,8 +31,8 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -83,17 +83,19 @@ export { config, cssProps };
 
 
 
+const wrapElm  = '& >li';
+const mainElm = '& >.lg-wrapper';
+
 const states = {extend:[ Contents.states, { // copy Content's states
     // customize the anim prop to be forwarded to another element(s):
     [vars.animFw]: getVar(vars.animFn),
 }]};
 
 const styles = {
-    main: {
+    basic: {
         extend: [
             stripOuts.list, // clear browser's default styles
             filterValidProps(cssProps), // apply our filtered cssProps
-            // states,                  // NOT apply our states here, but in child <li>
         ],
 
         // flex settings:
@@ -104,11 +106,7 @@ const styles = {
 
 
 
-        '& >li': { // wrapper element
-            extend: [
-                states, // apply our states
-            ],
-
+        [wrapElm]: { // wrapper element
             display: 'block',
     
 
@@ -128,9 +126,9 @@ const styles = {
 
 
 
-            '& >.lg-wrapper': { // main child elements
+            [mainElm]: { // main child elements
                 extend:[
-                    Elements.styles.main, // copy styles from Element, including Element's cssProps & Element's states.
+                    Elements.styles.basic, // copy styles from Element
                 ],
 
                 display       : 'block',
@@ -145,8 +143,22 @@ const styles = {
             } // main child elements
         }, // wrapper element
     },
+    main: {
+        extend: [
+            'basic',   // apply basic styles
+            // states, // NOT apply our states here, but in child <li>
+        ],
+
+
+
+        [wrapElm]: { // wrapper element
+            extend: [
+                states, // apply our states
+            ],
+        },
+    },
     gradient: {
-        '& >li >.lg-wrapper': Contents.styles.gradient,
+        '& >li >.lg-wrapper': Elements.styles.gradient,
     },
 };
 

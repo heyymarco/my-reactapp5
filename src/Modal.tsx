@@ -6,7 +6,6 @@ import
 }                          from 'react';
 
 import * as Elements       from './Element';
-import * as Contents       from './Content';
 import
     Card,
     * as Cards             from './Card';
@@ -14,8 +13,8 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -42,8 +41,8 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -80,7 +79,7 @@ const center  = 'center';
 // const middle  = 'middle';
 
 // internal css vars:
-export const vars = Object.assign({}, Contents.vars, {
+export const vars = {
     /**
      * custom css props for manipulating animation(s).
      */
@@ -90,7 +89,7 @@ export const vars = Object.assign({}, Contents.vars, {
      * custom css props for manipulating backg's animation(s).
      */
     animBackgFn  : '--mod-animBackgFn',
-});
+};
 
 // re-defined later, we need to construct varProps first
 export const keyframesActive       = { from: undefined, to: undefined };
@@ -176,15 +175,15 @@ const states = {
 
 
     extend:[
-        stateActive({
+        stateActive({ // [activating, actived]
             [vars.animFn]      : cssProps.animActive,
             [vars.animBackgFn] : cssProps.backgAnimActive,
         }),
-        statePassive({
+        statePassivating({ // [passivating]
             [vars.animFn]      : cssProps.animPassive,
             [vars.animBackgFn] : cssProps.backgAnimPassive,
         }),
-        stateNotActivePassive({ // hides the modal if not [activating, actived, deactivating]
+        stateNotActivePassive({ // hides the modal if not [activating, actived, passivating]
             display: none,
         }),
     ],
@@ -195,11 +194,10 @@ const styles = {
         // kill the scroll on the body:
         overflow: 'hidden',
     },
-    main: { // overlay layer with limited width & height as scroller
+    basic: { // overlay layer with limited width & height as scroller
         extend: [
             stripOuts.focusableElement, // clear browser's default styles
             filterPrefixProps(cssProps, 'backg'), // apply our cssProps starting with backg***
-            states,                     // apply our states
         ],
 
         // a custom css props for manipulating backg's animation(s):
@@ -224,7 +222,7 @@ const styles = {
         overflowY : 'auto',
         '& >*': { // scrolling layer with additional paddings
             extend: [
-                Containers.styles.main, // copy styles from Container
+                Containers.styles.basic, // copy styles from Container
             ],
 
             width     : 'fit-content',
@@ -260,6 +258,12 @@ const styles = {
                 },
             },
         },
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+            states,  // apply our states
+        ],
     },
     scollable: {
         '& >*': { // scrolling layer with additional paddings

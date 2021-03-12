@@ -13,10 +13,10 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup as base_stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -40,10 +40,10 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
 
     filterValidProps, filterPrefixProps,
 
@@ -94,10 +94,28 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
      */
     animIconFn          : '--chk-animIconFn',
 
+
+
     /**
-     * foreground color for the label.
+     * themed foreground color for the label.
      */
-    colorLabel          : '--chk-colorLabel',
+    colorLabelTh        : '--chk-colorLabelTh',
+
+    /**
+     * conditional unthemed foreground color for the label.
+     */
+    colorLabelIf        : '--chk-colorLabelIf',
+
+    /**
+     * active unthemed foreground color for the label.
+     */
+    colorLabelIfAct     : '--chk-colorLabelIfAct',
+
+    /**
+     * final foreground color for the label.
+     */
+    colorLabelFn        : '--chk-colorLabelFn',
+
 
 
     // anim props:
@@ -235,6 +253,11 @@ export { config, cssProps };
 
 
 
+export const stateChecking           = (content: object) => ({
+    '&.check': {
+        extend: [content]
+    }
+});
 export const stateCheck               = (content: object) => ({
     '&.check,&.checked,&:checked': {
         extend: [content]
@@ -245,7 +268,7 @@ export const stateNotCheck            = (content: object) => ({
         extend: [content]
     }
 });
-export const stateClear               = (content: object) => ({
+export const stateClearing           = (content: object) => ({
     '&.clear': {
         extend: [content]
     }
@@ -342,71 +365,99 @@ export function useStateCheckClear(props: Props) {
 
 
 
-const chkElm  = '& >:first-child';
-const iconElm = '&::before';
-const nextElm = '& >:nth-child(1n+2)';
+const chkElm         = '& >:first-child';
+const iconElm        = '&::before';
+const nextElm        = '& >:nth-child(1n+2)';
+const selfAndNextElm = '&,& ~*';
 
-const childFocusableStates = {extend:[ Controls.states, { // copy Control's states
-    [vars.colorTh]             : undefined, // ihnerit from <label>'s theme
-    [vars.colorIfIf]           : undefined, // ihnerit from <label>'s theme
-    [vars.colorIf]             : undefined, // ihnerit from <label>'s theme
-    [vars.colorFn]             : undefined, // ihnerit from <label>'s theme
-    [vars.backgTh]             : undefined, // ihnerit from <label>'s theme
-    [vars.backgIfIf]           : undefined, // ihnerit from <label>'s theme
-    [vars.backgIf]             : undefined, // ihnerit from <label>'s theme
-    [vars.backgFn]             : undefined, // ihnerit from <label>'s theme
-    [vars.colorOutlineTh]      : undefined, // ihnerit from <label>'s theme
-    [vars.colorOutlineIfIf]    : undefined, // ihnerit from <label>'s theme
-    [vars.colorOutlineIf]      : undefined, // ihnerit from <label>'s theme
-    [vars.colorOutlineFn]      : undefined, // ihnerit from <label>'s theme
-    [vars.backgOutlineFn]      : undefined, // ihnerit from <label>'s theme
-
-    [vars.colorIfAct]          : undefined, // ihnerit from <label>'s theme
-    [vars.backgIfAct]          : undefined, // ihnerit from <label>'s theme
-
-    [vars.boxShadowFocusFn]    : undefined, // ihnerit from <label>'s theme
-
-
-    [vars.filterEnableDisable] : undefined, // ihnerit from <label>'s enable/disable
-    [vars.animEnableDisable]   : undefined, // ihnerit from <label>'s enable/disable
-
-    [vars.filterHoverLeave]    : undefined, // ihnerit from <label>'s hover/leave
-    [vars.animHoverLeave]      : undefined, // ihnerit from <label>'s hover/leave
-
-    [vars.filterActivePassive] : undefined, // ihnerit from <label>'s active/passive
-    [vars.animActivePassive]   : undefined, // ihnerit from <label>'s active/passive
-}]};
-const childInheritStates = {extend:[ childFocusableStates, { // copy childFocusableStates
-    [vars.boxShadowFocusBlur]  : undefined, // ihnerit from <checkbox>'s focus/blur
-    [vars.animFocusBlur]       : undefined, // ihnerit from <checkbox>'s focus/blur
-}]};
-const chkStates = {extend:[ childFocusableStates, { // copy childFocusableStates
+const chkStates = {
     // specific states:
     extend:[
         // transfers the focus state to the "next" element(s):
-        stateFocusBlur({
-            '& ~*': {
-                [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
-            },
-        }),
-        stateBlur({
-            '& ~*': {
-                [vars.animFocusBlur]      : ccssProps.animBlur,
+        stateBlurring({
+            [selfAndNextElm]: {
+                [vars.boxShadowFocusBlur]     : getVar(vars.boxShadowFocusFn),
+                [vars.animFocusBlur]          : ccssProps.animBlur,
             },
         }),
         stateNotDisable({extend:[
             // state focus are possible when enabled
             stateFocus({
-                '& ~*': {
-                    [vars.animFocusBlur]  : ccssProps.animFocus,
+                [selfAndNextElm]: {
+                    [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
+                    [vars.animFocusBlur]      : ccssProps.animFocus,
+                    
+                    // apply active (primary) colors:
+                    [vars.colorIf]            : getVar(vars.colorIfAct),
+                    [vars.backgIf]            : getVar(vars.backgIfAct),
+                    [vars.colorOutlineIf]     : getVar(vars.colorOutlineIfAct),
+
+                    // apply active (primary) color on label:
+                    [vars.colorLabelIf]       : getVar(vars.colorLabelIfAct),
                 },
             }),
         ]}),
     ],
-}]};
-const states = {
-    // customize foreground color for the label:
-    [vars.colorLabel]: ecssProps.color,
+
+
+
+    // because we redefine the animFocusBlur on the chkElm =>
+    // we should redefine the animFn here:
+    [selfAndNextElm]: {
+        // customize final foreground color:
+        [vars.colorFn] : getVar(
+            vars.colorIfIf, // first  priority
+            vars.colorTh,   // second priority
+            vars.colorIf    // third  priority
+        ),
+
+        // customize final composite background(s):
+        [vars.backgFn] : [
+            getVar(
+                vars.backgGradTg,
+                vars.backgNo
+            ),
+            getVar(
+                vars.backgIfIf, // first  priority
+                vars.backgTh,   // second priority
+                vars.backgIf    // third  priority
+            ),
+            ecssProps.backg,
+        ],
+
+        // customize final foreground color at outlined state:
+        [vars.colorOutlineFn] : getVar(
+            vars.colorOutlineIfIf, // first  priority
+            vars.colorOutlineTh,   // second priority
+            vars.colorOutlineIf    // third  priority
+        ),
+
+
+
+        [vars.animFn]: [
+            ecssProps.anim,
+            getVar(vars.animEnableDisable), // 1st : ctrl must be enable
+            getVar(vars.animHoverLeave),    // 2nd : cursor hovered over ctrl
+            getVar(vars.animFocusBlur),     // 3rd : ctrl got focused (can interrupt hover/leave)
+            getVar(vars.animActivePassive), // 4th : ctrl got pressed (can interrupt focus/blur)
+        ],
+    },
+
+    //TODO: define the another 2 [vars.animFn] here
+};
+const states = {extend:[ Controls.states, { // copy Control's states
+    [nextElm]: {
+        // customize conditional unthemed foreground color for the label:
+        [vars.colorLabelIf]    : colors.secondaryCont,
+        [vars.colorLabelIfAct] : colors.primaryCont,
+    
+        // customize final foreground color for the label:
+        [vars.colorLabelFn] : getVar(
+            // vars.colorLabelIfIf, // first  priority - never got input error
+            vars.colorLabelTh,      // second priority
+            vars.colorLabelIf       // third  priority
+        ),
+    },
 
 
 
@@ -425,6 +476,23 @@ const states = {
 
     // specific states:
     extend:[
+        stateNotDisable({extend:[
+            stateHover({
+                [nextElm]: {
+                    // apply active (primary) color on label:
+                    [vars.colorLabelIf] : getVar(vars.colorLabelIfAct),
+                },
+            }),
+        ]}),
+        stateActive({ // [activating, actived]
+            [nextElm]: {
+                // apply active (primary) color on label:
+                [vars.colorLabelIf]     : getVar(vars.colorLabelIfAct),
+            },
+        }),
+
+
+
         stateCheckClear({ // [checking, checked, clearing]
             [nextElm]: { // transfer the check/clear state to the "next" element(s):
                 [vars.filterActivePassive] : icssProps.filterActive,
@@ -435,9 +503,14 @@ const states = {
 
             [nextElm]: { // transfer the check/clear state to the "next" element(s):
                 [vars.animActivePassive]   : icssProps.animActive,
+
+                // apply active colors:
+                [vars.colorIf]             : getVar(vars.colorIfAct),
+                [vars.backgIf]             : getVar(vars.backgIfAct),
+                [vars.colorOutlineIf]      : getVar(vars.colorOutlineIfAct),
             },
         }),
-        stateClear({ // [clearing]
+        stateClearing({ // [clearing]
             [nextElm]: { // transfer the check/clear state to the "next" element(s):
                 [vars.animActivePassive]   : icssProps.animPassive,
             },
@@ -457,35 +530,22 @@ const states = {
                 }),
             },
         },
-
-
-
-        // disable (overwrite) focus state:
-        stateNotDisable({extend:[
-            stateFocus({
-                [vars.animFocusBlur] : undefined,
-            }),
-            stateBlur({
-                [vars.animFocusBlur] : undefined,
-            }),
-        ]}),
     ],
-};
+}]};
 
 const chkStyles = {
     extend: [
-        Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
-        {
-            // fontSize       : undefined, // still needed for determining checkbox's size
-            fontFamily     : undefined,
-            fontWeight     : undefined,
-            fontStyle      : undefined,
-            textDecoration : undefined,
-            lineHeight     : undefined,
-        },
+        Controls.styles.basic,      // copy styles from Control
         filterValidProps(cssProps), // apply our filtered cssProps
-        chkStates,                  // apply our states
     ],
+
+    // not needed setting typos, just inherit from parent:
+    fontSize           : undefined, // delete
+    fontFamily         : undefined, // delete
+    fontWeight         : undefined, // delete
+    fontStyle          : undefined, // delete
+    textDecoration     : undefined, // delete
+    lineHeight         : undefined, // delete
 
     img                : undefined, // delete
     spacing            : undefined, // delete
@@ -493,7 +553,9 @@ const chkStyles = {
     switchImg          : undefined, // delete
     switchBorderRadius : undefined, // delete
 
-    display   : 'inline-block',
+    // layout:
+    display       : 'inline-block',
+    verticalAlign : 'baseline',
 
     // sizings:
     width     : '1em',
@@ -501,20 +563,18 @@ const chkStyles = {
     boxSizing : 'border-box',
     paddingX: 0, paddingY: 0,
 
-    // typo settings:
-    verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
-
+    // spacings:
     '&:not(:last-child)': {
         marginInlineEnd: cssProps.spacing,
     },
 
 
 
-    overflow: 'hidden',
+    overflow: 'hidden', // clip the icon at borderRadius
 
     [iconElm]: {
         extend: [
-            Icons.styles.main,
+            Icons.styles.basic,
             Icons.styles.img,
         ],
 
@@ -534,82 +594,19 @@ const chkStyles = {
     },
 
 };
-const chkBtnStyles = {
-    '&:not(._)': { // force to win conflict with states
-        verticalAlign : 'baseline',
-    },
-
-
-
-    [chkElm]: {
-        '&:not(._)': { // force to win conflict with states
-            // display: none, // hide the checkbox // causes focus doesn't work anymore
-    
-            // hiding the checkbox while still preserving focus working
-            opacity: 0,
-            width: 0, height: 0, border: 0,
-            marginInlineEnd: 0,
-
-            // turn off animations:
-            // anim: none, // still needed the anim focus/blur
-        },
-
-        
-        [iconElm]: {
-            '&:not(._)': { // force to win conflict with states
-                // turn off animations:
-                anim: none,
-            },
-        },
-    },
-
-
-    [nextElm]: {
-        extend: [
-            Buttons.styles.main, // copy styles from Button, including Button's cssProps & Button's states.
-            childInheritStates,
-        ],
-    },
-};
-const chkSwitchStyles = {
-    '&:not(._)': { // force to win conflict with states
-        // overwrite default animation:
-        [vars.filterCheckClearIn]     : cssProps.switchFilterCheck,
-        [vars.filterCheckClearOut]    : cssProps.switchFilterClear,
-
-        [vars.switchTransfIn]         : cssProps.switchTransfCheck,
-        [vars.switchTransfOut]        : cssProps.switchTransfClear,
-
-        // specific states:
-        extend:[
-            stateCheck({ // [checking, checked]
-                [vars.animCheckClear] : cssProps.switchAnimCheck,
-            }),
-            stateNotCheck({ // [not-checking, not-checked] => [clearing, cleared]
-                [vars.animCheckClear] : cssProps.switchAnimClear,
-            }),
-        ],
-    },
-
-
-    [chkElm]: {
-        '&:not(._)': { // force to win conflict with states
-            width        : '2em',
-            borderRadius : cssProps.switchBorderRadius,
-
-
-            [iconElm]: { // force to win conflict with states, :not(._) after pseudo-elm is invalid, so we use parent's :not(._)
-                [vars.img]: cssProps.switchImg,
-            },
-        },
-    },
-};
 const styles = {
-    main: {
+    basic: {
         extend: [
-            Controls.styles.main, // copy styles from Control, including Control's cssProps & Control's states.
-            states,
+            Elements.styles.basic, // copy styles from Element
         ],
+
+        backg        : undefined, // delete
+        paddingX     : undefined, // delete
+        paddingY     : undefined, // delete
+        border       : undefined, // delete
+        borderRadius : undefined, // delete
+        boxShadow    : undefined, // delete
+        anim         : undefined, // delete
 
         // layout:
         display       : 'inline-flex',
@@ -619,25 +616,7 @@ const styles = {
 
 
 
-        // apply foreground color for the label:
-        color : getVar(vars.colorLabel),
-
-
-
-        // removed:
-
-        // not needed a background:
-        backg        : undefined,
-
-        // not needed paddings & borders:
-        paddingX     : undefined,
-        paddingY     : undefined,
-        border       : undefined,
-        borderRadius : undefined,
-
-
-
-        // the dummy text content, for making height as line-height
+        // the dummy text content, for making height as tall as line-height
         '&::before': {
             content    : '"\xa0"', // &nbsp;
             display    : 'inline',
@@ -650,21 +629,92 @@ const styles = {
 
 
         [chkElm]: chkStyles,
+
+        [nextElm]: {
+            // apply final foreground color for the label:
+            color : getVar(vars.colorLabelFn),
+        },
     },
-
-    chkBtn: chkBtnStyles,
-
-    chkBtnOutline: {
+    main: {
         extend: [
-            chkBtnStyles,
-
-            stateNotCheck({
-                [nextElm]: Buttons.styles.btnOutline,
-            }),
+            'basic', // apply basic styles
+            states,  // apply our states
         ],
-    },
 
-    chkSwitch: chkSwitchStyles,
+        [chkElm]: chkStates,
+    },
+    chkOutline: {
+        [chkElm]: Controls.styles.outline,
+    },
+    chkBtn: {
+        '&:not(._)': { // force to win conflict with states
+            verticalAlign : 'baseline',
+        },
+    
+    
+    
+        [chkElm]: {
+            '&:not(._)': { // force to win conflict with states
+                // display: none, // hide the checkbox // causes focus doesn't work anymore
+        
+                // hiding the checkbox while still preserving focus working
+                opacity: 0,
+                width: 0, height: 0, border: 0,
+                marginInlineEnd: 0,
+    
+                // turn off animations:
+                // anim: none, // still needed the anim focus/blur
+            },
+    
+            
+            [iconElm]: {
+                '&:not(._)': { // force to win conflict with states
+                    // turn off animations:
+                    anim: none,
+                },
+            },
+        },
+    
+    
+        [nextElm]: {
+            extend: [
+                Buttons.styles.basic, // copy styles from Button
+            ],
+        },
+    },
+    chkSwitch: {
+        '&:not(._)': { // force to win conflict with states
+            // overwrite default animation:
+            [vars.filterCheckClearIn]     : cssProps.switchFilterCheck,
+            [vars.filterCheckClearOut]    : cssProps.switchFilterClear,
+    
+            [vars.switchTransfIn]         : cssProps.switchTransfCheck,
+            [vars.switchTransfOut]        : cssProps.switchTransfClear,
+    
+            // specific states:
+            extend:[
+                stateCheck({ // [checking, checked]
+                    [vars.animCheckClear] : cssProps.switchAnimCheck,
+                }),
+                stateNotCheck({ // [not-checking, not-checked] => [clearing, cleared]
+                    [vars.animCheckClear] : cssProps.switchAnimClear,
+                }),
+            ],
+        },
+    
+    
+        [chkElm]: {
+            '&:not(._)': { // force to win conflict with states
+                width        : '2em',
+                borderRadius : cssProps.switchBorderRadius,
+    
+    
+                [iconElm]: { // force to win conflict with states, :not(._) after pseudo-elm is invalid, so we use parent's :not(._)
+                    [vars.img]: cssProps.switchImg,
+                },
+            },
+        },
+    },
 };
 
 defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
@@ -674,36 +724,22 @@ defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
     ],
 
 
-    '&:not(._)': { // force to win conflict with states
-        // customize the label's text color:
-        [vars.colorLabel] : (colors as any)[`${theme}Cont`],
-    },
+    // customize the label's text color:
+    [vars.colorLabelTh] : (colors as any)[`${theme}Cont`],
 }));
 
 const useStyles = createUseStyles(styles);
-export { childInheritStates, chkStates, states, chkStyles, chkBtnStyles, styles, useStyles };
+export { chkStates, states, chkStyles, styles, useStyles };
 
 
 
-export type ChkStyle = 'switch' | 'btn' | 'btnOutline';
+export type ChkStyle = 'outline' | 'switch' | 'switchOutline' | 'btn' | 'btnOutline';
 export interface VariantCheck {
     chkStyle?: ChkStyle
 }
 export function useVariantCheck(props: VariantCheck, styles: Record<string, string>) {
     return {
         class: props.chkStyle ? (styles as any)[`chk${pascalCase(props.chkStyle)}`] : null,
-    };
-}
-
-export const themeDefaults: {[btnStyle: string]: (string|undefined)} = {
-    default    : 'primary',
-    switch     : 'primary',
-    btn        : 'primary',
-    btnOutline : 'primary',
-};
-export function useVariantThemeDefault(props: VariantCheck) {
-    return () => {
-        return themeDefaults?.[props.chkStyle ?? 'default'] ?? undefined;
     };
 }
 
@@ -724,15 +760,14 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
     const elmStyles      = Elements.useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variThemeDef   =          useVariantThemeDefault(props);
-    const variTheme      = Elements.useVariantTheme(props, styles, variThemeDef);
+    const variTheme      = Elements.useVariantTheme(props, styles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variCheck      =          useVariantCheck(props, styles);
 
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = useStateActivePassive(props);
+    const stateActPass   = useStateActivePassive(props, stateEnbDis);
     const stateChkClr    = useStateCheckClear(props);
 
     
@@ -744,7 +779,7 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                 styles.main,
 
                 variSize.class,
-                (props.theme ? variTheme.class : null), // if uses default theme => dont apply theme on the <label>
+                variTheme.class,
                 variGradient.class,
                 variCheck.class,
 
@@ -763,16 +798,18 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
             onKeyDown={stateActPass.handleKeyDown}
             onMouseUp={stateActPass.handleMouseUp}
             onKeyUp={stateActPass.handleKeyUp}
-            onAnimationEnd={(e) => {
-                stateEnbDis.handleAnimationEnd(e);
-                stateLeave.handleAnimationEnd(e);
-                // stateFocusBlur.handleAnimationEnd(e);
-                stateActPass.handleAnimationEnd(e);
-            }}
+
+            // no anim on <label>
+            // onAnimationEnd={(e) => {
+            //     stateEnbDis.handleAnimationEnd(e);
+            //     stateLeave.handleAnimationEnd(e);
+            //     // stateFocusBlur.handleAnimationEnd(e);
+            //     stateActPass.handleAnimationEnd(e);
+            // }}
         >
             <input className={[
                     // variSize.class,
-                    (!props.theme ? variTheme.class : null), // if use theme, inherit theme from <label>, otherwise define default theme here
+                    // variTheme.class,
                     // variGradient.class,
 
                     // stateEnbDis.class,
@@ -797,10 +834,10 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                 // onMouseUp={stateActPass.handleMouseUp}
                 // onKeyUp={stateActPass.handleKeyUp}
                 onAnimationEnd={(e) => {
-                    // stateEnbDis.handleAnimationEnd(e);
-                    // stateLeave.handleAnimationEnd(e);
+                    stateEnbDis.handleAnimationEnd(e);
+                    stateLeave.handleAnimationEnd(e);
                     stateFocusBlur.handleAnimationEnd(e);
-                    // stateActPass.handleAnimationEnd(e);
+                    stateActPass.handleAnimationEnd(e);
                     stateChkClr.handleAnimationEnd(e);
                 }}
                 onChange={props.onChange}

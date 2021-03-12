@@ -8,10 +8,10 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -34,10 +34,10 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -109,24 +109,32 @@ const linkStyles = {
     borderRadius   : border.radiuses.sm,
 };
 const styles = {
-    main: {
+    basic: {
         extend: [
-            Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
+            Controls.styles.basic,      // copy styles from Control
             filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
         ],
         
-        // flex settings:
+        // layout:
         display        : 'inline-flex',
         flexDirection  : cssProps.orientation,
         justifyContent : center,
         alignItems     : center,
+
+        // sizings:
+        boxSizing      : 'content-box',
 
         // typo settings:
         textAlign      : center,
         verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
 
         userSelect     : none, // disable selecting button's text
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+            states,  // apply our states
+        ],
     },
     btnOutline: Controls.styles.outline,
     btnLink: {
@@ -223,7 +231,7 @@ export default function Button(props: Props) {
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = useStateActivePassive(props);
+    const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
     
 

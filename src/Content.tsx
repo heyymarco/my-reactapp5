@@ -8,8 +8,8 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -30,8 +30,8 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -155,7 +155,7 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
         stateActive({
             [vars.animActivePassive]   : cssProps.animActive,   // override Indicator's anim active
         }),
-        statePassive({
+        statePassivating({
             [vars.animActivePassive]   : cssProps.animPassive,  // override Indicator's anim passive
         }),
     ],
@@ -171,6 +171,10 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
     // customize final composite background(s) at active state:
     [vars.backgActiveFn] : [
         getVar(
+            vars.backgGradTg,
+            vars.backgNo
+        ),
+        getVar(
             vars.backgActiveTh, // first  priority
             vars.backgIfAct     // second priority
         ),
@@ -179,31 +183,17 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
 }]};
 
 const styles = {
-    main: {
+    basic: {
         extend: [
-            Indicators.styles.main,     // copy styles from Indicator, including Indicator's cssProps & Indicator's states.
+            Indicators.styles.basic,    // copy styles from Indicator
             filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
         ],
     },
-    gradient: {
+    main: {
         extend: [
-            // copy the themes from Element:
-            Elements.styles.gradient,
+            'basic', // apply basic styles
+            states,  // apply our states
         ],
-
-        '&:not(._)': { // force to win conflict with main
-            // customize the backg at active state:
-            [vars.backgActiveFn] : [
-                ecssProps.backgGrad,
-
-                getVar(
-                    vars.backgActiveTh, // first  priority
-                    vars.backgIfAct     // second priority
-                ),
-                ecssProps.backg,
-            ],
-        },
     },
 };
 
@@ -257,13 +247,14 @@ export interface Props
 }
 export default function ListGroup(props: Props) {
     const styles         =          useStyles();
+    const elmStyles      = Elements.useStyles();
 
     const variSize       = Elements.useVariantSize(props, styles);
     const variTheme      = Elements.useVariantTheme(props, styles);
-    const variGradient   = Elements.useVariantGradient(props, styles);
+    const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
     const stateEnbDis    = useStateEnableDisable(props);
-    const stateActPass   = useStateActivePassive(props);
+    const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
     
     

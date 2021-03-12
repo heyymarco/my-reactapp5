@@ -179,6 +179,11 @@ export const stateNotEnable            = (content: object) => ({
         extend: [content]
     }
 });
+export const stateDisabling            = (content: object) => ({
+    '&.disable': { // .disable
+        extend: [content]
+    }
+});
 export const stateDisable              = (content: object) => ({
     '&.disable,&.disabled,&:disabled': { // .disable or .disabled or :disabled
         extend: [content]
@@ -206,6 +211,11 @@ export const stateNotEnablingDisabling = (content: object) => ({
 });
 
 // non-pseudo active only
+export const stateActivating               = (content: object) => ({
+    '&.active': {
+        extend: [content]
+    }
+});
 export const stateActive                   = (content: object) => ({
     '&.active,&.actived': {
         extend: [content]
@@ -216,7 +226,7 @@ export const stateNotActive                = (content: object) => ({
         extend: [content]
     }
 });
-export const statePassive                  = (content: object) => ({
+export const statePassivating              = (content: object) => ({
     '&.passive': {
         extend: [content]
     }
@@ -252,13 +262,9 @@ export const stateNoAnimStartup = () =>
 
 
 const states = {extend:[ Elements.states, { // copy Element's states
-    // customize active unthemed foreground color:
+    // define active (primary) colors:
     [vars.colorIfAct]        : colors.primaryText,
-
-    // customize active unthemed background color:
     [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
-
-    // customize active unthemed foreground color at outlined state:
     [vars.colorOutlineIfAct] : colors.primary,
 
 
@@ -305,20 +311,17 @@ const states = {extend:[ Elements.states, { // copy Element's states
         stateActive({ // [activating, actived]
             [vars.animActivePassive]              : cssProps.animActive,
 
-            extend:[
-                stateNotDisable({
-                    [vars.colorIf]        : getVar(vars.colorIfAct),
-                    [vars.backgIf]        : getVar(vars.backgIfAct),
-                    [vars.colorOutlineIf] : getVar(vars.colorOutlineIfAct),
-                }),
-            ],
+            // apply active (primary) colors:
+            [vars.colorIf]                        : getVar(vars.colorIfAct),
+            [vars.backgIf]                        : getVar(vars.backgIfAct),
+            [vars.colorOutlineIf]                 : getVar(vars.colorOutlineIfAct),
         }),
-        statePassive({ // [passivating]
+        statePassivating({ // [passivating]
             [vars.animActivePassive]              : cssProps.animPassive,
         }),
         {
             // [actived]
-            '&.actived': // if indicator was activated programatically, disable the animation
+            '&.actived': // if activated programmatically (not by user input), disable the animation
                 stateNoAnimStartup(),
 
             '&.active,&.actived': { // if activated programmatically (not by user input)
@@ -343,11 +346,16 @@ const states = {extend:[ Elements.states, { // copy Element's states
 }]};
 
 const styles = {
+    basic: {
+        extend: [
+            Elements.styles.basic,      // copy styles from Element
+            filterValidProps(cssProps), // apply our filtered cssProps
+        ],
+    },
     main: {
         extend: [
-            Elements.styles.main,       // copy styles from Element, including Element's cssProps & Element's states.
-            filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
+            'basic', // apply basic styles
+            states,  // apply our states
         ],
     },
 };
@@ -400,7 +408,7 @@ export function useStateEnableDisable(props: Props) {
     };
 }
 
-export function useStateActivePassive(props: Props) {
+export function useStateActivePassive(props: Props, stateEnbDis: {enabled: boolean} = {enabled: true}) {
     const defaultActived = false; // if [active] was not specified => the default value is active=false (released)
     const [actived,     setActived    ] = useState(props.active ?? defaultActived);
     const [activating,  setActivating ] = useState(false);
@@ -425,6 +433,7 @@ export function useStateActivePassive(props: Props) {
 
     
     const handlePassivating = () => {
+        if (!stateEnbDis.enabled) return; // control disabled => no response
         if (actived) return; // already beed actived programatically => cannot be released by mouse/keyboard
         if (passivating) return; // already being deactivating => action is not required
 
@@ -488,7 +497,7 @@ export default function Indicator(props: Props) {
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
     const stateEnbDis    = useStateEnableDisable(props);
-    const stateActPass   = useStateActivePassive(props);
+    const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
     
 

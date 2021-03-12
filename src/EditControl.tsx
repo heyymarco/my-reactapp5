@@ -13,10 +13,10 @@ import {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -38,10 +38,10 @@ export {
     escapeSvg,
     getVar,
     
-    stateEnable, stateNotEnable, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
-    stateActive, stateNotActive, statePassive, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateHover, stateNotHover, stateLeave, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
-    stateFocus, stateNotFocus, stateBlur, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
+    stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
+    stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
+    stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -56,8 +56,6 @@ export {
 
 export interface CssProps {
     cursor                 : Css.Cursor
-
-    backg                  : Css.Background
 
 
     // anim props:
@@ -143,8 +141,6 @@ const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
     cursor                 : 'text',
-
-    backg                  : colors.backg as string,
 
 
     // anim props:
@@ -319,37 +315,29 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
 
 
-    // overwrite from Control (replace with softer inactive (secondary) color):
+    // apply inactive (secondary) colors:
+    [vars.colorIf]              : colors.secondaryCont,
+    [vars.backgIf]              : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
+    // [vars.colorOutlineIf]    : colors.secondary, // still same as Control's
+    // [vars.boxShadowFocusIf]  : colors.secondaryTransp, // focus boxShadow never reach inactive (secondary) color
 
-    // customize conditional unthemed foreground color:
-    [vars.colorIf]    : colors.secondaryCont,
+    // define active (primary) colors:
+    [vars.colorIfAct]           : colors.primaryCont,
+    [vars.backgIfAct]           : `linear-gradient(${colors.primaryThin},${colors.primaryThin})`,
+    // [vars.colorOutlineIfAct] : colors.primary, // still same as Control's
+    // [vars.boxShadowFocusIf]  : colors.primaryTransp, // still same as Control's
 
-    // customize conditional unthemed background color:
-    [vars.backgIf] : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
+    // define valid (success) colors:
+    [vars.colorIfVal]           : colors.successCont,
+    [vars.backgIfVal]           : `linear-gradient(${colors.successThin},${colors.successThin})`,
+    [vars.colorOutlineIfVal]    : colors.success,
+    [vars.boxShadowFocusIfVal]  : colors.successTransp,
 
-
-
-    // overwrite from Control (replace with softer active (primary) color):
-
-    // customize active unthemed foreground color with softer color:
-    [vars.colorIfAct] : colors.primaryCont,
-
-    // customize active unthemed background color with softer color:
-    [vars.backgIfAct] : `linear-gradient(${colors.primaryThin},${colors.primaryThin})`,
-
-
-
-    // valid colors:
-    [vars.colorIfVal]          : colors.successCont,
-    [vars.backgIfVal]          : `linear-gradient(${colors.successThin},${colors.successThin})`,
-    [vars.colorOutlineIfVal]   : colors.success,
-    [vars.boxShadowFocusIfVal] : colors.successTransp,
-
-    // invalid colors:
-    [vars.colorIfInv]          : colors.dangerCont,
-    [vars.backgIfInv]          : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
-    [vars.colorOutlineIfInv]   : colors.danger,
-    [vars.boxShadowFocusIfInv] : colors.dangerTransp,
+    // define invalid (danger) colors:
+    [vars.colorIfInv]           : colors.dangerCont,
+    [vars.backgIfInv]           : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
+    [vars.colorOutlineIfInv]    : colors.danger,
+    [vars.boxShadowFocusIfInv]  : colors.dangerTransp,
 
 
 
@@ -368,7 +356,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     // all initial states are none:
 
-    [vars.backgValInv]  : 'linear-gradient(transparent,transparent)',
+    [vars.backgValInv]  : getVar(vars.backgNo),
     [vars.animValUnval] : ecssProps.animNone,
     [vars.animInvUninv] : ecssProps.animNone,
 
@@ -410,7 +398,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
         stateValid({
             [vars.backgValInv]        : cssProps.backgValid,
 
-            // apply valid colors:
+            // apply valid (success) colors:
             [vars.colorIfIf]          : getVar(vars.colorIfVal),
             [vars.backgIfIf]          : getVar(vars.backgIfVal),
             [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfVal),
@@ -426,7 +414,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
         stateInvalid({
             [vars.backgValInv]        : cssProps.backgInvalid,
 
-            // apply invalid colors:
+            // apply invalid (danger) colors:
             [vars.colorIfIf]          : getVar(vars.colorIfInv),
             [vars.backgIfIf]          : getVar(vars.backgIfInv),
             [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfInv),
@@ -439,17 +427,16 @@ const states = {extend:[ Controls.states, { // copy Control's states
 }]};
 
 const styles = {
-    main: {
+    basic: {
         extend: [
-            Controls.styles.main,       // copy styles from Control, including Control's cssProps & Control's states.
+            Controls.styles.basic,      // copy styles from Control
             filterValidProps(cssProps), // apply our filtered cssProps
-            states,                     // apply our states
         ],
 
 
         [iconElm]: {
             extend: [
-                Icons.styles.main,
+                Icons.styles.basic,
                 Icons.styles.img,
             ],
 
@@ -467,6 +454,12 @@ const styles = {
             [vars.img] : getVar(vars.backgValInv),
             backg      : getVar(vars.colorOutlineFn),
         },
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+            states,  // apply our states
+        ],
     },
 };
 
@@ -588,7 +581,7 @@ export default function EditControl(props: Props) {
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = useStateActivePassive(props);
+    const stateActPass   = useStateActivePassive(props, stateEnbDis);
     const stateValInval  = useStateValidInvalid(props);
 
     

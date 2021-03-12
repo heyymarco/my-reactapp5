@@ -71,11 +71,16 @@ createJss().setup({plugins:[
 
 
 const styles = {
-    main: {
+    basic: {
         paddingX : cssProps.x,
         paddingY : cssProps.y,
 
         display  : 'block',
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+        ],
     },
 };
 
