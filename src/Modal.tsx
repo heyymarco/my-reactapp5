@@ -27,7 +27,7 @@ import * as Containers     from './Container'
 import {
     general as typoGeneral
 }                          from './typos/index';
-import stripOuts           from './strip-outs';
+import * as stripOuts      from './strip-outs';
 import Button              from './Button';
 import ButtonIcon          from './ButtonIcon';
 

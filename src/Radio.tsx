@@ -9,6 +9,9 @@ import {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
+    stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
+    stateUncheck, stateNotUncheck,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -17,6 +20,7 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
+    useStateValidInvalid,
 }                          from './Check';
 import * as border         from './borders';
 
@@ -33,6 +37,9 @@ export {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
+    stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
+    stateUncheck, stateNotUncheck,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -41,6 +48,7 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
+    useStateValidInvalid,
 };
 
 

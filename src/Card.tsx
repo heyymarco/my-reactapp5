@@ -19,7 +19,7 @@ import {
     useStateEnableDisable, useStateActivePassive,
 }                          from './Content';
 import spacers             from './spacers';
-import stripOuts           from './strip-outs';
+import * as stripOuts      from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';

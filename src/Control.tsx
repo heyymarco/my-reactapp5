@@ -21,7 +21,7 @@ import {
     useStateEnableDisable, useStateActivePassive,
 }                          from './Indicator';
 import colors              from './colors';
-import stripOuts           from './strip-outs';
+import * as stripOuts      from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -44,28 +44,30 @@ export {
 
 
 export interface CssProps {
-    cursor                : Css.Cursor
-    cursorDisable         : Css.Cursor
+    cursor             : Css.Cursor
+    cursorDisable      : Css.Cursor
     
     
     // anim props:
 
-    boxShadowFocus        : Css.BoxShadow
+    boxShadowFocus     : Css.BoxShadow
 
-    filterHover           : Css.Filter
+    filterHover        : Css.Filter
 
-    '@keyframes hover'    : Css.Keyframes
-    '@keyframes leave'    : Css.Keyframes
-    '@keyframes focus'    : Css.Keyframes
-    '@keyframes blur'     : Css.Keyframes
-    animHover             : Css.Animation
-    animLeave             : Css.Animation
-    animFocus             : Css.Animation
-    animBlur              : Css.Animation
+    '@keyframes hover' : Css.Keyframes
+    '@keyframes leave' : Css.Keyframes
+    '@keyframes focus' : Css.Keyframes
+    '@keyframes blur'  : Css.Keyframes
+    animHover          : Css.Animation
+    animLeave          : Css.Animation
+    animFocus          : Css.Animation
+    animBlur           : Css.Animation
 }
 // const unset   = 'unset';
 const none    = 'none';
 // const inherit = 'inherit';
+// const center  = 'center';
+// const middle  = 'middle';
 
 // internal css vars:
 export const vars = Object.assign({}, Indicators.vars, {
@@ -100,32 +102,32 @@ export const vars = Object.assign({}, Indicators.vars, {
 });
 
 // re-defined later, we need to construct varProps first
-export const keyframesHover    = { from: undefined, to: undefined };
-export const keyframesLeave    = { from: undefined, to: undefined };
-export const keyframesFocus    = { from: undefined, to: undefined };
-export const keyframesBlur     = { from: undefined, to: undefined };
+export const keyframesHover = { from: undefined, to: undefined };
+export const keyframesLeave = { from: undefined, to: undefined };
+export const keyframesFocus = { from: undefined, to: undefined };
+export const keyframesBlur  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 const icssProps = Indicators.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    cursor                : 'pointer',
-    cursorDisable         : 'not-allowed',
+    cursor             : 'pointer',
+    cursorDisable      : 'not-allowed',
 
 
     // anim props:
     
-    boxShadowFocus        : [[0, 0, 0, '0.25rem']],
+    boxShadowFocus     : [[0, 0, 0, '0.25rem']],
 
-    filterHover           : [['brightness(85%)']],
+    filterHover        : [['brightness(85%)']],
 
-    '@keyframes hover'    : keyframesHover,
-    '@keyframes leave'    : keyframesLeave,
-    '@keyframes focus'    : keyframesFocus,
-    '@keyframes blur'     : keyframesBlur,
-    animHover             : [['150ms', 'ease-out', 'both', keyframesHover   ]],
-    animLeave             : [['300ms', 'ease-out', 'both', keyframesLeave   ]],
-    animFocus             : [['150ms', 'ease-out', 'both', keyframesFocus   ]],
-    animBlur              : [['300ms', 'ease-out', 'both', keyframesBlur    ]],
+    '@keyframes hover' : keyframesHover,
+    '@keyframes leave' : keyframesLeave,
+    '@keyframes focus' : keyframesFocus,
+    '@keyframes blur'  : keyframesBlur,
+    animHover          : [['150ms', 'ease-out', 'both', keyframesHover]],
+    animLeave          : [['300ms', 'ease-out', 'both', keyframesLeave]],
+    animFocus          : [['150ms', 'ease-out', 'both', keyframesFocus]],
+    animBlur           : [['300ms', 'ease-out', 'both', keyframesBlur ]],
 };
 
 
@@ -352,18 +354,16 @@ const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
 }]};
 const states = {extend:[ Elements.states, { // not copy from Indicator's states because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
     // apply inactive (secondary) colors:
-    [vars.colorIf]           : colors.secondaryText,
-    [vars.backgIf]           : `linear-gradient(${colors.secondary},${colors.secondary})`,
-    [vars.colorOutlineIf]    : colors.secondary,
+    [vars.colorIf]             : colors.secondaryText,
+    [vars.backgIf]             : `linear-gradient(${colors.secondary},${colors.secondary})`,
+    [vars.colorOutlineIf]      : colors.secondary,
+    // [vars.boxShadowFocusIf] : colors.secondaryTransp, // focus boxShadow never reach inactive (secondary) color
 
     // define active (primary) colors:
-    [vars.colorIfAct]        : colors.primaryText,
-    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
-    [vars.colorOutlineIfAct] : colors.primary,
-
-    // focus boxShadow initial is active (primary) colors:
-    // no inactive (secondary) focus boxShadow
-    [vars.boxShadowFocusIf]  : colors.primaryTransp,
+    [vars.colorIfAct]          : colors.primaryText,
+    [vars.backgIfAct]          : `linear-gradient(${colors.primary},${colors.primary})`,
+    [vars.colorOutlineIfAct]   : colors.primary,
+    [vars.boxShadowFocusIf]    : colors.primaryTransp,
 
 
 

@@ -4,7 +4,7 @@ import React               from 'react';
 
 import * as Elements       from './Element';
 import * as Controls       from './Control';
-import * as EditControls   from './EditControl';
+import * as ETxtControls   from './EditableTextControl';
 import {
     escapeSvg,
     getVar,
@@ -13,6 +13,9 @@ import {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
+    stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
+    stateUncheck, stateNotUncheck,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -22,8 +25,8 @@ import {
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
     useStateValidInvalid,
-}                          from './EditControl';
-import stripOuts           from './strip-outs';
+}                          from './EditableTextControl';
+import * as stripOuts      from './strip-outs';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -39,6 +42,9 @@ export {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
+    stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
+    stateUncheck, stateNotUncheck,
     stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -53,21 +59,21 @@ export {
 
 
 export interface CssProps {
-    backgGrad          : Css.Background
+    backgGrad : Css.Background
 }
 // const unset   = 'unset';
 // const none    = 'none';
-// const inherit = 'inherit';
-// const center  = 'center';
+const inherit = 'inherit';
+const center  = 'center';
 // const middle  = 'middle';
 
 // internal css vars:
-export const vars = EditControls.vars;
+export const vars = ETxtControls.vars;
 
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    backgGrad         : [['linear-gradient(180deg, rgba(0,0,0, 0.2), rgba(255,255,255, 0.2))', 'border-box']],
+    backgGrad : [['linear-gradient(180deg, rgba(0,0,0, 0.2), rgba(255,255,255, 0.2))', 'border-box']],
 };
 
 
@@ -87,12 +93,22 @@ export { config, cssProps };
 
 const inpElm  = '& >:first-child';
 
-const states = EditControls.states;
+const states = {extend:[ ETxtControls.states, { // copy ETxtControl's states
+    // specific states:
+    extend:[
+        stateNotUncheck({
+            [inpElm]: {
+                '&:valid': {
+                },
+            },
+        }),
+    ],
+}]};
 
 const styles = {
     basic: {
         extend: [
-            EditControls.styles.basic,  // copy styles from EditControl
+            ETxtControls.styles.basic,  // copy styles from ETxtControl
             filterValidProps(cssProps), // apply our filtered cssProps
         ],
 
@@ -100,7 +116,7 @@ const styles = {
         
         // appearance settings:
         display    : 'flex',
-        alignItems : 'center',
+        alignItems : center,
 
         // typo settings:
         verticalAlign  : 'baseline',
@@ -108,11 +124,11 @@ const styles = {
 
         [inpElm]: {
             extend: [
-                stripOuts.control,
+                stripOuts.textbox,
             ],
 
             // appearance settings:
-            display  : 'inherit',
+            display  : inherit,
             marginX  : [['calc(0px -', ecssProps.paddingX, ')']],
             marginY  : [['calc(0px -', ecssProps.paddingY, ')']],
             paddingX : ecssProps.paddingX,
@@ -152,7 +168,7 @@ export function useVariantInput(props: VariantInput, styles: Record<string, stri
 
 export interface Props
     extends
-        EditControls.Props,
+        ETxtControls.Props,
         VariantInput
 {
     defaultValue? : string | number | ReadonlyArray<string>
@@ -161,7 +177,7 @@ export interface Props
 export default function Input(props: Props) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
-    const editCtrlStyles = EditControls.useStyles();
+    const editCtrlStyles = ETxtControls.useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
     const variTheme      = Elements.useVariantTheme(props, editCtrlStyles);

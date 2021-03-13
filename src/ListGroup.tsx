@@ -19,7 +19,7 @@ import {
     useStateEnableDisable, useStateActivePassive,
 }                          from './Content';
 import * as border         from './borders';
-import stripOuts           from './strip-outs';
+import * as stripOuts      from './strip-outs';
 import ListGroupItem       from './ListGroupItem';
 
 import { createUseStyles } from 'react-jss';

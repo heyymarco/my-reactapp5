@@ -50,6 +50,7 @@ export default function App (props: any) {
 	const [focus, 	   setFocus     ] = useState(false);
 	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
 	const [check,      setCheck   ] = useState(false);
+	const [isValid,    setIsValid   ] = useState<boolean|null|undefined>(undefined);
 
     const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnableGrad(e.target.checked);
@@ -69,6 +70,21 @@ export default function App (props: any) {
 	const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCheck(e.target.checked);
 	}
+	const handleChangeIsValid = (e: React.ChangeEvent<HTMLInputElement>) => {
+		switch(e.target.value) {
+			case ' ':
+				setIsValid(null);
+				break;
+			case '1':
+				setIsValid(true);
+				break;
+			case '0':
+				setIsValid(false);
+				break;
+			default:
+				setIsValid(undefined);
+		} // switch
+	}
 
 
 	const styles = [undefined,'outline','switch','switchOutline','btn','btnOutline'];
@@ -85,6 +101,7 @@ export default function App (props: any) {
 							{
 								themes.map(theme => (
 									<Check key={theme ?? 'none'} text={theme ?? 'default'} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
+										isValid={isValid}
 										checked={check}
 										onChange={handleChangeCheck}
 										chkStyle={style as Checks.ChkStyle}
@@ -105,6 +122,7 @@ export default function App (props: any) {
 							{
 								themes.map(theme => (
 									<Radio key={indexRadio++} text={theme ?? 'default'} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}
+										isValid={isValid}
 										chkStyle={style as Checks.ChkStyle}
 
 										value={indexRadio}
@@ -174,13 +192,30 @@ export default function App (props: any) {
 						lg
 					</label>
 				</p>
-				<label>
-					<input type='checkbox'
-						checked={check}
-						onChange={handleChangeCheck}
-					/>
-					checked
-				</label>
+				<p>
+					<label>
+						<input type='checkbox'
+							checked={check}
+							onChange={handleChangeCheck}
+						/>
+						checked
+					</label>
+				</p>
+				<p>
+					IsValid:
+					{
+						[undefined, null, true, false].map(v =>
+							<label key={(v===undefined) ? '?' : ((v===null) ? ' ' : (v ? 1 : 0))}>
+								<input type='radio'
+									value={(v===undefined) ? undefined : ((v===null) ? ' ' : (v ? 1 : 0))}
+									checked={isValid===v}
+									onChange={handleChangeIsValid}
+								/>
+								{(v===undefined) ? 'auto' : ((v===null) ? 'uncheck' : (v ? 'valid' : 'invalid'))}
+							</label>
+						)
+					}
+				</p>
             </Container>
         </JssProvider>
     );

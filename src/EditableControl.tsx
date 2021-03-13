@@ -7,7 +7,6 @@ import
 }                          from 'react';
 
 import * as Elements       from './Element';
-import * as Contents       from './Content';
 import * as Controls       from './Control';
 import {
     escapeSvg,
@@ -55,12 +54,7 @@ export {
 
 
 export interface CssProps {
-    cursor                 : Css.Cursor
-
-
     // anim props:
-    backgValid             : Css.Background
-    backgInvalid           : Css.Background
 
     '@keyframes valid'     : Css.Keyframes
     '@keyframes unvalid'   : Css.Keyframes
@@ -82,54 +76,50 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
     /**
      * valid-state foreground color.
      */
-    colorIfVal          : '--indi-colorIfVal',
+    colorIfVal          : '--ectrl-colorIfVal',
 
     /**
      * valid-state background color.
      */
-    backgIfVal          : '--indi-backgIfVal',
+    backgIfVal          : '--ectrl-backgIfVal',
 
     /**
      * valid-state foreground color at outlined state.
      */
-    colorOutlineIfVal   : '--indi-colorOutlineIfVal',
+    colorOutlineIfVal   : '--ectrl-colorOutlineIfVal',
 
     /**
      * valid-state box-shadow at focused state.
      */
-    boxShadowFocusIfVal : '--indi-boxShadowFocusIfVal',
-
-
+    boxShadowFocusIfVal : '--ectrl-boxShadowFocusIfVal',
+ 
+ 
     /**
      * invalid-state foreground color.
      */
-    colorIfInv          : '--indi-colorIfInv',
+    colorIfInv          : '--ectrl-colorIfInv',
 
     /**
      * invalid-state background color.
      */
-    backgIfInv          : '--indi-backgIfInv',
+    backgIfInv          : '--ectrl-backgIfInv',
 
     /**
      * invalid-state foreground color at outlined state.
      */
-    colorOutlineIfInv   : '--indi-colorOutlineIfInv',
+    colorOutlineIfInv   : '--ectrl-colorOutlineIfInv',
 
     /**
      * invalid-state box-shadow at focused state.
      */
-    boxShadowFocusIfInv : '--indi-boxShadowFocusIfInv',
-
-
-    
-    backgValInv       : '--ectrl-backgValInv',
+    boxShadowFocusIfInv : '--ectrl-boxShadowFocusIfInv',
 
 
 
     // anim props:
 
-    animValUnval : '--ectrl-animValUnval',
-    animInvUninv : '--ectrl-animInvUninv',
+    animValUnval        : '--ectrl-animValUnval',
+    animInvUninv        : '--ectrl-animInvUninv',
 });
 
 // re-defined later, we need to construct varProps first
@@ -140,13 +130,8 @@ export const keyframesUninvalid = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    cursor                 : 'text',
-
-
     // anim props:
-    backgValid             : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#000' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/></svg>")}")`,
-    backgInvalid           : `url("data:image/svg+xml,${escapeSvg("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#000' d='M7.3,6.31,5,4,7.28,1.71a.7.7,0,1,0-1-1L4,3,1.71.72a.7.7,0,1,0-1,1L3,4,.7,6.31a.7.7,0,0,0,1,1L4,5,6.31,7.3A.7.7,0,0,0,7.3,6.31Z'/></svg>")}")`,
-
+    
     '@keyframes valid'     : keyframesValid,
     '@keyframes unvalid'   : keyframesUnvalid,
     '@keyframes invalid'   : keyframesInvalid,
@@ -165,6 +150,7 @@ Object.assign(keyframesValid, {
     },
     to: {
         backg: getVar(vars.backgFn),
+        //TODO: backg: getVar(vars.backgOutlineFn),
     }
 });
 Object.assign(keyframesUnvalid, {
@@ -179,21 +165,9 @@ Object.assign(keyframesInvalid, {
     from: {
         backg: colors.danger,
     },
-    '10%, 90%': {
-        transform: 'translate3d(-1px, 0, 0)',
-    },
-    '20%, 80%': {
-        transform: 'translate3d(2px, 0, 0)',
-    },
-    '30%, 50%, 70%': {
-        transform: 'translate3d(-4px, 0, 0)',
-    },
-    '40%, 60%': {
-        transform: 'translate3d(4px, 0, 0)',
-    },
     to: {
-        transform: 'none',
         backg: getVar(vars.backgFn),
+        //TODO: backg: getVar(vars.backgOutlineFn),
     }
 });
 Object.assign(keyframesUninvalid, {
@@ -301,9 +275,14 @@ export const stateNotInvalidatingUninvalidating = (content: object) => ({
     }
 });
 
+export const stateUncheck    = (content: object) => ({
+    '&.uncheck'       : stateNotValid(stateNotInvalid(content)),
+});
+export const stateNotUncheck = (content: object) => ({
+    '&:not(.uncheck)' : stateNotValid(stateNotInvalid(content)),
+});
 
 
-const iconElm = '&::after';
 
 const fnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
     // customize the anim:
@@ -344,36 +323,15 @@ const fnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
     },
 }]};
 const states = {extend:[ Controls.states, { // copy Control's states
-    // supress activating by mouse/keyboard (:active)
-    // but still responsive activating programatically (.active & .actived)
-    '&:active:not(.active):not(.actived)': {
-        [vars.filterActivePassive] : ecssProps.filterNone,
-        [vars.animActivePassive]   : ecssProps.animNone,
-    },
-
-
-
-    // apply inactive (secondary) colors:
-    [vars.colorIf]              : colors.secondaryCont,
-    [vars.backgIf]              : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
-    // [vars.colorOutlineIf]    : colors.secondary, // still same as Control's
-    // [vars.boxShadowFocusIf]  : colors.secondaryTransp, // focus boxShadow never reach inactive (secondary) color
-
-    // define active (primary) colors:
-    [vars.colorIfAct]           : colors.primaryCont,
-    [vars.backgIfAct]           : `linear-gradient(${colors.primaryThin},${colors.primaryThin})`,
-    // [vars.colorOutlineIfAct] : colors.primary, // still same as Control's
-    // [vars.boxShadowFocusIf]  : colors.primaryTransp, // still same as Control's
-
     // define valid (success) colors:
-    [vars.colorIfVal]           : colors.successCont,
-    [vars.backgIfVal]           : `linear-gradient(${colors.successThin},${colors.successThin})`,
+    [vars.colorIfVal]           : colors.successText,
+    [vars.backgIfVal]           : `linear-gradient(${colors.success},${colors.success})`,
     [vars.colorOutlineIfVal]    : colors.success,
     [vars.boxShadowFocusIfVal]  : colors.successTransp,
 
     // define invalid (danger) colors:
-    [vars.colorIfInv]           : colors.dangerCont,
-    [vars.backgIfInv]           : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
+    [vars.colorIfInv]           : colors.dangerText,
+    [vars.backgIfInv]           : `linear-gradient(${colors.danger},${colors.danger})`,
     [vars.colorOutlineIfInv]    : colors.danger,
     [vars.boxShadowFocusIfInv]  : colors.dangerTransp,
 
@@ -381,18 +339,26 @@ const states = {extend:[ Controls.states, { // copy Control's states
 
     // all initial states are none:
 
-    [vars.backgValInv]  : getVar(vars.backgNo),
     [vars.animValUnval] : ecssProps.animNone,
     [vars.animInvUninv] : ecssProps.animNone,
 
     // specific states:
     extend:[
+        // supress activating by mouse/keyboard (:active)
+        // but still responsive activating programatically (.active & .actived)
+        stateActive({ // [activating, actived]
+            '&:active:not(.active):not(.actived)': {
+                [vars.filterActivePassive] : ecssProps.filterNone,
+                [vars.animActivePassive]   : ecssProps.animNone,
+            },
+        }),
+
+
+
         stateValidating({
             [vars.animValUnval]       : cssProps.animValid,
         }),
         stateValid({
-            [vars.backgValInv]        : cssProps.backgValid,
-
             // apply valid (success) colors:
             [vars.colorIfIf]          : getVar(vars.colorIfVal),
             [vars.backgIfIf]          : getVar(vars.backgIfVal),
@@ -407,8 +373,6 @@ const states = {extend:[ Controls.states, { // copy Control's states
             [vars.animInvUninv]       : cssProps.animInvalid,
         }),
         stateInvalid({
-            [vars.backgValInv]        : cssProps.backgInvalid,
-
             // apply invalid (danger) colors:
             [vars.colorIfIf]          : getVar(vars.colorIfInv),
             [vars.backgIfIf]          : getVar(vars.backgIfInv),
@@ -431,28 +395,6 @@ const styles = {
             Controls.styles.basic,      // copy styles from Control
             filterValidProps(cssProps), // apply our filtered cssProps
         ],
-
-
-        [iconElm]: {
-            extend: [
-                Icons.styles.basic,
-                Icons.styles.img,
-            ],
-
-            content : '""',
-            display : 'inline-block',
-
-            height                 : '1em',     // follow parent text height
-            width                  : '1.25em',  // make sure the icon's image ratio is 1.25 or less
-            marginInlineStart      : '-1.25em', // cancel-out icon's width with negative margin, so it doen't take up space
-            maskPosition           : 'right',   // align to right
-            '-webkit-maskPosition' : 'right',   // align to right
-            pointerEvents          : 'none',    // just an overlayed element, no mouse interaction
-
-
-            [vars.img] : getVar(vars.backgValInv),
-            backg      : getVar(vars.colorOutlineFn),
-        },
     },
     main: {
         extend: [
@@ -461,16 +403,6 @@ const styles = {
         ],
     },
 };
-
-defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    extend: [
-        // copy the themes from Control:
-        (Controls.styles as any)[themeProp],
-
-        // then overwrite the themes from Content:
-        (Contents.styles as any)[themeProp],
-    ],
-}));
 
 const useStyles = createUseStyles(styles);
 export { fnVars, states, styles, useStyles };
@@ -548,7 +480,11 @@ export function useStateValidInvalid(props: Props) {
         */
         valid : valided,
 
-        class: !(succeeding || unsucceeding || erroring || unerroring) ? ((valided===null) ? null : (valided ? 'vald' : 'invd')) : [(succeeding? 'val' : (unsucceeding ? 'unval': null)), (erroring? 'inv' : (unerroring ? 'uninv': null))].join(' '),
+        class: [
+            (succeeding ? 'val' : (unsucceeding ? 'unval' : ((valided===true)  ? 'vald'                                           : null))),
+            (erroring   ? 'inv' : (unerroring   ? 'uninv' : ((valided===false) ? 'invd'                                           : null))),
+                                                            ((valided===null)  ? ((props.isValid===undefined) ? null : 'uncheck') : null),
+        ].join(' '),
         handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
             if (e.target !== e.currentTarget) return; // no bubbling
 
@@ -567,14 +503,15 @@ export interface Props
         Controls.Props
 {
     readonly? : boolean
-    isValid?  : boolean
+    isValid?  : boolean | null
 }
-export default function EditControl(props: Props) {
+export default function EditableControl(props: Props) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
+    const ctrlStyles     = Controls.useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, styles);
+    const variTheme      = Elements.useVariantTheme(props, ctrlStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
     const stateEnbDis    = useStateEnableDisable(props);
@@ -618,7 +555,7 @@ export default function EditControl(props: Props) {
                 stateValInval.handleAnimationEnd(e);
             }}
         >
-            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Content Control'}
+            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Edit Control'}
         </textarea>
     );
 }

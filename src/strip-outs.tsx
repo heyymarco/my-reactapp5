@@ -49,6 +49,27 @@ export const control = {
     },
 };
 
+/**
+ * removes a browser's default styling on input[type=**text**].
+ * **text** = text|number|email|tel|password|search|url|date|time|datetime-local|week|month
+ */
+ export const textbox = {
+     extend: [
+        control,
+     ],
+
+
+    '&::-webkit-calendar-picker-indicator, &::-webkit-inner-spin-button, &::-webkit-search-cancel-button': {
+        appearance : none,
+        display    : none,
+    },
+    
+    '-moz-appearance': 'textfield',
+    '&:valid, &:invalid': {
+        boxShadow  : unset,
+    },
+ };
+
 
 /**
  * removes a browser's default styling on list (ul > li) & (ol > li).
@@ -85,7 +106,4 @@ export const focusableElement = {
     '&:focus': {
         outline: unset,
     }
-}
-
-const exports = { link, control, list, figure, focusableElement };
-export default exports;
+};

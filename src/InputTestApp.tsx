@@ -1,3 +1,5 @@
+import type * as Css       from './Css';
+
 import
     React, {
     useState }            from 'react';
@@ -46,9 +48,9 @@ export default function App (props: any) {
 	const [enable,     setEnable    ] = useState(true);
 	const [focus, 	   setFocus     ] = useState(false);
 	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
-	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
+	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>(undefined);
 	const [inpStyle,   setInpStyle  ] = useState<'outline'|undefined>(undefined);
-	const [isValid,    setIsValid   ] = useState<boolean|undefined>(undefined);
+	const [isValid,    setIsValid   ] = useState<boolean|null|undefined>(undefined);
 
     const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnableGrad(e.target.checked);
@@ -69,17 +71,32 @@ export default function App (props: any) {
 		setInpStyle((e.target.value || undefined) as ('outline'|undefined));
 	}
 	const handleChangeIsValid = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setIsValid((e.target.value === '') ? undefined : !!(+e.target.value));
+		switch(e.target.value) {
+			case ' ':
+				setIsValid(null);
+				break;
+			case '1':
+				setIsValid(true);
+				break;
+			case '0':
+				setIsValid(false);
+				break;
+			default:
+				setIsValid(undefined);
+		} // switch
 	}
 
 
 	return (
         <JssProvider jss={jss}>
             <Container style={{minHeight: '100vh'}}>
-				Hello
-				<Input defaultValue={theme ?? 'default'} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} isValid={isValid} focus={focus}
-					inpStyle={inpStyle as Inputs.InpStyle}
-				/>
+				{
+					['text','number','email','tel','password','search','url','date','time','datetime-local','week','month'].map(type => (
+						<Input key={type} defaultValue={`type ${type}`} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} isValid={isValid} focus={focus}
+							inpStyle={inpStyle as Inputs.InpStyle} type={type as Css.InputType}
+						/>
+					))
+				}
 
 
                 <hr style={{flexBasis: '100%'}} />
@@ -161,18 +178,17 @@ export default function App (props: any) {
 						)
 					}
 				</p>
-				
 				<p>
 					IsValid:
 					{
-						[undefined, true, false].map(v =>
-							<label key={v ? 1 : ((v===false) ? 0 : -1)}>
+						[undefined, null, true, false].map(v =>
+							<label key={(v===undefined) ? '?' : ((v===null) ? ' ' : (v ? 1 : 0))}>
 								<input type='radio'
-									value={v ? 1 : ((v===false) ? 0 : undefined)}
+									value={(v===undefined) ? undefined : ((v===null) ? ' ' : (v ? 1 : 0))}
 									checked={isValid===v}
 									onChange={handleChangeIsValid}
 								/>
-								{`${v ? 'valid' : ((v === false) ? 'invalid' : 'unset')}`}
+								{(v===undefined) ? 'auto' : ((v===null) ? 'uncheck' : (v ? 'valid' : 'invalid'))}
 							</label>
 						)
 					}

@@ -9,6 +9,7 @@ import
 import * as Elements       from './Element';
 import * as Indicators     from './Indicator';
 import * as Controls       from './Control';
+import * as EditControls   from './EditableControl';
 import {
     escapeSvg,
     getVar,
@@ -17,6 +18,9 @@ import {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
+    stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
+    stateUncheck, stateNotUncheck,
     stateNoAnimStartup as base_stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
@@ -25,7 +29,8 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-}                          from './Control';
+    useStateValidInvalid,
+}                          from './EditableControl';
 import * as Buttons        from './Button';
 import * as Icons          from './Icon';
 import colors              from './colors';
@@ -44,6 +49,10 @@ export {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
+    stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
+    stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
+    stateUncheck, stateNotUncheck,
+    // stateNoAnimStartup,
 
     filterValidProps, filterPrefixProps,
 
@@ -51,6 +60,7 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
+    useStateValidInvalid,
 };
 
 
@@ -88,7 +98,7 @@ const none    = 'none';
 const center  = 'center';
 
 // internal css vars:
-export const vars = Object.assign({}, Controls.vars, Icons.vars, {
+export const vars = Object.assign({}, EditControls.vars, Icons.vars, {
     /**
      * final composite animation(s) at the "icon" element.
      */
@@ -100,6 +110,11 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
      * themed foreground color for the label.
      */
     colorLabelTh        : '--chk-colorLabelTh',
+
+    /**
+     * conditional foreground color for the label.
+     */
+    colorLabelIfIf      : '--chk-colorLabelIfIf',
 
     /**
      * conditional unthemed foreground color for the label.
@@ -115,6 +130,18 @@ export const vars = Object.assign({}, Controls.vars, Icons.vars, {
      * final foreground color for the label.
      */
     colorLabelFn        : '--chk-colorLabelFn',
+
+
+
+    /**
+     * valid-state foreground color for the label.
+     */
+    colorLabelIfVal     : '--chk-colorLabelIfVal',
+
+    /**
+     * invalid-state foreground color for the label.
+     */
+    colorLabelIfInv     : '--chk-colorLabelIfInv',
 
 
 
@@ -370,7 +397,7 @@ const iconElm        = '&::before';
 const nextElm        = '& >:nth-child(1n+2)';
 const selfAndNextElm = '&,& ~*';
 
-const fnVars = Controls.fnVars; // copy Control's fnVars
+const fnVars = EditControls.fnVars; // copy EditControl's fnVars
 const chkStates = {
     // specific states:
     extend:[
@@ -406,18 +433,28 @@ const chkStates = {
     // we should redefine the fnVars here:
     [selfAndNextElm]: fnVars,
 };
-const states = {extend:[ Controls.states, { // copy Control's states
+const states = {extend:[ EditControls.states, { // copy EditControl's states
     [nextElm]: {
-        // customize conditional unthemed foreground color for the label:
-        [vars.colorLabelIf]    : colors.secondaryCont,
-        [vars.colorLabelIfAct] : colors.primaryCont,
-    
         // customize final foreground color for the label:
         [vars.colorLabelFn] : getVar(
-            // vars.colorLabelIfIf, // first  priority - never got input error
-            vars.colorLabelTh,      // second priority
-            vars.colorLabelIf       // third  priority
+            vars.colorLabelIfIf, // first  priority
+            vars.colorLabelTh,   // second priority
+            vars.colorLabelIf    // third  priority
         ),
+
+
+
+        // apply inactive (secondary) color for the label:
+        [vars.colorLabelIf]    : colors.secondaryCont,
+
+        // define active (primary) color for the label:
+        [vars.colorLabelIfAct] : colors.primaryCont,
+
+        // define valid (success) color for the label:
+        [vars.colorLabelIfVal] : colors.successCont,
+
+        // define invalid (danger) color for the label:
+        [vars.colorLabelIfInv] : colors.dangerCont,
     },
 
 
@@ -440,17 +477,30 @@ const states = {extend:[ Controls.states, { // copy Control's states
         stateNotDisable({extend:[
             stateHover({
                 [nextElm]: {
-                    // apply active (primary) color on label:
+                    // apply active (primary) color for the label:
                     [vars.colorLabelIf] : getVar(vars.colorLabelIfAct),
                 },
             }),
         ]}),
         stateActive({ // [activating, actived]
             [nextElm]: {
-                // apply active (primary) color on label:
+                // apply active (primary) color for the label:
                 [vars.colorLabelIf]     : getVar(vars.colorLabelIfAct),
             },
         }),
+
+
+
+        stateValid({
+            [nextElm]: {
+                [vars.colorLabelIfIf]   : getVar(vars.colorLabelIfVal),
+            }
+        }),
+        stateInvalid({
+            [nextElm]: {
+                [vars.colorLabelIfIf]   : getVar(vars.colorLabelIfInv),
+            }
+        }), 
 
 
 
@@ -511,7 +561,7 @@ const inheritStyles = {
 };
 const chkStyles = {
     extend: [
-        Controls.styles.basic,      // copy styles from Control
+        EditControls.styles.basic,  // copy styles from EditControl
         inheritStyles,              // force some props inherited from parent
         filterValidProps(cssProps), // apply our filtered cssProps
     ],
@@ -566,7 +616,7 @@ const chkStyles = {
 const styles = {
     basic: {
         extend: [
-            Controls.styles.basic, // copy styles from Control
+            EditControls.styles.basic, // copy styles from EditControl
         ],
 
         backg         : undefined, // delete
@@ -731,7 +781,7 @@ export function useVariantCheck(props: VariantCheck, styles: Record<string, stri
 
 export interface Props
     extends
-        Controls.Props,
+        EditControls.Props,
         VariantCheck
 {
     text?     : string
@@ -754,6 +804,7 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
     const stateActPass   = useStateActivePassive(props, stateEnbDis);
+    const stateValInval  = useStateValidInvalid(props);
     const stateChkClr    = useStateCheckClear(props);
 
     
@@ -773,6 +824,7 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                 stateLeave.class,
                 // stateFocusBlur.class,
                 stateActPass.class,
+                stateValInval.class,
                 stateChkClr.class ?? (stateChkClr.checked ? 'checked' : null),
             ].join(' ')}
         
@@ -824,6 +876,7 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                     stateLeave.handleAnimationEnd(e);
                     stateFocusBlur.handleAnimationEnd(e);
                     stateActPass.handleAnimationEnd(e);
+                    stateValInval.handleAnimationEnd(e);
                     stateChkClr.handleAnimationEnd(e);
                 }}
                 onChange={props.onChange}
