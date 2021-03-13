@@ -21,7 +21,8 @@ import {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateUncheck, stateNotUncheck,
-    stateNoAnimStartup as base_stateNoAnimStartup,
+    applyStateNoAnimStartup as base_applyStateNoAnimStartup,
+    applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -52,7 +53,8 @@ export {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateUncheck, stateNotUncheck,
-    // stateNoAnimStartup,
+    // applyStateNoAnimStartup,
+    applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -322,7 +324,7 @@ export const stateNotCheckingClearing = (content: object) => ({
 });
 
 // override base: pseudo + non-pseudo active
-export const stateNoAnimStartup = () =>
+export const applyStateNoAnimStartup = () =>
     stateNotCheckingClearing(
         stateNotEnablingDisabling(
             stateNotActivatingPassivating(
@@ -530,14 +532,14 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
             [vars.animCheckClear]          : cssProps.animClear,
         }),
         stateNotCheckingClearing( // [not-checking, not-clearing]
-            stateNoAnimStartup()
+            applyStateNoAnimStartup()
         ),
         { // [cleared]
             '&.checked,&:checked:not(.check)': { // if ctrl was checked, disable the animation
                 [chkElm]: stateNotFocusBlur({ // still transfering the focus state to the "sibling" element(s):
                     // the "sibling" element(s):
                     '&~*': // transfer the checked state to the "sibling" element(s):
-                        base_stateNoAnimStartup(),
+                        base_applyStateNoAnimStartup(),
                 }),
             },
         },

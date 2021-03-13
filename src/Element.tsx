@@ -237,6 +237,16 @@ export { config, cssProps };
 
 
 
+export const applyStateDefault = () => ({
+    // apply default colors:
+
+    [vars.colorIf]        : cssProps.color,
+    [vars.backgIf]        : getVar(vars.backgNo),
+    [vars.colorOutlineIf] : cssProps.color,
+});
+
+
+
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
@@ -300,25 +310,16 @@ const fnVars = {
 };
 
 const states = {
-    // customize conditional unthemed foreground color:
-    [vars.colorIf] : cssProps.color,
-
-
-
     // customize none background.
     [vars.backgNo] : 'linear-gradient(transparent,transparent)',
-
-    // customize conditional unthemed background color:
-    [vars.backgIf] : getVar(vars.backgNo),
-
-
-
-    // customize conditional unthemed foreground color at outlined state:
-    [vars.colorOutlineIf] : cssProps.color,
 
 
 
     extend: [
+        applyStateDefault(),
+
+
+
         fnVars,
     ],
 };

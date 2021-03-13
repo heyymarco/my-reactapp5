@@ -16,7 +16,7 @@ import {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -41,7 +41,7 @@ export {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -282,6 +282,21 @@ export const stateNotUncheck = (content: object) => ({
     '&:not(.uncheck)' : stateNotValid(stateNotInvalid(content)),
 });
 
+export const applyStateValid = () => ({
+    // apply valid (success) colors:
+    [vars.colorIfIf]          : getVar(vars.colorIfVal),
+    [vars.backgIfIf]          : getVar(vars.backgIfVal),
+    [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfVal),
+    [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfVal),
+});
+export const applyStateInvalid = () => ({
+    // apply invalid (danger) colors:
+    [vars.colorIfIf]          : getVar(vars.colorIfInv),
+    [vars.backgIfIf]          : getVar(vars.backgIfInv),
+    [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfInv),
+    [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfInv),
+});
+
 
 
 const fnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
@@ -358,13 +373,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
         stateValidating({
             [vars.animValUnval]       : cssProps.animValid,
         }),
-        stateValid({
-            // apply valid (success) colors:
-            [vars.colorIfIf]          : getVar(vars.colorIfVal),
-            [vars.backgIfIf]          : getVar(vars.backgIfVal),
-            [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfVal),
-            [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfVal),
-        }),
+        stateValid(applyStateValid()),
         stateUnvalidating({
             [vars.animValUnval]       : cssProps.animUnvalid,
         }),
@@ -372,13 +381,7 @@ const states = {extend:[ Controls.states, { // copy Control's states
         stateInvalidating({
             [vars.animInvUninv]       : cssProps.animInvalid,
         }),
-        stateInvalid({
-            // apply invalid (danger) colors:
-            [vars.colorIfIf]          : getVar(vars.colorIfInv),
-            [vars.backgIfIf]          : getVar(vars.backgIfInv),
-            [vars.colorOutlineIfIf]   : getVar(vars.colorOutlineIfInv),
-            [vars.boxShadowFocusIfIf] : getVar(vars.boxShadowFocusIfInv),
-        }),
+        stateInvalid(applyStateInvalid()),
         stateUninvalidating({
             [vars.animInvUninv]       : cssProps.animUninvalid,
         }),

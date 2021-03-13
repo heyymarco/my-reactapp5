@@ -11,6 +11,8 @@ import {
     escapeSvg,
     getVar,
 
+    applyStateDefault,
+
     filterValidProps, filterPrefixProps,
     
     defineSizes, defineThemes,
@@ -25,6 +27,8 @@ import JssVarCollection    from './jss-var-collection';
 export {
     escapeSvg,
     getVar,
+
+    applyStateDefault,
     
     filterValidProps, filterPrefixProps,
 
@@ -252,12 +256,18 @@ export const stateNotActivatingPassivating = (content: object) => ({
     }
 });
 
-export const stateNoAnimStartup = () =>
+export const applyStateNoAnimStartup = () =>
     stateNotEnablingDisabling(
         stateNotActivatingPassivating({
             animationDuration: [['0ms'], '!important'],
         })
     );
+export const applyStateActive = () => ({
+    // apply active (primary) colors:
+    [vars.colorIf]        : getVar(vars.colorIfAct),
+    [vars.backgIf]        : getVar(vars.backgIfAct),
+    [vars.colorOutlineIf] : getVar(vars.colorOutlineIfAct),
+});
 
 
 
@@ -318,7 +328,7 @@ const states = {extend:[ Elements.states, { // copy Element's states
         }),
         { // [disabled]
             '&.disabled,&:disabled:not(.disable)' : // if ctrl was disabled programatically, disable first animation
-                stateNoAnimStartup(),
+                applyStateNoAnimStartup(),
         },
 
 
@@ -328,10 +338,9 @@ const states = {extend:[ Elements.states, { // copy Element's states
         stateActive({ // [activating, actived]
             [vars.animActivePassive]              : cssProps.animActive,
 
-            // apply active (primary) colors:
-            [vars.colorIf]                        : getVar(vars.colorIfAct),
-            [vars.backgIf]                        : getVar(vars.backgIfAct),
-            [vars.colorOutlineIf]                 : getVar(vars.colorOutlineIfAct),
+            extend:[
+                applyStateActive(),
+            ],
         }),
         statePassivating({ // [passivating]
             [vars.animActivePassive]              : cssProps.animPassive,
@@ -339,7 +348,7 @@ const states = {extend:[ Elements.states, { // copy Element's states
         {
             // [actived]
             '&.actived': // if activated programmatically (not by user input), disable the animation
-                stateNoAnimStartup(),
+                applyStateNoAnimStartup(),
         },
 
 

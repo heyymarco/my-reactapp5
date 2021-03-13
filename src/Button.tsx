@@ -12,7 +12,7 @@ import {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -38,7 +38,7 @@ export {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 

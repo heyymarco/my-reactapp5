@@ -17,7 +17,7 @@ import {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateUncheck, stateNotUncheck,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -46,7 +46,7 @@ export {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateUncheck, stateNotUncheck,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -104,16 +104,19 @@ export { config, cssProps };
 
 
 
+export const applyStateDefault = () => ({
+    [vars.colorIf]             : colors.secondaryCont,
+    [vars.backgIf]             : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
+    // [vars.colorOutlineIf]   : colors.secondary,       // still same as Control's
+    // [vars.boxShadowFocusIf] : colors.secondaryTransp, // still same as Control's
+});
+
+
+
 const iconElm = '&::after';
 
 const fnVars = EditControls.fnVars;
 const states = {extend:[ EditControls.states, { // copy EditControl's states
-    // apply inactive (secondary) colors:
-    [vars.colorIf]              : colors.secondaryCont,
-    [vars.backgIf]              : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
-    // [vars.colorOutlineIf]    : colors.secondary,       // still same as Control's
-    // [vars.boxShadowFocusIf]  : colors.secondaryTransp, // still same as Control's
-
     // define active (primary) colors:
     [vars.colorIfAct]           : colors.primaryCont,
     [vars.backgIfAct]           : `linear-gradient(${colors.primaryThin},${colors.primaryThin})`,
@@ -159,6 +162,10 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
         stateInvalid({
             [vars.backgValInv] : cssProps.backgInvalid,
         }),
+
+
+
+        applyStateDefault(),
 
 
 
@@ -224,7 +231,7 @@ export interface Props
 {
     readonly? : boolean
 }
-export default function EditTextControl(props: Props) {
+export default function EditableTextControl(props: Props) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
 

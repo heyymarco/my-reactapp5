@@ -3,7 +3,7 @@ import React               from 'react';
 import {
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateDefault,
 
     filterValidProps, filterPrefixProps,
 
@@ -17,7 +17,7 @@ import {
 export {
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    stateNoAnimStartup,
+    applyStateNoAnimStartup, applyStateDefault,
 
     filterValidProps, filterPrefixProps,
 

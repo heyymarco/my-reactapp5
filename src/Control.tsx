@@ -295,7 +295,7 @@ export const stateNotActivatingPassivating = (content: object) => ({
 });
 
 // override base: pseudo + non-pseudo active
-export const stateNoAnimStartup = () =>
+export const applyStateNoAnimStartup = () =>
     stateNotEnablingDisabling(
         stateNotActivatingPassivating(
             stateNotHoverLeave(
@@ -305,6 +305,20 @@ export const stateNoAnimStartup = () =>
             )
         )
     );
+export const applyStateDefault = () => ({
+    // apply default (secondary) colors:
+    [vars.colorIf]          : colors.secondaryText,
+    [vars.backgIf]          : `linear-gradient(${colors.secondary},${colors.secondary})`,
+    [vars.colorOutlineIf]   : colors.secondary,
+    [vars.boxShadowFocusIf] : colors.secondaryTransp,
+});
+export const applyStateActive = () => ({
+    // apply active (primary) colors:
+    [vars.colorIf]          : getVar(vars.colorIfAct),
+    [vars.backgIf]          : getVar(vars.backgIfAct),
+    [vars.colorOutlineIf]   : getVar(vars.colorOutlineIfAct),
+    [vars.boxShadowFocusIf] : colors.primaryTransp,
+});
 
 
 
@@ -353,17 +367,11 @@ const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     },
 }]};
 const states = {extend:[ Elements.states, { // not copy from Indicator's states because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
-    // apply inactive (secondary) colors:
-    [vars.colorIf]             : colors.secondaryText,
-    [vars.backgIf]             : `linear-gradient(${colors.secondary},${colors.secondary})`,
-    [vars.colorOutlineIf]      : colors.secondary,
-    // [vars.boxShadowFocusIf] : colors.secondaryTransp, // focus boxShadow never reach inactive (secondary) color
-
     // define active (primary) colors:
     [vars.colorIfAct]          : colors.primaryText,
     [vars.backgIfAct]          : `linear-gradient(${colors.primary},${colors.primary})`,
     [vars.colorOutlineIfAct]   : colors.primary,
-    [vars.boxShadowFocusIf]    : colors.primaryTransp,
+    // [vars.boxShadowFocusIfAct] : colors.primaryTransp,
 
 
 
@@ -396,7 +404,7 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
         }),
         { // [disabled]
             '&.disabled,&:disabled:not(.disable)' : // if ctrl was disabled programatically, disable first animation
-                stateNoAnimStartup(),
+                applyStateNoAnimStartup(),
         },
 
 
@@ -414,19 +422,17 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
                 [vars.filterHoverLeave]   : cssProps.filterHover,
                 [vars.animHoverLeave]     : cssProps.animHover,
 
-                // apply active (primary) colors:
-                [vars.colorIf]            : getVar(vars.colorIfAct),
-                [vars.backgIf]            : getVar(vars.backgIfAct),
-                [vars.colorOutlineIf]     : getVar(vars.colorOutlineIfAct),
+                extend:[
+                    applyStateActive(),
+                ],
             }),
             stateFocus({
                 [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
                 [vars.animFocusBlur]      : cssProps.animFocus,
 
-                // apply active (primary) colors:
-                [vars.colorIf]            : getVar(vars.colorIfAct),
-                [vars.backgIf]            : getVar(vars.backgIfAct),
-                [vars.colorOutlineIf]     : getVar(vars.colorOutlineIfAct),
+                extend:[
+                    applyStateActive(),
+                ],
             }),
         ]}),
         
@@ -438,10 +444,9 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
         stateActive({ // [activating, actived]
             [vars.animActivePassive]              : icssProps.animActive,
 
-            // apply active (primary) colors:
-            [vars.colorIf]        : getVar(vars.colorIfAct),
-            [vars.backgIf]        : getVar(vars.backgIfAct),
-            [vars.colorOutlineIf] : getVar(vars.colorOutlineIfAct),
+            extend:[
+                applyStateActive(),
+            ],
         }),
         statePassivating({ // [passivating]
             [vars.animActivePassive]              : icssProps.animPassive,
@@ -449,8 +454,12 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
         {
             // [actived]
             '&.actived': // // if activated programmatically (not by user input), disable the animation
-                stateNoAnimStartup(),
+                applyStateNoAnimStartup(),
         },
+
+
+
+        applyStateDefault(),
 
 
 
