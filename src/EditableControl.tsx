@@ -438,7 +438,7 @@ export function useNativeValidator(customValidator?: CustomValidatorHandler) {
 
 
     const handleVals = (target: EditableControlElement) => {
-        setValid(customValidator ? customValidator(target.validity, target.value) : valid);
+        setValid(customValidator ? customValidator(target.validity, target.value) : target.validity.valid);
     }
     const handleInit = (target: EditableControlElement | null) => {
         if (target) handleVals(target);
