@@ -786,8 +786,11 @@ export interface Props
         EditControls.Props<HTMLInputElement, string|number>,
         VariantCheck
 {
-    text?    : string
+    // values:
     checked? : boolean
+
+    // labels:
+    text?    : string
 }
 export function CheckBase(styleMain: string | null, props: Props, inputType: string) {
     const styles          =          useStyles();
@@ -802,7 +805,7 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
     const stateLeave      = useStateLeave(stateEnbDis);
     const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
     const stateActPass    = useStateActivePassive(props, stateEnbDis);
-    const nativeValidator = useNativeValidator();
+    const nativeValidator = useNativeValidator(props.customValidator);
     const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
     const stateChkClr     = useStateCheckClear(props);
 
@@ -855,15 +858,27 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                     // stateActPass.class,
                 ].join(' ')}
 
-                type={inputType}
-
+                // accessibility:
                 disabled={stateEnbDis.disabled}
-                required={props.required}
                 readOnly={props.readonly}
+
+                // values:
                 value={props.value}
                 defaultValue={props.defaultValue}
+                onChange={(e) => {
+                    props.onChange?.(e);
+                    nativeValidator.handleChange(e);
+                }}
                 checked={stateChkClr.checked}
 
+                // validations:
+                required={props.required}
+                ref={nativeValidator.handleInit}
+
+                // formats:
+                type={inputType}
+
+                // labels:
                 aria-hidden={isBtnStyle}
             
                 // onMouseEnter={stateLeave.handleMouseEnter}
@@ -881,11 +896,6 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                     stateActPass.handleAnimationEnd(e);
                     stateValInval.handleAnimationEnd(e);
                     stateChkClr.handleAnimationEnd(e);
-                }}
-                ref={nativeValidator.handleInit}
-                onChange={(e) => {
-                    props.onChange?.(e);
-                    nativeValidator.handleChange(e);
                 }}
             />
             {props.text ? <span onAnimationEnd={stateChkClr.handleAnimationEndPress}>{props.text}</span> : undefined}

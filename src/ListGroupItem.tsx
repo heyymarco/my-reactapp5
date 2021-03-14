@@ -29,8 +29,9 @@ export {
 
 
 export interface Props {
-    active?:   boolean
+    // accessibility:
     enabled?:  boolean
+    active?:   boolean
 
     children?: React.ReactNode
 };

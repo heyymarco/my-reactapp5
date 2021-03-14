@@ -94,6 +94,8 @@ export default function App (props: any) {
 					['text','number','email','tel','password','search','url','date','time','datetime-local','week','month'].map(type => (
 						<Input key={type} defaultValue={`type ${type}`} theme={theme} enableGradient={enableGrad} size={size} enabled={enable} isValid={isValid} focus={focus}
 							inpStyle={inpStyle as Inputs.InpStyle} type={type as Css.InputType}
+
+							customValidator={((type==='email') && ((state, val) => state.valid && (!val || val.endsWith('gmail.com')))) || undefined}
 						/>
 					))
 				}

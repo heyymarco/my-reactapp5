@@ -193,8 +193,6 @@ export function useVariantButton(props: VariantButton, styles: Record<string, st
 }
 
 export const themeDefaults: {[btnStyle: string]: (string|undefined)} = {
-    default     : 'secondary',
-    outline     : 'secondary',
     link        : 'primary',
     outlineLink : 'primary',
 };
@@ -209,13 +207,16 @@ export interface Props
         Controls.Props,
         VariantButton
 {
-    orientation? : Css.Orientation
-    whiteSpace?  : Css.WhiteSpace
+    // actions:
+    onClick?     : React.MouseEventHandler<HTMLButtonElement>
 
+    // labels:
     text?        : string
     children?    : React.ReactNode
 
-    onClick?     : React.MouseEventHandler<HTMLButtonElement>
+    // layouts:
+    orientation? : Css.Orientation
+    whiteSpace?  : Css.WhiteSpace
 }
 export default function Button(props: Props) {
     const styles         =          useStyles();
@@ -250,7 +251,11 @@ export default function Button(props: Props) {
                 stateActPass.class,
             ].join(' ')}
 
+            // accessibility:
             disabled={stateEnbDis.disabled}
+
+            // actions:
+            onClick={props.onClick}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
@@ -266,7 +271,6 @@ export default function Button(props: Props) {
                 stateFocusBlur.handleAnimationEnd(e);
                 stateActPass.handleAnimationEnd(e);
             }}
-            onClick={props.onClick}
         >
             {props.text}
             {props.children}

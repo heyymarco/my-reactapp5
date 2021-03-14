@@ -412,19 +412,39 @@ export { fnVars, states, styles, useStyles };
 
 
 
-type EditableControlElement = HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement;
-export function useNativeValidator() {
-    const [valid, setValid] = useState<boolean|undefined>(undefined);
+type EditableControlElement  = HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement;
+/**
+ * Validation was not performed because validation service is not ready.
+ * Next validation (if fail or success) will treated as "the first validation" thus the animation might be suppressed.
+ */
+export type ValNotPerf = undefined
+/**
+ * Validation was skipped because its not required. No success nor error shown.
+ */
+export type ValNone    = null
+/**
+ * Validation result was failed because the value is not meet the criteria.
+ */
+export type ValError   = false
+/**
+ * Validation result was successful and the value is meet the criteria.
+ */
+export type ValSuccess = true
+export type ValResult  = ValNotPerf|ValNone|ValError|ValSuccess;
+export type ValidatorHandler = () => ValResult;
+export type CustomValidatorHandler = (state: ValidityState, value: string) => ValResult;
+export function useNativeValidator(customValidator?: CustomValidatorHandler) {
+    const [valid, setValid] = useState<ValResult>(undefined);
 
 
+    const handleVals = (target: EditableControlElement) => {
+        setValid(customValidator ? customValidator(target.validity, target.value) : valid);
+    }
     const handleInit = (target: EditableControlElement | null) => {
-        if (target) {
-            const valid = target.validity.valid;
-            setValid(valid);
-        } // if
+        if (target) handleVals(target);
     }
     const handleChange = ({target}: React.ChangeEvent<EditableControlElement>) => {
-        setValid(target.validity.valid);
+        handleVals(target);
     }
     return {
         /**
@@ -436,11 +456,10 @@ export function useNativeValidator() {
         handleChange : handleChange,
     };
 }
-export type ValidatorHandler = () => (boolean|null|undefined);
 export function useStateValidInvalid<TElement, TValue>(props: Props<TElement, TValue>, validator?: ValidatorHandler) {
     const defaultValided: (boolean|null)  = null; // if [isValid] was not specified => the default value is isValid=null (unverified)
     const getIsValid = () => (props.isValid!==undefined) ? props.isValid : (validator ? validator() : defaultValided);
-    const [valided,      setValided     ] = useState(getIsValid());
+    const [valided,      setValided     ] = useState<ValResult>(getIsValid());
     const [succeeding,   setSucceeding  ] = useState(false);
     const [unsucceeding, setUnsucceeding] = useState(false);
     const [erroring,     setErroring    ] = useState(false);
@@ -533,27 +552,34 @@ export interface Props<TElement, TValue>
     extends
         Controls.Props
 {
-    required?     : boolean
-    readonly?     : boolean
-    value?        : TValue
-    defaultValue? : TValue
-    isValid?      : boolean | null
-    onChange?     : React.ChangeEventHandler<TElement>
+    // accessibility:
+    readonly?        : boolean
+
+    // values:
+    value?           : TValue
+    defaultValue?    : TValue
+    onChange?        : React.ChangeEventHandler<TElement>
+    
+    // validations:
+    isValid?         : boolean | null
+    customValidator? : CustomValidatorHandler
+    required?        : boolean
 }
 export default function EditableControl(props: Props<HTMLTextAreaElement, string>) {
-    const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
-    const ctrlStyles     = Controls.useStyles();
+    const styles          =          useStyles();
+    const elmStyles       = Elements.useStyles();
+    const ctrlStyles      = Controls.useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, ctrlStyles);
-    const variGradient   = Elements.useVariantGradient(props, elmStyles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
+    const variTheme       = Elements.useVariantTheme(props, ctrlStyles);
+    const variGradient    = Elements.useVariantGradient(props, elmStyles);
 
-    const stateEnbDis    = useStateEnableDisable(props);
-    const stateLeave     = useStateLeave(stateEnbDis);
-    const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = useStateActivePassive(props, stateEnbDis);
-    const stateValInval  = useStateValidInvalid(props);
+    const stateEnbDis     = useStateEnableDisable(props);
+    const stateLeave      = useStateLeave(stateEnbDis);
+    const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
+    const stateActPass    = useStateActivePassive(props, stateEnbDis);
+    const nativeValidator = useNativeValidator(props.customValidator);
+    const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
 
     
 
@@ -572,11 +598,21 @@ export default function EditableControl(props: Props<HTMLTextAreaElement, string
                 stateValInval.class,
             ].join(' ')}
 
+            // accessibility:
             disabled={stateEnbDis.disabled}
-            required={props.required}
             readOnly={props.readonly}
+
+            // values:
             value={props.value}
             defaultValue={props.defaultValue}
+            onChange={(e) => {
+                props.onChange?.(e);
+                nativeValidator.handleChange(e);
+            }}
+
+            // validations:
+            required={props.required}
+            ref={nativeValidator.handleInit}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
@@ -593,7 +629,6 @@ export default function EditableControl(props: Props<HTMLTextAreaElement, string
                 stateActPass.handleAnimationEnd(e);
                 stateValInval.handleAnimationEnd(e);
             }}
-            onChange={props.onChange}
         >
             {(props as React.PropsWithChildren<typeof props>)?.children ?? 'Base Edit Control'}
         </textarea>

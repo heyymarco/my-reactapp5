@@ -637,6 +637,7 @@ export interface Props
     extends
         Indicators.Props
 {
+    // accessibility:
     focus?:   boolean
 }
 export default function Control(props: Props) {
@@ -668,6 +669,7 @@ export default function Control(props: Props) {
                 stateActPass.class,
             ].join(' ')}
 
+            // accessibility:
             disabled={stateEnbDis.disabled}
         
             onMouseEnter={stateLeave.handleMouseEnter}

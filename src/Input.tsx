@@ -172,7 +172,13 @@ export interface Props<TElement, TValue>
         ETxtControls.Props<TElement, TValue>,
         VariantInput
 {
+    // validations:
+    min? : string | number;
+    max? : string | number;
+
+    // formats:
     type?         : Css.InputType
+    placeholder?  : string
 }
 export default function Input(props: Props<HTMLInputElement, string>) {
     const styles          =          useStyles();
@@ -187,7 +193,7 @@ export default function Input(props: Props<HTMLInputElement, string>) {
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
     const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
-    const nativeValidator = useNativeValidator();
+    const nativeValidator = useNativeValidator(props.customValidator);
     const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
 
     
@@ -217,22 +223,33 @@ export default function Input(props: Props<HTMLInputElement, string>) {
             }}
         >
             <input
-                type={props.type ?? 'text'}
-
+                // accessibility:
                 disabled={stateEnbDis.disabled}
-                required={props.required}
                 readOnly={props.readonly}
+
+                // values:
                 value={props.value}
                 defaultValue={props.defaultValue}
-
-                onFocus={stateFocusBlur.handleFocus}
-                onBlur={stateFocusBlur.handleBlur}
-
-                ref={nativeValidator.handleInit}
                 onChange={(e) => {
                     props.onChange?.(e);
                     nativeValidator.handleChange(e);
                 }}
+                
+                // validations:
+                required={props.required}
+                minLength={props.minLength}
+                maxLength={props.maxLength}
+                pattern={props.pattern}
+                min={props.min}
+                max={props.max}
+                ref={nativeValidator.handleInit}
+
+                // formats:
+                type={props.type ?? 'text'}
+                placeholder={props.placeholder}
+
+                onFocus={stateFocusBlur.handleFocus}
+                onBlur={stateFocusBlur.handleBlur}
             />
 
         </span>

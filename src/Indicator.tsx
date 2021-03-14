@@ -497,8 +497,9 @@ export interface Props
     extends
         Elements.Props
 {
-    active?:  boolean
+    // accessibility:
     enabled?: boolean
+    active?:  boolean
 }
 export default function Indicator(props: Props) {
     const styles         =          useStyles();

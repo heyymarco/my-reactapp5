@@ -230,6 +230,10 @@ export interface Props<TElement, TValue>
     extends
         EditControls.Props<TElement, TValue>
 {
+    // validations:
+    minLength? : number
+    maxLength? : number
+    pattern?   : string
 }
 export default function EditableTextControl(props: Props<HTMLTextAreaElement, string>) {
     const styles          =          useStyles();
@@ -242,7 +246,7 @@ export default function EditableTextControl(props: Props<HTMLTextAreaElement, st
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
     const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
-    const nativeValidator = useNativeValidator();
+    const nativeValidator = useNativeValidator(props.customValidator);
     const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
 
     
@@ -261,11 +265,24 @@ export default function EditableTextControl(props: Props<HTMLTextAreaElement, st
                 stateValInval.class,
             ].join(' ')}
 
+            // accessibility:
             disabled={stateEnbDis.disabled}
-            required={props.required}
             readOnly={props.readonly}
+
+            // values:
             value={props.value}
             defaultValue={props.defaultValue}
+            onChange={(e) => {
+                props.onChange?.(e);
+                nativeValidator.handleChange(e);
+            }}
+            
+            // validations:
+            required={props.required}
+            minLength={props.minLength}
+            maxLength={props.maxLength}
+            // pattern={props.pattern}
+            ref={nativeValidator.handleInit}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
@@ -276,11 +293,6 @@ export default function EditableTextControl(props: Props<HTMLTextAreaElement, st
                 stateLeave.handleAnimationEnd(e);
                 stateFocusBlur.handleAnimationEnd(e);
                 stateValInval.handleAnimationEnd(e);
-            }}
-            ref={nativeValidator.handleInit}
-            onChange={(e) => {
-                props.onChange?.(e);
-                nativeValidator.handleChange(e);
             }}
         >
             {(props as React.PropsWithChildren<typeof props>)?.children ?? 'Base Edit Text Control'}

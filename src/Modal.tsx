@@ -322,14 +322,17 @@ export interface Props
         Elements.VariantGradient,
         VariantAlign
 {
+    // appearance:
     active?     : boolean
     scrollable? : boolean
 
+    // actions:
+    onClose?    : (closeType: CloseType) => void
+
+    // children:
     header?     : React.ReactNode
     children?   : React.ReactNode
     footer?     : React.ReactNode
-
-    onClose?    : (closeType: CloseType) => void
 }
 export default function Modal(props: Props) {
     const styles       = useStyles();
