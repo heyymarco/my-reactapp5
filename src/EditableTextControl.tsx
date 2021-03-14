@@ -25,7 +25,7 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 }                          from './EditableControl';
 import colors              from './colors';
 import * as Icons          from './Icon';
@@ -54,8 +54,9 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 };
+export type ValidatorHandler = EditControls.ValidatorHandler;
 
 
 
@@ -225,25 +226,24 @@ export { fnVars, states, styles, useStyles };
 
 
 
-export interface Props
+export interface Props<TElement, TValue>
     extends
-        EditControls.Props
+        EditControls.Props<TElement, TValue>
 {
-    readonly? : boolean
 }
-export default function EditableTextControl(props: Props) {
-    const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
+export default function EditableTextControl(props: Props<HTMLTextAreaElement, string>) {
+    const styles          =          useStyles();
+    const elmStyles       = Elements.useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, styles);
-    const variGradient   = Elements.useVariantGradient(props, elmStyles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
+    const variTheme       = Elements.useVariantTheme(props, styles);
+    const variGradient    = Elements.useVariantGradient(props, elmStyles);
 
-    const stateEnbDis    = useStateEnableDisable(props);
-    const stateLeave     = useStateLeave(stateEnbDis);
-    const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = useStateActivePassive(props, stateEnbDis);
-    const stateValInval  = useStateValidInvalid(props);
+    const stateEnbDis     = useStateEnableDisable(props);
+    const stateLeave      = useStateLeave(stateEnbDis);
+    const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
+    const nativeValidator = useNativeValidator();
+    const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
 
     
 
@@ -258,29 +258,32 @@ export default function EditableTextControl(props: Props) {
                 stateEnbDis.class,
                 stateLeave.class,
                 stateFocusBlur.class,
-                stateActPass.class,
                 stateValInval.class,
             ].join(' ')}
 
             disabled={stateEnbDis.disabled}
+            required={props.required}
+            readOnly={props.readonly}
+            value={props.value}
+            defaultValue={props.defaultValue}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
             onFocus={stateFocusBlur.handleFocus}
             onBlur={stateFocusBlur.handleBlur}
-            onMouseDown={stateActPass.handleMouseDown}
-            onKeyDown={stateActPass.handleKeyDown}
-            onMouseUp={stateActPass.handleMouseUp}
-            onKeyUp={stateActPass.handleKeyUp}
             onAnimationEnd={(e) => {
                 stateEnbDis.handleAnimationEnd(e);
                 stateLeave.handleAnimationEnd(e);
                 stateFocusBlur.handleAnimationEnd(e);
-                stateActPass.handleAnimationEnd(e);
                 stateValInval.handleAnimationEnd(e);
             }}
+            ref={nativeValidator.handleInit}
+            onChange={(e) => {
+                props.onChange?.(e);
+                nativeValidator.handleChange(e);
+            }}
         >
-            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Edit Text Control'}
+            {(props as React.PropsWithChildren<typeof props>)?.children ?? 'Base Edit Text Control'}
         </textarea>
     );
 }

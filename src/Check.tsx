@@ -30,7 +30,7 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 }                          from './EditableControl';
 import * as Buttons        from './Button';
 import * as Icons          from './Icon';
@@ -62,7 +62,7 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 };
 
 
@@ -783,31 +783,28 @@ export function useVariantCheck(props: VariantCheck, styles: Record<string, stri
 
 export interface Props
     extends
-        EditControls.Props,
+        EditControls.Props<HTMLInputElement, string|number>,
         VariantCheck
 {
-    text?     : string
-
-    checked?  : boolean
-    onChange? : React.ChangeEventHandler<HTMLInputElement>
-
-    value?    : string | ReadonlyArray<string> | number
+    text?    : string
+    checked? : boolean
 }
 export function CheckBase(styleMain: string | null, props: Props, inputType: string) {
-    const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
+    const styles          =          useStyles();
+    const elmStyles       = Elements.useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, styles);
-    const variGradient   = Elements.useVariantGradient(props, elmStyles);
-    const variCheck      =          useVariantCheck(props, styles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
+    const variTheme       = Elements.useVariantTheme(props, styles);
+    const variGradient    = Elements.useVariantGradient(props, elmStyles);
+    const variCheck       =          useVariantCheck(props, styles);
 
-    const stateEnbDis    = useStateEnableDisable(props);
-    const stateLeave     = useStateLeave(stateEnbDis);
-    const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateActPass   = useStateActivePassive(props, stateEnbDis);
-    const stateValInval  = useStateValidInvalid(props);
-    const stateChkClr    = useStateCheckClear(props);
+    const stateEnbDis     = useStateEnableDisable(props);
+    const stateLeave      = useStateLeave(stateEnbDis);
+    const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
+    const stateActPass    = useStateActivePassive(props, stateEnbDis);
+    const nativeValidator = useNativeValidator();
+    const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
+    const stateChkClr     = useStateCheckClear(props);
 
     
 
@@ -859,10 +856,14 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                 ].join(' ')}
 
                 type={inputType}
-                value={props.value}
 
                 disabled={stateEnbDis.disabled}
+                required={props.required}
+                readOnly={props.readonly}
+                value={props.value}
+                defaultValue={props.defaultValue}
                 checked={stateChkClr.checked}
+
                 aria-hidden={isBtnStyle}
             
                 // onMouseEnter={stateLeave.handleMouseEnter}
@@ -881,7 +882,11 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                     stateValInval.handleAnimationEnd(e);
                     stateChkClr.handleAnimationEnd(e);
                 }}
-                onChange={props.onChange}
+                ref={nativeValidator.handleInit}
+                onChange={(e) => {
+                    props.onChange?.(e);
+                    nativeValidator.handleChange(e);
+                }}
             />
             {props.text ? <span onAnimationEnd={stateChkClr.handleAnimationEndPress}>{props.text}</span> : undefined}
         </label>

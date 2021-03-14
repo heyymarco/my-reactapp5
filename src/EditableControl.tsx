@@ -412,21 +412,50 @@ export { fnVars, states, styles, useStyles };
 
 
 
-export function useStateValidInvalid(props: Props) {
+type EditableControlElement = HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement;
+export function useNativeValidator() {
+    const [valid, setValid] = useState<boolean|undefined>(undefined);
+
+
+    const handleInit = (target: EditableControlElement | null) => {
+        if (target) {
+            const valid = target.validity.valid;
+            setValid(valid);
+        } // if
+    }
+    const handleChange = ({target}: React.ChangeEvent<EditableControlElement>) => {
+        setValid(target.validity.valid);
+    }
+    return {
+        /**
+         * 
+         * @returns true = valid, false = invalid, undefined = UI is still loading, validator is not ready to validate
+         */
+        validator    : () => valid,
+        handleInit   : handleInit,
+        handleChange : handleChange,
+    };
+}
+export type ValidatorHandler = () => (boolean|null|undefined);
+export function useStateValidInvalid<TElement, TValue>(props: Props<TElement, TValue>, validator?: ValidatorHandler) {
     const defaultValided: (boolean|null)  = null; // if [isValid] was not specified => the default value is isValid=null (unverified)
-    const [valided,      setValided     ] = useState(props.isValid ?? defaultValided);
+    const getIsValid = () => (props.isValid!==undefined) ? props.isValid : (validator ? validator() : defaultValided);
+    const [valided,      setValided     ] = useState(getIsValid());
     const [succeeding,   setSucceeding  ] = useState(false);
     const [unsucceeding, setUnsucceeding] = useState(false);
     const [erroring,     setErroring    ] = useState(false);
     const [unerroring,   setUnerroring  ] = useState(false);
 
     
-    const newValid = props.isValid ?? defaultValided;
+    const newValid = getIsValid();
     useEffect(() => {
         if (valided !== newValid) {
             setValided(newValid);
 
-            if (newValid === null) { // neither success nor error
+            if ((valided === undefined) || (newValid === undefined)) {
+                // UI is still loading, validator is not ready to validate
+            }
+            else if (newValid === null) { // neither success nor error
                 if (valided === true) { // if was success
                     // fade out success mark:
                     setSucceeding(false);
@@ -481,8 +510,7 @@ export function useStateValidInvalid(props: Props) {
         /**
          * being/was valid or being/was invalid
         */
-        valid : valided,
-
+        valid: valided,
         class: [
             (succeeding ? 'val' : (unsucceeding ? 'unval' : ((valided===true)  ? 'vald'                                           : null))),
             (erroring   ? 'inv' : (unerroring   ? 'uninv' : ((valided===false) ? 'invd'                                           : null))),
@@ -501,14 +529,18 @@ export function useStateValidInvalid(props: Props) {
     };
 }
 
-export interface Props
+export interface Props<TElement, TValue>
     extends
         Controls.Props
 {
-    readonly? : boolean
-    isValid?  : boolean | null
+    required?     : boolean
+    readonly?     : boolean
+    value?        : TValue
+    defaultValue? : TValue
+    isValid?      : boolean | null
+    onChange?     : React.ChangeEventHandler<TElement>
 }
-export default function EditableControl(props: Props) {
+export default function EditableControl(props: Props<HTMLTextAreaElement, string>) {
     const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
     const ctrlStyles     = Controls.useStyles();
@@ -541,6 +573,10 @@ export default function EditableControl(props: Props) {
             ].join(' ')}
 
             disabled={stateEnbDis.disabled}
+            required={props.required}
+            readOnly={props.readonly}
+            value={props.value}
+            defaultValue={props.defaultValue}
         
             onMouseEnter={stateLeave.handleMouseEnter}
             onMouseLeave={stateLeave.handleMouseLeave}
@@ -557,8 +593,9 @@ export default function EditableControl(props: Props) {
                 stateActPass.handleAnimationEnd(e);
                 stateValInval.handleAnimationEnd(e);
             }}
+            onChange={props.onChange}
         >
-            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Edit Control'}
+            {(props as React.PropsWithChildren<typeof props>)?.children ?? 'Base Edit Control'}
         </textarea>
     );
 }

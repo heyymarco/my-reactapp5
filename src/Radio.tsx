@@ -20,7 +20,7 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 }                          from './Check';
 import * as border         from './borders';
 
@@ -48,7 +48,7 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 };
 
 

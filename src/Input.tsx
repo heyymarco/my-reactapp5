@@ -24,7 +24,7 @@ import {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 }                          from './EditableTextControl';
 import * as stripOuts      from './strip-outs';
 
@@ -53,8 +53,9 @@ export {
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
-    useStateValidInvalid,
+    useNativeValidator, useStateValidInvalid,
 };
+export type ValidatorHandler = ETxtControls.ValidatorHandler;
 
 
 
@@ -166,28 +167,28 @@ export function useVariantInput(props: VariantInput, styles: Record<string, stri
     };
 }
 
-export interface Props
+export interface Props<TElement, TValue>
     extends
-        ETxtControls.Props,
+        ETxtControls.Props<TElement, TValue>,
         VariantInput
 {
-    defaultValue? : string | number | ReadonlyArray<string>
     type?         : Css.InputType
 }
-export default function Input(props: Props) {
-    const styles         =          useStyles();
-    const elmStyles      = Elements.useStyles();
-    const editCtrlStyles = ETxtControls.useStyles();
+export default function Input(props: Props<HTMLInputElement, string>) {
+    const styles          =          useStyles();
+    const elmStyles       = Elements.useStyles();
+    const eTxtCtrlStyles  = ETxtControls.useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, editCtrlStyles);
-    const variGradient   = Elements.useVariantGradient(props, elmStyles);
-    const variInput      =          useVariantInput(props, styles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
+    const variTheme       = Elements.useVariantTheme(props, eTxtCtrlStyles);
+    const variGradient    = Elements.useVariantGradient(props, elmStyles);
+    const variInput       =          useVariantInput(props, styles);
 
-    const stateEnbDis    = useStateEnableDisable(props);
-    const stateLeave     = useStateLeave(stateEnbDis);
-    const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
-    const stateValInval  = useStateValidInvalid(props);
+    const stateEnbDis     = useStateEnableDisable(props);
+    const stateLeave      = useStateLeave(stateEnbDis);
+    const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
+    const nativeValidator = useNativeValidator();
+    const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
 
     
 
@@ -216,13 +217,22 @@ export default function Input(props: Props) {
             }}
         >
             <input
+                type={props.type ?? 'text'}
+
                 disabled={stateEnbDis.disabled}
+                required={props.required}
+                readOnly={props.readonly}
+                value={props.value}
+                defaultValue={props.defaultValue}
 
                 onFocus={stateFocusBlur.handleFocus}
                 onBlur={stateFocusBlur.handleBlur}
-    
-                type={props.type ?? 'text'}
-                defaultValue={props.defaultValue}
+
+                ref={nativeValidator.handleInit}
+                onChange={(e) => {
+                    props.onChange?.(e);
+                    nativeValidator.handleChange(e);
+                }}
             />
 
         </span>
