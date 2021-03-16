@@ -15,7 +15,7 @@ import {
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
-    stateUncheck, stateNotUncheck,
+    stateValidationDisabled, stateValidationEnabled,
     applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
@@ -44,7 +44,7 @@ export {
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
-    stateUncheck, stateNotUncheck,
+    stateValidationDisabled, stateValidationEnabled,
     applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
@@ -97,7 +97,7 @@ const inpElm  = '& >:first-child';
 const states = {extend:[ ETxtControls.states, { // copy ETxtControl's states
     // specific states:
     extend:[
-        stateNotUncheck({
+        stateValidationEnabled({
             [inpElm]: {
                 '&:valid': {
                 },

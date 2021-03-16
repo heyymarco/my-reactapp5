@@ -3,7 +3,8 @@ import type * as Css       from './Css';
 import
     React, {
     useState,
-    useEffect
+    useEffect,
+    useContext
 }                          from 'react';
 
 import * as Elements       from './Element';
@@ -26,6 +27,8 @@ import {
     useStateLeave, useStateFocusBlur,
 }                          from './Control';
 import colors              from './colors';
+import * as validations    from './validations';
+import type * as Val       from './validations';
 
 import { createUseStyles } from 'react-jss';
 import JssVarCollection    from './jss-var-collection';
@@ -274,11 +277,15 @@ export const stateNotInvalidatingUninvalidating = (content: object) => ({
     }
 });
 
-export const stateUncheck    = (content: object) => ({
-    '&.uncheck'       : stateNotValid(stateNotInvalid(content)),
+export const stateValidationDisabled = (content: object) => ({
+    '&.valdis'       : {
+        extend: [content]
+    }
 });
-export const stateNotUncheck = (content: object) => ({
-    '&:not(.uncheck)' : stateNotValid(stateNotInvalid(content)),
+export const stateValidationEnabled  = (content: object) => ({
+    '&:not(.valdis)' : {
+        extend: [content]
+    }
 });
 
 export const applyStateValid = () => ({
@@ -412,28 +419,15 @@ export { fnVars, states, styles, useStyles };
 
 
 type EditableControlElement  = HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement;
-/**
- * Validation was skipped because its not required. Neither success nor error shown.
- */
-export type ValNone    = null
-/**
- * Validation result was failed because the value is not meet the criteria.
- */
-export type ValError   = false
-/**
- * Validation result was successful and the value is meet the criteria.
- */
-export type ValSuccess = true
-export type ValResult  = ValNone|ValError|ValSuccess;
-export type ValidatorHandler = () => ValResult;
-export type CustomValidatorHandler = (state: ValidityState, value: string) => ValResult;
+export type ValidatorHandler = () => Val.Result;
+export type CustomValidatorHandler = (state: ValidityState, value: string) => Val.Result;
 export function useNativeValidator(customValidator?: CustomValidatorHandler) {
-    let [valid, setValid] = useState<ValResult>(null);
+    let [isValid, setIsValid] = useState<Val.Result>(null);
 
 
     const handleVals = (target: EditableControlElement) => {
-        valid = (customValidator ? customValidator(target.validity, target.value) : target.validity.valid);
-        setValid(valid);
+        isValid = (customValidator ? customValidator(target.validity, target.value) : target.validity.valid);
+        setIsValid(isValid);
     }
     const handleInit = (target: EditableControlElement | null) => {
         if (target) handleVals(target);
@@ -446,25 +440,37 @@ export function useNativeValidator(customValidator?: CustomValidatorHandler) {
          * 
          * @returns true = valid, false = invalid, undefined = UI is still loading, validator is not ready to validate
          */
-        validator    : () => valid,
+        validator    : (() => isValid) as ValidatorHandler,
+
         handleInit   : handleInit,
         handleChange : handleChange,
     };
 }
 export function useStateValidInvalid<TElement, TValue>(props: Props<TElement, TValue>, validator?: ValidatorHandler) {
-    const defaultValided: ValResult  = null; // if [isValid] nor validator was not specified => the default value is isValid=null (neither error nor success)
-    const [valided,      setValided     ] = useState<ValResult|undefined>(
-        (props.isValid !== undefined) ? props.isValid // if [isValid] was specified => use the value as initial
-        :
-        (validator ? undefined : defaultValided)      // if validator was specified => evaluate the validator at startup (mark as undefined); otherwise use the default value
-    );
+    const valContext          = useContext(validations.Context);
+    const defaultValided: Val.Result  = null; // if [isValid] nor validator was not specified => the default value is isValid=null (neither error nor success)
+    const [valided,      setValided     ] = useState((): (Val.Result|undefined) => {
+        // use context as the primary validator:
+        if (valContext.enableValidation === false) return null;
+        if (valContext.isValid !== undefined)      return valContext.isValid;
+
+        // use own controllable validator as secondary:
+        if (props.enableValidation === false)      return null;
+        if (props.isValid !== undefined)           return props.isValid;
+
+        // use native validator as tertiary:
+        if (validator)                             return undefined; // undefined means => evaluate the validator at startup
+
+        // use default value as fallback:
+        return defaultValided;
+    });
     const [succeeding,   setSucceeding  ] = useState(false);
     const [unsucceeding, setUnsucceeding] = useState(false);
     const [erroring,     setErroring    ] = useState(false);
     const [unerroring,   setUnerroring  ] = useState(false);
 
 
-    const handleChangeInternal = (newValid: ValResult) => {
+    const handleChangeInternal = (newValid: Val.Result) => {
         if (valided !== newValid) {
             setValided(newValid);
 
@@ -507,14 +513,26 @@ export function useStateValidInvalid<TElement, TValue>(props: Props<TElement, TV
     }
 
 
-    if (props.isValid !== undefined) { // controllable prop => watch the changes
-        handleChangeInternal(/*newValid =*/props.isValid);
-    }
-    else if ((valided !== undefined) && validator) { // validator marked has been loaded => watch the validator's changes
-        handleChangeInternal(/*newValid =*/validator());
-    }
+    // watch the changes:
+    const newValid = ((): (Val.Result|undefined) => {
+        // use context as the primary validator:
+        if (valContext.enableValidation === false) return null;
+        if (valContext.isValid !== undefined)      return valContext.isValid;
+
+        // use own controllable validator as secondary:
+        if (props.enableValidation === false)      return null;
+        if (props.isValid !== undefined)           return props.isValid;
+
+        // use native validator as tertiary (if validator has been loaded):
+        if ((valided !== undefined) && validator)  return validator();
+
+        // no change needed:
+        return undefined;
+    })();
+    if (newValid !== undefined) handleChangeInternal(/*newValid =*/newValid);
 
     
+    // watch the changes once (only at startup):
     useEffect(() => {
         if (valided === undefined) {
             // now validator has been loaded => re-"set the initial" of [valided] with any values other than undefined
@@ -535,15 +553,22 @@ export function useStateValidInvalid<TElement, TValue>(props: Props<TElement, TV
         if (erroring)     setErroring(false);
         if (unerroring)   setUnerroring(false);
     }
+    const valDisabled = // causing the validator() not evaluated (disabled):
+        (valContext.enableValidation === false) ||
+        (valContext.isValid === null) ||
+        (props.enableValidation === false) ||
+        (props.isValid !== null) ||
+        (!validator);
     return {
         /**
          * being/was valid or being/was invalid
         */
-        valid: (valided ?? null) as ValResult,
+        valid: (valided ?? null) as Val.Result,
+        valDisabled: valDisabled,
         class: [
-            (succeeding ? 'val' : (unsucceeding ? 'unval' : ((valided===true)  ? 'vald'                                           : null))),
-            (erroring   ? 'inv' : (unerroring   ? 'uninv' : ((valided===false) ? 'invd'                                           : null))),
-                                                            ((valided===null)  ? ((props.isValid===undefined) ? null : 'uncheck') : null),
+            (succeeding ? 'val' : (unsucceeding ? 'unval' : ((valided === true)  ? 'vald'                          : null))),
+            (erroring   ? 'inv' : (unerroring   ? 'uninv' : ((valided === false) ? 'invd'                          : null))),
+                                                            ((valided === null)  ? (valDisabled ? 'valdis' : null) : null),
         ].join(' '),
         handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
             if (e.target !== e.currentTarget) return; // no bubbling
@@ -560,7 +585,8 @@ export function useStateValidInvalid<TElement, TValue>(props: Props<TElement, TV
 
 export interface Props<TElement, TValue>
     extends
-        Controls.Props
+        Controls.Props,
+        Val.Validation
 {
     // accessibility:
     readonly?        : boolean
@@ -571,7 +597,6 @@ export interface Props<TElement, TValue>
     onChange?        : React.ChangeEventHandler<TElement>
     
     // validations:
-    isValid?         : ValResult
     customValidator? : CustomValidatorHandler
     required?        : boolean
 }

@@ -10,6 +10,7 @@ import type * as Inputs from './Input';
 import Input from './Input';
 import Check from './Check';
 import Button from './Button';
+import ValidationProvider from './validations';
 // import Icon from './Icon';
 
 import {JssProvider}             from 'react-jss'
@@ -46,40 +47,47 @@ const jss = createJss().setup({plugins:[
 	jssPluginNormalizeShorthands()
 ]});
 export default function App (props: any) {
-	const [enabled, setEnabled] = useState(true);
-	const [active, setActive] = useState(false);
-	const [agree, setAgree] = useState(false);
+	const [enableVal, setEnableVal] = useState(false);
 
 	return (
         <JssProvider jss={jss}>
             <Container style={{minHeight: '100vh'}}>
 				<form>
-					<Input 
-						type='email'
-						required={true}
-						defaultValue='abc@'
-					/>
-
-					<label>
-						<input type='checkbox' checked={agree}
-							onChange={(e) => setAgree(e.target.checked)}
+					<ValidationProvider
+						enableValidation={enableVal}
+					>
+						<Input 
+							type='text'
+							required={true}
+							placeholder='your name?'
 						/>
-						checked
-					</label>
-
-					<label>
-						<input type='checkbox' checked={enabled}
-							onChange={(e) => setEnabled(e.target.checked)}
+						<Input 
+							type='email'
+							required={true}
+							defaultValue='abc@'
 						/>
-						enabled
-					</label>
-
-					<label>
-						<input type='checkbox' checked={active}
-							onChange={(e) => setActive(e.target.checked)}
+						<Input 
+							type='text'
+							required={false}
+							minLength={3}
+							placeholder='your pet name?'
 						/>
-						active
-					</label>
+						<Check text='I agree the terms'
+							required={true}
+						/>
+						<hr/>
+
+						<Button text='submit' theme='primary' onClick={() =>
+							setEnableVal(true)
+						} />
+
+						<label>
+							<input type='checkbox' checked={enableVal}
+								onChange={(e) => setEnableVal(e.target.checked)}
+							/>
+							enable validation
+						</label>
+					</ValidationProvider>
 				</form>
             </Container>
         </JssProvider>

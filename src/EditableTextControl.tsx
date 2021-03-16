@@ -16,7 +16,7 @@ import {
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
-    stateUncheck, stateNotUncheck,
+    stateValidationDisabled, stateValidationEnabled,
     applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
@@ -45,7 +45,7 @@ export {
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
-    stateUncheck, stateNotUncheck,
+    stateValidationDisabled, stateValidationEnabled,
     applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,

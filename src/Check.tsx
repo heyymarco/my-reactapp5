@@ -19,7 +19,7 @@ import {
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
-    stateUncheck, stateNotUncheck,
+    stateValidationDisabled, stateValidationEnabled,
     applyStateNoAnimStartup as base_applyStateNoAnimStartup,
     applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
 
@@ -51,7 +51,7 @@ export {
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
-    stateUncheck, stateNotUncheck,
+    stateValidationDisabled, stateValidationEnabled,
     // applyStateNoAnimStartup,
     applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
 
