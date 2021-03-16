@@ -55,9 +55,9 @@ export {
 
 
 export interface CssProps {
-    align     : Css.AlignItems
+    align                     : Css.AlignItems
 
-    boxShadow : Css.BoxShadow
+    boxShadow                 : Css.BoxShadow
 
 
     // anim props:
@@ -81,14 +81,21 @@ const center  = 'center';
 // internal css vars:
 export const vars = {
     /**
-     * custom css props for manipulating animation(s).
+     * final composite animation(s) at the content (card) layer.
      */
-    animFn       : '--mod-animFn',
+    animFn      : '--mod-animFn',
 
     /**
-     * custom css props for manipulating backg's animation(s).
+     * final composite animation(s) at the backg (overlay) layer.
      */
-    animBackgFn  : '--mod-animBackgFn',
+    backgAnimFn : '--mod-backgAnimFn',
+
+
+    // forwards:
+    backgFw     : '--mod-backgFw',
+    boxShadowFw : '--mod-boxShadowFw',
+    animFw      : '--mod-animFw',
+    heightFw    : '--mod-heightFw',
 };
 
 // re-defined later, we need to construct varProps first
@@ -99,9 +106,9 @@ export const keyframesBackgPassive = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
-    align     : center,
+    align                     : center,
 
-    boxShadow : [[0, 0, '10px', 'black']],
+    boxShadow                 : [[0, 0, '10px', 'black']],
     
 
     // anim props:
@@ -121,15 +128,15 @@ const _cssProps: CssProps = {
 
 Object.assign(keyframesActive, {
     from: {
-        opacity: 0,
-        transform: 'scale(0)',
+        opacity   : 0,
+        transform : 'scale(0)',
     },
     '70%': {
-        transform: 'scale(1.1)',
+        transform : 'scale(1.1)',
     },
     to: {
-        opacity: 1,
-        transform: 'scale(1)',
+        opacity   : 1,
+        transform : 'scale(1)',
     }
 });
 Object.assign(keyframesPassive, {
@@ -167,25 +174,30 @@ export { config, cssProps };
 
 
 
-const states = {
-    // customize the anim:
+const fnVars = {
+    // customize final composite animation(s) at the content (card) layer:
     [vars.animFn]      : none,
-    [vars.animBackgFn] : none,
 
-
-
+    // customize final composite animation(s) at the backg (overlay) layer:
+    [vars.backgAnimFn] : none,
+};
+const states = {
     extend:[
         stateActive({ // [activating, actived]
             [vars.animFn]      : cssProps.animActive,
-            [vars.animBackgFn] : cssProps.backgAnimActive,
+            [vars.backgAnimFn] : cssProps.backgAnimActive,
         }),
         statePassivating({ // [passivating]
             [vars.animFn]      : cssProps.animPassive,
-            [vars.animBackgFn] : cssProps.backgAnimPassive,
+            [vars.backgAnimFn] : cssProps.backgAnimPassive,
         }),
         stateNotActivePassive({ // hides the modal if not [activating, actived, passivating]
             display: none,
         }),
+
+
+
+        fnVars,
     ],
 };
 
@@ -194,6 +206,7 @@ const styles = {
         // kill the scroll on the body:
         overflow: 'hidden',
     },
+
     basic: { // overlay layer with limited width & height as scroller
         extend: [
             stripOuts.focusableElement, // clear browser's default styles
@@ -201,7 +214,7 @@ const styles = {
         ],
 
         // a custom css props for manipulating backg's animation(s):
-        anim: getVar(vars.animBackgFn), // apply prop
+        anim: getVar(vars.backgAnimFn), // apply prop
 
         // fill the entire screen:
         position : 'fixed',
@@ -231,30 +244,22 @@ const styles = {
 
 
 
-            '& >*': { // background layer
-                extend: [
-                    filterValidProps(cssProps), // apply our filtered cssProps
-                ],
+            [vars.backgFw]     : ecssProps.backg,
+            [vars.boxShadowFw] : ecssProps.boxShadow,
+            [vars.animFw]      : ecssProps.anim,
+            [vars.heightFw]    : Cards.cssProps.height,
+            '& >*': { // card layer
+                // overwrite some Card's props:
+                '--elm-backg'       : typoGeneral.cssProps.backg, // set backg as same as page's backg (can be solid color or image)
+                '--elm-boxShadow'   : cssProps.boxShadow,
+                [Cards.vars.animFn] : getVar(vars.animFn), // apply prop
+                '--crd-height'      : 'auto', // overwrite card's height to auto resize
 
-                // a custom css props for manipulating animation(s):
-                anim: getVar(vars.animFn), // apply prop
-
-                display   : 'block',
-                width     : 'fit-content',
-                height    : 'fit-content',
-                boxSizing : 'content-box',
-
-                // set backg as same as page's backg (can be solid color or image):
-                // to overcome card's transparent/trancluent backg color:
-                backg        : typoGeneral.cssProps.backg,
-                backgClip    : 'border-box',
-                borderRadius : ecssProps.borderRadius,
-                
-                
-                
-                '& >*': { // card layer
-                    // overwrite some Card's props:
-                    '--crd-height'    : 'auto', // overwrite card's height to auto resize
+                '& >*': {
+                    '--elm-backg'       : getVar(vars.backgFw),
+                    '--elm-boxShadow'   : getVar(vars.boxShadowFw),
+                    [Cards.vars.animFn] : getVar(vars.animFw),
+                    '--crd-height'      : getVar(vars.heightFw),
                 },
             },
         },
@@ -265,20 +270,20 @@ const styles = {
             states,  // apply our states
         ],
     },
+
     scollable: {
         '& >*': { // scrolling layer with additional paddings
-            '& >*': { // background layer
-                '& >*': { // card layer
-                    maxHeight : `calc(100vh - (${Containers.cssProps.y} * 2))`,
-                    boxSizing : 'border-box',
-    
-                    '& >*': { // header, body, footer
-                        overflowY: 'auto',
-                    },
+            '& >*': { // card layer
+                maxHeight : `calc(100vh - (${Containers.cssProps.y} * 2))`,
+                boxSizing : 'border-box',
+
+                '& >*': { // header, body, footer
+                    overflowY: 'auto',
                 },
             },
         },
     },
+
     alignStart: {
         alignItems: 'start',
     },
@@ -290,19 +295,19 @@ const styles = {
     },
 
     title: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        display        : 'flex',
+        justifyContent : 'space-between',
+        alignItems     : center,
     },
     actionBar: {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
+        display        : 'flex',
+        justifyContent : 'flex-end',
+        alignItems     : center,
     },
 };
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 
@@ -322,12 +327,14 @@ export interface Props
         Elements.VariantGradient,
         VariantAlign
 {
-    // appearance:
+    // accessibility:
     active?     : boolean
-    scrollable? : boolean
 
     // actions:
     onClose?    : (closeType: CloseType) => void
+
+    // layouts:
+    scrollable? : boolean
 
     // children:
     header?     : React.ReactNode
@@ -343,11 +350,14 @@ export default function Modal(props: Props) {
 
 
     
+    // dynamic cardProps based on current props:
     const cardProps = useMemo(() => {
-        const cardProps: Cards.Props = Object.assign({}, props, {
+        const cardProps: Cards.Props = {
+            ...props,
             active: undefined,
-        });
+        };
 
+        // create default header:
         if ((cardProps.header === undefined) || (typeof(cardProps.header) === 'string')) {
             cardProps.header = (
                 <h5 className={styles.title}>
@@ -357,6 +367,7 @@ export default function Modal(props: Props) {
             );
         }
 
+        // create default footer:
         if ((cardProps.footer === undefined) || (typeof(cardProps.footer) === 'string')) {
             cardProps.footer = (
                 <p className={styles.actionBar}>
@@ -371,6 +382,7 @@ export default function Modal(props: Props) {
     }, [props, styles.title, styles.actionBar]);
 
 
+    // if actived => auto focus the ui:
     const modalUi = useRef<HTMLElement>(null);
     useEffect(() => {
         if (stateActPass.actived) modalUi.current?.focus();
@@ -387,10 +399,8 @@ export default function Modal(props: Props) {
 
                 stateActPass.class,
             ].join(' ')}
-        
-            onAnimationEnd={(e) => {
-                stateActPass.handleAnimationEnd(e);
-            }}
+
+            // actions:
 
             // watch [escape key] on the whole modal, including card & children:
             onKeyDown={(e) => ((e.code === 'Escape') || (e.key === 'Escape')) && props.onClose?.('shortcut')}
@@ -403,11 +413,14 @@ export default function Modal(props: Props) {
 
             // make a reference for focusing programatically at shown (active = true)
             ref={modalUi}
+        
+
+            onAnimationEnd={(e) => {
+                stateActPass.handleAnimationEnd(e);
+            }}
         >
             <div>
-                <div>
-                    <Card {...cardProps} />
-                </div>
+                <Card {...cardProps} />
             </div>
         </section>
     );

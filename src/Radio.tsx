@@ -64,8 +64,7 @@ export interface CssProps {
 // const center  = 'center';
 
 // internal css vars:
-export const vars = Object.assign({}, Checks.vars, {
-});
+export const vars = Checks.vars;
 
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {

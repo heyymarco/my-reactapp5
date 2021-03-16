@@ -54,12 +54,12 @@ export interface CssProps {
 // const middle  = 'middle';
 
 // internal css vars:
-export const vars = Object.assign({}, Contents.vars, {
+export const vars = {...Contents.vars,
     /**
      * (internal use) Forwards anim to children element.
     */
     animFw: '--lg-animFw',
-});
+};
 
 // re-defined later, we need to construct varProps first
 const ecssProps = Elements.cssProps;

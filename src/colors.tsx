@@ -103,26 +103,17 @@ const themesCont = {
     darkCont      : contColor(themes.dark      as Color),
 };
 
-const props4 = Object.assign({},
-    basics,
-    themes,
-    page,
-);
-const props3 = Object.assign({},
-    props4,
-    page2,
-    page3,
-);
-const props2 = Object.assign({},
-    props3,
-    themesTransp,
-    themesText,
-);
-const props = Object.assign({},
-    props2,
-    themesThin,
-    themesCont,
-);
+const props = {
+    ...basics,
+    ...themes,
+    ...page,
+    ...page2,
+    ...page3,
+    ...themesTransp,
+    ...themesText,
+    ...themesThin,
+    ...themesCont,
+};
 
 
 

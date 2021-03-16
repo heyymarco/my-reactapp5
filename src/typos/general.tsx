@@ -72,25 +72,23 @@ const basics = {
     backg                 : colors.backg as string, // defaults is color's backg. It can be an image with the average color as color's backg.
 };
 
-const cssProps: CssProps = Object.assign({},
-    basics,
-    {
-        fontSize          : basics.fontSizeNm,
-        fontSizeXs        : [['calc(', basics.fontSizeNm, '*', 0.50  , ')']],
-        fontSizeSm        : [['calc(', basics.fontSizeNm, '*', 0.75  , ')']],
-        fontSizeMd        : [['calc(', basics.fontSizeNm, '*', 1.25  , ')']],
-        fontSizeLg        : [['calc(', basics.fontSizeNm, '*', 1.50  , ')']],
-        fontSizeXl        : [['calc(', basics.fontSizeNm, '*', 1.75  , ')']],
-        fontSizeXxl       : [['calc(', basics.fontSizeNm, '*', 2.00  , ')']],
-        fontSizeXxxl      : [['calc(', basics.fontSizeNm, '*', 2.25  , ')']],
+const cssProps: CssProps = {
+    ...basics,
+    fontSize              : basics.fontSizeNm,
+    fontSizeXs            : [['calc(', basics.fontSizeNm, '*', 0.50  , ')']],
+    fontSizeSm            : [['calc(', basics.fontSizeNm, '*', 0.75  , ')']],
+    fontSizeMd            : [['calc(', basics.fontSizeNm, '*', 1.25  , ')']],
+    fontSizeLg            : [['calc(', basics.fontSizeNm, '*', 1.50  , ')']],
+    fontSizeXl            : [['calc(', basics.fontSizeNm, '*', 1.75  , ')']],
+    fontSizeXxl           : [['calc(', basics.fontSizeNm, '*', 2.00  , ')']],
+    fontSizeXxxl          : [['calc(', basics.fontSizeNm, '*', 2.25  , ')']],
 
-        fontFamily        : basics.fontFamilySansSerief,
+    fontFamily            : basics.fontFamilySansSerief,
 
-        fontWeight        : basics.fontWeightNormal,
+    fontWeight            : basics.fontWeightNormal,
 
-        lineHeight        : basics.lineHeightNm,
-    }
-);
+    lineHeight            : basics.lineHeightNm,
+};
 
 
 

@@ -17,14 +17,12 @@ const others = {
     style: 'solid',
 };
 
-const props = Object.assign({},
-    widths,
-    others,
-    {
-        defaultWidth : widths.hair,
-        default      : [[others.style, widths.hair, others.color]] as (string[][] | string),
-    }
-);
+const props = {
+    ...widths,
+    ...others,
+    defaultWidth : widths.hair,
+    default      : [[others.style, widths.hair, others.color]] as (string[][] | string),
+};
 
 
 

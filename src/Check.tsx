@@ -2,8 +2,7 @@ import type * as Css       from './Css';
 
 import
     React, {
-    useState,
-    useEffect
+    useState
 }                          from 'react';
 
 import * as Elements       from './Element';
@@ -100,7 +99,7 @@ const none    = 'none';
 const center  = 'center';
 
 // internal css vars:
-export const vars = Object.assign({}, EditControls.vars, Icons.vars, {
+export const vars = {...EditControls.vars, ...Icons.vars,
     /**
      * final composite animation(s) at the "icon" element.
      */
@@ -155,7 +154,7 @@ export const vars = Object.assign({}, EditControls.vars, Icons.vars, {
     filterCheckClearIn  : '--chk-filterCheckClearIn',
     filterCheckClearOut : '--chk-filterCheckClearOut',
     animCheckClear      : '--chk-animCheckClear',
-});
+};
 
 // re-defined later, we need to construct varProps first
 export const keyframesCheck       = { from: undefined, to: undefined };
@@ -344,17 +343,16 @@ export const applyStateNoAnimStartup = () =>
 
 
 export function useStateCheckClear(props: Props) {
-    const defaultChecked = false; // if [checked] was not specified => the default value is checked=false
-    const [checked,  setChecked ] = useState(props.checked ?? defaultChecked);
+    const defaultChecked = false; // if [checked] and/or [defaultChecked] was not specified => the default value is checked=false
+    const [checked,  setChecked ] = useState(props.checked ?? props.defaultChecked ?? defaultChecked);
     const [checking, setChecking] = useState(false);
     const [clearing, setClearing] = useState(false);
 
 
-    const newCheck = props.checked ?? defaultChecked;
-    useEffect(() => {
-        if (checked !== newCheck) {
+    const handleChangeInternal = (newCheck: boolean) => {
+        if (checked !== newCheck) { // changes detected => apply the changes & start animating
             setChecked(newCheck);
-
+            
             if (newCheck) {
                 setClearing(false);
                 setChecking(true);
@@ -364,9 +362,19 @@ export function useStateCheckClear(props: Props) {
                 setClearing(true);
             }
         }
-    }, [checked, newCheck]);
+    }
+
+
+    if (props.checked !== undefined) { // controllable prop => watch the changes
+        handleChangeInternal(/*newCheck =*/props.checked);
+    } // if
 
     
+    const handleChange = ({target}: React.ChangeEvent<HTMLInputElement>) => {
+        if (props.checked !== undefined) return; // controllable prop => let the prop determines the state
+
+        handleChangeInternal(/*newCheck =*/target.checked);
+    }
     const handleIdle = () => {
         // clean up expired animations
 
@@ -374,9 +382,10 @@ export function useStateCheckClear(props: Props) {
         if (clearing) setClearing(false);
     }
     return {
-        checked : checked,
-        cleared: !checked,
+        checked :  checked,
+        cleared : !checked,
         class: (checking? 'check' : (clearing ? 'clear': null)),
+        handleChange: handleChange,
         handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {
             if (e.target !== e.currentTarget) return; // no bubbling
             if (/((?<![a-z])(check|clear)|(?<=[a-z])(Check|Clear))(?![a-z])/.test(e.animationName)) {
@@ -787,7 +796,8 @@ export interface Props
         VariantCheck
 {
     // values:
-    checked? : boolean
+    checked?        : boolean
+    defaultChecked? : boolean
 
     // labels:
     text?    : string
@@ -865,11 +875,13 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                 // values:
                 value={props.value}
                 defaultValue={props.defaultValue}
+                checked={props.checked}
+                defaultChecked={props.defaultChecked}
                 onChange={(e) => {
                     props.onChange?.(e);
                     nativeValidator.handleChange(e);
+                    stateChkClr.handleChange(e);
                 }}
-                checked={stateChkClr.checked}
 
                 // validations:
                 required={props.required}

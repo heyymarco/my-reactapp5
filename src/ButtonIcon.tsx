@@ -21,15 +21,15 @@ export default function ButtonIcon(props: Props) {
         if (!props.icon) return [props, null];
 
 
-        const iconProps = Object.assign({}, props, {
+        const iconProps = {...props,
             size     : '1em',
-        });
+        };
         delete iconProps.theme;
         delete iconProps.children;
         delete iconProps.text;
 
 
-        const btnProps = Object.assign({}, props);
+        const btnProps = {...props};
         delete btnProps.icon;
         delete btnProps['aria-hidden'];
         delete btnProps.children;

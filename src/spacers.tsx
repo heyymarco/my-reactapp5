@@ -8,16 +8,14 @@ const basics = {
     md     : '1rem',
 };
 
-const props = Object.assign({},
-    basics,
-    {
-        default: basics.md,
-        xs : [['calc(', basics.md, '/', 4  , ')']] as ((string | number)[][] | string),
-        sm : [['calc(', basics.md, '/', 2  , ')']] as ((string | number)[][] | string),
-        lg : [['calc(', basics.md, '*', 1.5, ')']] as ((string | number)[][] | string),
-        xl : [['calc(', basics.md, '*', 3  , ')']] as ((string | number)[][] | string),
-    }
-);
+const props = {
+    ...basics,
+    default : basics.md,
+    xs      : [['calc(', basics.md, '/', 4  , ')']] as ((string | number)[][] | string),
+    sm      : [['calc(', basics.md, '/', 2  , ')']] as ((string | number)[][] | string),
+    lg      : [['calc(', basics.md, '*', 1.5, ')']] as ((string | number)[][] | string),
+    xl      : [['calc(', basics.md, '*', 3  , ')']] as ((string | number)[][] | string),
+};
 
 
 

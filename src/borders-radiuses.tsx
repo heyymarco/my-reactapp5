@@ -11,12 +11,10 @@ const basics = {
     pill        : '50rem',
     circle      : '50%',
 };
-const props = Object.assign({},
-    basics,
-    {
-        default : basics.md,
-    }
-);
+const props = {
+    ...basics,
+    default : basics.md,
+};
 
 
 

@@ -5,12 +5,13 @@ import App from './App';
 import ModalTestApp from './ModalTestApp';
 import CheckTestApp from './CheckTestApp';
 import InptTestApp from './InputTestApp';
+import FormValTestApp from './FormValTestApp';
 import JssTestApp from './JssTestApp';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <InptTestApp />
+    <CheckTestApp />
   </React.StrictMode>,
   document.getElementById('root')
 );

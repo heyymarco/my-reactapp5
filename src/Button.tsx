@@ -142,13 +142,16 @@ const styles = {
             Elements.styles.outline,
         ],
 
-        // hide the border:
-        borderColor    : 'transparent',
 
+        
+        '&:not(._)': { // force to win conflict with outline
+            // hide the border:
+            borderColor    : 'transparent',
 
-
-        // apply linkStyles & force to win conflict with main
-        '&:not(._)': linkStyles,
+            extend:[
+                linkStyles,
+            ],
+        },
     },
     btnOutlineLink: {
         extend:[

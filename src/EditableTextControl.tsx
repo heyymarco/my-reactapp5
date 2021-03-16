@@ -75,9 +75,9 @@ export interface CssProps {
 // const middle  = 'middle';
 
 // internal css vars:
-export const vars = Object.assign({}, EditControls.vars, Icons.vars, {
+export const vars = {...EditControls.vars, ...Icons.vars,
     backgValInv       : '--etctrl-backgValInv',
-});
+};
 
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:

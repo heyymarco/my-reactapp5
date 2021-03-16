@@ -61,12 +61,12 @@ const basics = {
     sizeNm     : '24px',
 };
 
-const _cssProps: CssProps = Object.assign({}, basics, {
+const _cssProps: CssProps = {...basics,
     size   :  basics.sizeNm,
     sizeSm : [['calc(', basics.sizeNm, '*', 0.75  , ')']],
     sizeMd : [['calc(', basics.sizeNm, '*', 1.50  , ')']],
     sizeLg : [['calc(', basics.sizeNm, '*', 2.00  , ')']],
-});
+};
 
 const config = {
     varPrefix: 'ico',
@@ -140,9 +140,10 @@ const styles = {
         ],
     },
     '@font-face': [
-        Object.assign({
-            src   : config.font.files.map(file => `url("${resolveUrl(file, config.font.path)}") ${formatOf(file)}`).join(',')
-        }, customFont),
+        {
+            src: config.font.files.map(file => `url("${resolveUrl(file, config.font.path)}") ${formatOf(file)}`).join(','),
+            ...customFont,
+        },
     ],
     font: {
         extend: [

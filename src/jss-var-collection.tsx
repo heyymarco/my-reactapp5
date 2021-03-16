@@ -296,7 +296,7 @@ export default class JssVarCollection<TProp> {
         for (const [id, keyframe] of Object.entries(keyframes)) {
             if ((keyframe === undefined) || (keyframe === null)) continue;
 
-            const keyframeCopy = Object.assign({}, keyframe);
+            const keyframeCopy = {...keyframe};
             let modified = false;
 
             for (const [key, frame] of Object.entries(keyframeCopy)) {
@@ -314,12 +314,11 @@ export default class JssVarCollection<TProp> {
 
 
 
-        const global = {
-            ':root': this._valProps,
-        };
-        Object.assign(global, keyframes);
         const styles = {
-            '@global': global,
+            '@global': {
+                ':root': this._valProps,
+                ...keyframes,
+            },
         };
         this._css =
             getCustomJss()

@@ -2,8 +2,7 @@ import type * as Css       from './Css';
 
 import
     React, {
-    useState,
-    useEffect
+    useState
 }                          from 'react';
 
 import * as Elements       from './Element';
@@ -70,7 +69,7 @@ const none    = 'none';
 // const middle  = 'middle';
 
 // internal css vars:
-export const vars = Object.assign({}, Indicators.vars, {
+export const vars = {...Indicators.vars,
     /**
      * themed box-shadow at focused state.
      */
@@ -99,7 +98,7 @@ export const vars = Object.assign({}, Indicators.vars, {
     
     boxShadowFocusBlur  : '--ctrl-boxShadowFocusBlur',
     animFocusBlur       : '--ctrl-animFocusBlur',
-});
+};
 
 // re-defined later, we need to construct varProps first
 export const keyframesHover = { from: undefined, to: undefined };
@@ -190,33 +189,35 @@ export { config, cssProps };
 
 
 export const stateHover         = (content: object) => ({
-    '&:hover,&:focus': { // hover or focus
+    '&:hover,&.focus,&:focus': {
         extend: [content]
     }
 });
 export const stateNotHover      = (content: object) => ({
-    '&:not(:hover):not(:focus)': { // not-hover and not-focus
+    '&:not(:hover):not(.focus):not(:focus)': {
         extend: [content]
     }
 });
 export const stateLeaving       = (content: object) =>
-    stateNotHover({ // not-hover and not-focus and (leave or blur)
+    // mouse leave but still focus => not leave
+    // blur but mouse  still hover => not leave
+    stateNotHover({
         extend:[{'&.leave,&.blur': {
             extend: [content]
         }}]
     });
 export const stateNotLeave      = (content: object) => ({
-    '&:not(.leave):not(.blur)': { // not-leave and not-blur
+    '&:not(.leave):not(.blur)': {
         extend: [content]
     }
 });
 export const stateHoverLeave    = (content: object) => ({
-    '&:hover,&:focus,&.leave,&.blur': { // hover or focus or leave or blur
+    '&:hover,&.focus,&:focus,&.leave,&.blur': {
         extend: [content]
     }
 });
 export const stateNotHoverLeave = (content: object) => ({
-    '&:not(:hover):not(:focus):not(.leave):not(.blur)': { // not-hover and not-focus and not-leave and not-blur
+    '&:not(:hover):not(.focus):not(:focus):not(.leave):not(.blur)': {
         extend: [content]
     }
 });
@@ -242,12 +243,12 @@ export const stateNotBlur       = (content: object) => ({
     }
 });
 export const stateFocusBlur     = (content: object) => ({
-    '&:focus,&.focus,&.blur': {
+    '&.focus,&:focus,&.blur': {
         extend: [content]
     }
 });
 export const stateNotFocusBlur  = (content: object) => ({
-    '&:not(:focus):not(.focus):not(.blur)': {
+    '&:not(.focus):not(:focus):not(.blur)': {
         extend: [content]
     }
 });
@@ -508,38 +509,43 @@ export { fnVars, states, styles, useStyles };
 
 
 export function useStateLeave(stateEnbDis: {enabled: boolean}) {
-    const [hasHover, setHasHover] = useState(false);
-    const [leaving,  setLeaving ] = useState(false);
+    const [hovered, setHovered] = useState(false);
+    const [leaving, setLeaving] = useState(false);
 
 
-    useEffect(() => {
-        if (hasHover && (!stateEnbDis.enabled)) {
-            // loosing hover because of the control has been disabled
+    const handleChangeInternal = (newHover: boolean) => {
+        if (hovered !== newHover) { // changes detected => apply the changes & start animating
+            setHovered(newHover);
+    
+            if (newHover) {
+                setLeaving(false); // stop  leaving anim
+            }
+            else {
+                setLeaving(true);  // start leaving anim
+            } // if
+        }
+    }
 
-            setHasHover(false); // mark has leave
-            setLeaving(true);   // start leaving anim
-        } // if
-    }, [hasHover, stateEnbDis.enabled]);
+
+    if (!stateEnbDis.enabled && hovered) {
+        // loosing hover because of the control has been disabled
+        handleChangeInternal(/*newHover =*/false);
+    } // if
     
 
     const handleHover = () => {
-        if (!stateEnbDis.enabled) return; // control disabled => no response
-        if (hasHover) return; // already has hover => action is not required
+        // control disabled => no response
+        // onMouseEnter can be triggered by custom control, because it doesn't have "native :disabled" state
+        if (!stateEnbDis.enabled) return;
 
-        if (leaving) setLeaving(false); // stop leaving anim
-
-        setHasHover(true); // mark has hover
+        handleChangeInternal(/*newHover =*/true);
     }
     const handleLeaving = () => {
-        if (!stateEnbDis.enabled) return; // control disabled => no response
-        if (leaving) return; // already being leaving => action is not required
+        // control disabled => no response
+        // onMouseLeave can be triggered by custom control, because it doesn't have "native :disabled" state
+        if (!stateEnbDis.enabled) return;
 
-        if (hasHover) {
-            setHasHover(false); // mark has leave
-
-            // leaving only possible if was hovered:
-            setLeaving(true); // start leaving anim
-        } // if
+        handleChangeInternal(/*newHover =*/false);
     }
     const handleIdle = () => {
         // clean up expired animations
@@ -560,55 +566,53 @@ export function useStateLeave(stateEnbDis: {enabled: boolean}) {
 }
 
 export function useStateFocusBlur(props: Props, stateEnbDis: {enabled: boolean}) {
-    const defaultManualFocused = false; // if [focus] was not specified => the default value is focus=false
-    const [focused,  setFocused ] = useState((props.focus ?? defaultManualFocused) && stateEnbDis.enabled);
-    const [hasFocus, setHasFocus] = useState(false);
+    const defaultFocused = false; // if [focus] was not specified => the default value is focus=false
+    const [focused,  setFocused ] = useState((props.focus ?? defaultFocused) && stateEnbDis.enabled);
     const [blurring, setBlurring] = useState(false);
 
 
-    const newFocus = (props.focus ?? defaultManualFocused) && stateEnbDis.enabled;
-    useEffect(() => {
-        if (focused !== newFocus) {
+    const handleChangeInternal = (newFocus: boolean) => {
+        if (focused !== newFocus) { // changes detected => apply the changes & start animating
             setFocused(newFocus);
-
-            if (newFocus) { // has got focus
-                setBlurring(false); // stop blurring anim
-                setHasFocus(true);  // mark has focus
+    
+            if (newFocus) {
+                setBlurring(false); // stop  blurring anim
             }
-            else { // has lost focus
-                setHasFocus(false); // mark has blur
+            else {
                 setBlurring(true);  // start blurring anim
             } // if
         }
-        else if (hasFocus && (!stateEnbDis.enabled)) {
-            // loosing focus because of the control has been disabled
+    }
 
-            setHasFocus(false); // mark has blur
-            setBlurring(true);  // start blurring anim
-        } // if
-    }, [focused, newFocus, hasFocus, stateEnbDis.enabled]);
+
+    if (stateEnbDis.enabled) {
+        if (props.focus !== undefined) { // controllable prop => watch the changes
+            handleChangeInternal(/*newFocus =*/props.focus);
+        }
+    }
+    else {
+        // loosing focus because of the control has been disabled
+        handleChangeInternal(/*newFocus =*/false);
+    } // if
 
 
     const handleFocus = () => {
-        if (!stateEnbDis.enabled) return; // control disabled => no response
-        if (focused) return; // already beed focused programatically => cannot be blurred by mouse/keyboard
-        if (hasFocus) return; // already has focus => action is not required
+        if (props.focus !== undefined) return; // controllable prop => let the prop determines the state
 
-        if (blurring) setBlurring(false); // stop blurring anim
-
-        setHasFocus(true); // mark has focus
+        // control disabled => no response
+        // onFocus can be triggered by custom control, because it doesn't have "native :disabled" state
+        if (!stateEnbDis.enabled) return;
+        
+        handleChangeInternal(/*newFocus =*/true);
     }
     const handleBlurring = () => {
-        if (!stateEnbDis.enabled) return; // control disabled => no response
-        if (focused) return; // already beed focused programatically => cannot be blurred by mouse/keyboard
-        if (blurring) return; // already being blurring => action is not required
+        if (props.focus !== undefined) return; // controllable prop => let the prop determines the state
 
-        if (hasFocus) {
-            setHasFocus(false); // mark has blur
-
-            // blurring only possible if was focused:
-            setBlurring(true); // start blurring anim
-        } // if
+        // control disabled => no response
+        // onBlur can be triggered by custom control, because it doesn't have "native :disabled" state
+        if (!stateEnbDis.enabled) return;
+        
+        handleChangeInternal(/*newFocus =*/false);
     }
     const handleIdle = () => {
         // clean up expired animations
@@ -619,9 +623,9 @@ export function useStateFocusBlur(props: Props, stateEnbDis: {enabled: boolean})
         /**
          * partially/fully focus
         */
-        focus  : hasFocus,
+        focus  : focused,
 
-        class: blurring ? 'blur' : ((focused && stateEnbDis.enabled) ? 'focus' : null),
+        class: blurring ? 'blur' : (focused ? ((props.focus !== undefined) ? 'focus' : null) : null),
         handleFocus        : handleFocus,
         handleBlur         : handleBlurring,
         handleAnimationEnd : (e: React.AnimationEvent<HTMLElement>) => {

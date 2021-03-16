@@ -2,8 +2,7 @@ import type * as Css       from './Css';
 
 import
     React, {
-    useState,
-    useEffect
+    useState
 }                          from 'react';
 
 import * as Elements       from './Element';
@@ -57,7 +56,7 @@ export interface CssProps {
 // const inherit = 'inherit';
 
 // internal css vars:
-export const vars = Object.assign({}, Elements.vars, {
+export const vars = {...Elements.vars,
     /**
      * active unthemed foreground color.
      */
@@ -85,11 +84,11 @@ export const vars = Object.assign({}, Elements.vars, {
 
     filterActivePassive : '--indi-filterActivePassive',
     animActivePassive   : '--indi-animActivePassive',
-});
+};
 
 // re-defined later, we need to construct varProps first
 export const keyframesEnable   = { from: undefined, to: undefined };
-export const keyframesDisable = { from: undefined, to: undefined };
+export const keyframesDisable  = { from: undefined, to: undefined };
 export const keyframesActive   = { from: undefined, to: undefined };
 export const keyframesPassive  = { from: undefined, to: undefined };
 const ecssProps = Elements.cssProps;
@@ -384,11 +383,12 @@ export function useStateEnableDisable(props: Props) {
     const [disabling, setDisabling] = useState(false);
 
     
-    const newEnable = props.enabled ?? defaultEnabled;
-    useEffect(() => {
-        if (enabled !== newEnable) {
-            setEnabled(newEnable);
+    if (props.enabled !== undefined) { // controllable prop => watch the changes
+        const newEnable = props.enabled;
 
+        if (enabled !== newEnable) { // changes detected => apply the changes & start animating
+            setEnabled(newEnable);
+    
             if (newEnable) {
                 setDisabling(false);
                 setEnabling(true);
@@ -398,7 +398,7 @@ export function useStateEnableDisable(props: Props) {
                 setDisabling(true);
             }
         }
-    }, [enabled, newEnable]);
+    } // if
 
     
     const handleIdle = () => {
@@ -427,11 +427,12 @@ export function useStateActivePassive(props: Props, stateEnbDis: {enabled: boole
     const [passivating, setPassivating] = useState(false);
 
     
-    const newActive = props.active ?? defaultActived;
-    useEffect(() => {
-        if (actived !== newActive) {
-            setActived(newActive);
+    if (props.active !== undefined) { // controllable prop => watch the changes
+        const newActive = props.active ?? defaultActived;
 
+        if (actived !== newActive) { // changes detected => apply the changes & start animating
+            setActived(newActive);
+    
             if (newActive) {
                 setPassivating(false);
                 setActivating(true);
@@ -441,7 +442,7 @@ export function useStateActivePassive(props: Props, stateEnbDis: {enabled: boole
                 setPassivating(true);
             }
         }
-    }, [actived, newActive]);
+    } // if
 
     
     const handlePassivating = () => {

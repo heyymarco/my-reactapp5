@@ -68,7 +68,7 @@ export interface CssProps {
 // const middle  = 'middle';
 
 // internal css vars:
-export const vars = Object.assign({}, Indicators.vars, {
+export const vars = {...Indicators.vars,
     /**
      * themed foreground color at active state.
      */
@@ -88,7 +88,7 @@ export const vars = Object.assign({}, Indicators.vars, {
      * final composite background(s) at active state.
      */
     backgActiveFn : '--ct-backgActiveFn',
-});
+};
 
 // re-defined later, we need to construct varProps first
 export const keyframesActive   = { from: undefined, to: undefined };
