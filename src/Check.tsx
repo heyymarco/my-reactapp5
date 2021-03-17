@@ -465,8 +465,8 @@ const chkStates = {
     },
 };
 
-const fnVars = EditControls.fnVars; // copy EditControl's fnVars
-const states = {extend:[ EditControls.states, { // copy EditControl's states
+export const fnVars = EditControls.fnVars; // copy EditControl's fnVars
+export const states = {extend:[ EditControls.states, { // copy EditControl's states
     [nextElm]: {
         // customize final foreground color for the label:
         [vars.colorLabelFn] : getVar(
@@ -567,7 +567,7 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
     ],
 }]};
 
-const themes = { ...Controls.themes, }; // copy Control's themes
+export const themes = { ...Controls.themes, }; // copy Control's themes
 defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     // customize the label's text color:
     [vars.colorLabelTh] : (colors as any)[`${theme}Cont`],
@@ -590,7 +590,7 @@ const inheritStyles = {
 };
 const chkStyles = {
     extend: [
-        EditControls.styles.basic,  // copy styles from EditControl
+        EditControls.basicStyle,    // copy basicStyle from EditControl
         inheritStyles,              // force some props inherited from parent
         filterValidProps(cssProps), // apply our filtered cssProps
     ],
@@ -622,7 +622,7 @@ const chkStyles = {
 
     [iconElm]: {
         extend: [
-            Icons.styles.basic,
+            Icons.basicStyle,
             Icons.styles.img,
         ],
 
@@ -642,51 +642,51 @@ const chkStyles = {
     },
 
 };
-const styles = {
-    basic: {
-        extend: [
-            EditControls.styles.basic, // copy styles from EditControl
-        ],
+export const basicStyle = {
+    extend: [
+        EditControls.basicStyle, // copy basicStyle from EditControl
+    ],
 
-        backg         : undefined, // delete
-        paddingX      : undefined, // delete
-        paddingY      : undefined, // delete
-        border        : undefined, // delete
-        borderRadius  : undefined, // delete
-        boxShadow     : undefined, // delete
-        anim          : undefined, // delete
+    backg         : undefined, // delete
+    paddingX      : undefined, // delete
+    paddingY      : undefined, // delete
+    border        : undefined, // delete
+    borderRadius  : undefined, // delete
+    boxShadow     : undefined, // delete
+    anim          : undefined, // delete
 
-        // layout:
-        display       : 'inline-flex',
-        verticalAlign : 'text-bottom',
-        alignItems    : center,
-        flexWrap      : 'wrap',
-
-
-
-        // the dummy text content, for making height as tall as line-height
-        '&::before': {
-            content    : '"\xa0"', // &nbsp;
-            display    : 'inline',
-            
-            width      : 0,
-            overflow   : 'hidden',
-            visibility : 'hidden',
-        },
+    // layout:
+    display       : 'inline-flex',
+    verticalAlign : 'text-bottom',
+    alignItems    : center,
+    flexWrap      : 'wrap',
 
 
 
-        [chkElm]: chkStyles,
-
-        [nextElm]: {
-            // apply final foreground color for the label:
-            color : getVar(vars.colorLabelFn),
-        },
+    // the dummy text content, for making height as tall as line-height
+    '&::before': {
+        content    : '"\xa0"', // &nbsp;
+        display    : 'inline',
+        
+        width      : 0,
+        overflow   : 'hidden',
+        visibility : 'hidden',
     },
+
+
+
+    [chkElm]: chkStyles,
+
+    [nextElm]: {
+        // apply final foreground color for the label:
+        color : getVar(vars.colorLabelFn),
+    },
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
 
         [chkElm]: chkStates,
@@ -726,8 +726,8 @@ const styles = {
     
         [nextElm]: {
             extend: [
-                Buttons.styles.basic, // copy styles from Button
-                inheritStyles,        // force some props inherited from parent
+                Buttons.basicStyle, // copy basicStyle from Button
+                inheritStyles,      // force some props inherited from parent
             ],
         },
     },
@@ -783,8 +783,7 @@ const styles = {
     ...themes,
 };
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, themes, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

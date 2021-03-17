@@ -174,14 +174,14 @@ export { config, cssProps };
 
 
 
-const fnVars = {
+export const fnVars = {
     // customize final composite animation(s) at the content (card) layer:
     [vars.animFn]      : none,
 
     // customize final composite animation(s) at the backg (overlay) layer:
     [vars.backgAnimFn] : none,
 };
-const states = {
+export const states = {
     extend:[
         stateActive({ // [activating, actived]
             [vars.animFn]      : cssProps.animActive,
@@ -201,73 +201,73 @@ const states = {
     ],
 };
 
-const styles = {
+export const basicStyle = { // overlay layer with limited width & height as scroller
+    extend: [
+        stripOuts.focusableElement, // clear browser's default styles
+        filterPrefixProps(cssProps, 'backg'), // apply our cssProps starting with backg***
+    ],
+
+    // a custom css props for manipulating backg's animation(s):
+    anim: getVar(vars.backgAnimFn), // apply prop
+
+    // fill the entire screen:
+    position : 'fixed',
+    left     : 0,
+    right    : 0,
+    top      : 0,
+    bottom   : 0,
+
+    // grid properties:
+    display      : 'grid',         // we use grid, so we can align the card both horizontally & vertically
+    justifyItems : center,         // align center horizontally
+    alignItems   : cssProps.align, // align (defaults center) vertically
+
+
+
+    // scroller props:
+    overflowX : 'hidden',
+    overflowY : 'auto',
+    '& >*': { // scrolling layer with additional paddings
+        extend: [
+            Containers.basicStyle, // copy basicStyle from Container
+        ],
+
+        width     : 'fit-content',
+        height    : 'fit-content',
+        boxSizing : 'content-box',
+
+
+
+        [vars.backgFw]     : ecssProps.backg,
+        [vars.boxShadowFw] : ecssProps.boxShadow,
+        [vars.animFw]      : ecssProps.anim,
+        [vars.heightFw]    : Cards.cssProps.height,
+        '& >*': { // card layer
+            // overwrite some Card's props:
+            '--elm-backg'       : typoGeneral.cssProps.backg, // set backg as same as page's backg (can be solid color or image)
+            '--elm-boxShadow'   : cssProps.boxShadow,
+            [Cards.vars.animFn] : getVar(vars.animFn), // apply prop
+            '--crd-height'      : 'auto', // overwrite card's height to auto resize
+
+            '& >*': {
+                '--elm-backg'       : getVar(vars.backgFw),
+                '--elm-boxShadow'   : getVar(vars.boxShadowFw),
+                [Cards.vars.animFn] : getVar(vars.animFw),
+                '--crd-height'      : getVar(vars.heightFw),
+            },
+        },
+    },
+};
+export const styles = {
     modalOpen: {
         // kill the scroll on the body:
         overflow: 'hidden',
     },
 
-    basic: { // overlay layer with limited width & height as scroller
-        extend: [
-            stripOuts.focusableElement, // clear browser's default styles
-            filterPrefixProps(cssProps, 'backg'), // apply our cssProps starting with backg***
-        ],
-
-        // a custom css props for manipulating backg's animation(s):
-        anim: getVar(vars.backgAnimFn), // apply prop
-
-        // fill the entire screen:
-        position : 'fixed',
-        left     : 0,
-        right    : 0,
-        top      : 0,
-        bottom   : 0,
-
-        // grid properties:
-        display      : 'grid',         // we use grid, so we can align the card both horizontally & vertically
-        justifyItems : center,         // align center horizontally
-        alignItems   : cssProps.align, // align (defaults center) vertically
-
-
-
-        // scroller props:
-        overflowX : 'hidden',
-        overflowY : 'auto',
-        '& >*': { // scrolling layer with additional paddings
-            extend: [
-                Containers.styles.basic, // copy styles from Container
-            ],
-
-            width     : 'fit-content',
-            height    : 'fit-content',
-            boxSizing : 'content-box',
-
-
-
-            [vars.backgFw]     : ecssProps.backg,
-            [vars.boxShadowFw] : ecssProps.boxShadow,
-            [vars.animFw]      : ecssProps.anim,
-            [vars.heightFw]    : Cards.cssProps.height,
-            '& >*': { // card layer
-                // overwrite some Card's props:
-                '--elm-backg'       : typoGeneral.cssProps.backg, // set backg as same as page's backg (can be solid color or image)
-                '--elm-boxShadow'   : cssProps.boxShadow,
-                [Cards.vars.animFn] : getVar(vars.animFn), // apply prop
-                '--crd-height'      : 'auto', // overwrite card's height to auto resize
-
-                '& >*': {
-                    '--elm-backg'       : getVar(vars.backgFw),
-                    '--elm-boxShadow'   : getVar(vars.boxShadowFw),
-                    [Cards.vars.animFn] : getVar(vars.animFw),
-                    '--crd-height'      : getVar(vars.heightFw),
-                },
-            },
-        },
-    },
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
 
@@ -306,8 +306,7 @@ const styles = {
     },
 };
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

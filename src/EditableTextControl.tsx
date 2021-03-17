@@ -107,7 +107,7 @@ export { config, cssProps };
 
 const iconElm = '&::after';
 
-const themesIf = {
+export const themesIf = {
     // define default (secondary) colors:
     [vars.colorIf]              : colors.secondaryCont,
     [vars.backgIf]              : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
@@ -134,8 +134,8 @@ const themesIf = {
     // [vars.colorOutlineIfInv]    : colors.danger,        // still same as EditControl's
     // [vars.boxShadowFocusIfInv]  : colors.dangerTransp,  // still same as EditControl's
 };
-const fnVars = EditControls.fnVars; // copy EditControl's fnVars
-const states = {extend:[ EditControls.states, { // copy EditControl's states
+export const fnVars = EditControls.fnVars; // copy EditControl's fnVars
+export const states = {extend:[ EditControls.states, { // copy EditControl's states
     // all initial states are none:
 
     [vars.backgValInv]  : getVar(vars.backgNo),
@@ -167,48 +167,47 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
     ],
 }]};
 
-const themes = {extend:[ Controls.themes, Contents.themes, ]}; // copy Control's + Content's themes
+export const themes = {extend:[ Controls.themes, Contents.themes, ]}; // copy Control's + Content's themes
 
-const styles = {
-    basic: {
+export const basicStyle = {
+    extend: [
+        EditControls.basicStyle,    // copy basicStyle from EditControl
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+
+
+    [iconElm]: {
         extend: [
-            EditControls.styles.basic,  // copy styles from EditControl
-            filterValidProps(cssProps), // apply our filtered cssProps
+            Icons.basicStyle,
+            Icons.styles.img,
         ],
 
+        content : '""',
+        display : 'inline-block',
 
-        [iconElm]: {
-            extend: [
-                Icons.styles.basic,
-                Icons.styles.img,
-            ],
-
-            content : '""',
-            display : 'inline-block',
-
-            height                 : '1em',     // follow parent text height
-            width                  : '1.25em',  // make sure the icon's image ratio is 1.25 or less
-            marginInlineStart      : '-1.25em', // cancel-out icon's width with negative margin, so it doen't take up space
-            maskPosition           : 'right',   // align to right
-            '-webkit-maskPosition' : 'right',   // align to right
-            pointerEvents          : 'none',    // just an overlayed element, no mouse interaction
+        height                 : '1em',     // follow parent text height
+        width                  : '1.25em',  // make sure the icon's image ratio is 1.25 or less
+        marginInlineStart      : '-1.25em', // cancel-out icon's width with negative margin, so it doen't take up space
+        maskPosition           : 'right',   // align to right
+        '-webkit-maskPosition' : 'right',   // align to right
+        pointerEvents          : 'none',    // just an overlayed element, no mouse interaction
 
 
-            [vars.img] : getVar(vars.backgValInv),
-            backg      : getVar(vars.colorOutlineFn),
-        },
+        [vars.img] : getVar(vars.backgValInv),
+        backg      : getVar(vars.colorOutlineFn),
     },
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
     ...themes,
 };
 
-const useStyles = createUseStyles(styles);
-export { themesIf, fnVars, states, themes, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

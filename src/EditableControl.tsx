@@ -305,7 +305,7 @@ export const applyStateInvalid = () => ({
 
 
 
-const validationThemesIf = {
+export const validationThemesIf = {
     // define valid (success) colors:
     [vars.colorIfVal]           : colors.successText,
     [vars.backgIfVal]           : `linear-gradient(${colors.success},${colors.success})`,
@@ -318,15 +318,15 @@ const validationThemesIf = {
     [vars.colorOutlineIfInv]    : colors.danger,
     [vars.boxShadowFocusIfInv]  : colors.dangerTransp,
 };
-const validationFnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
+export const validationFnVars = {
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
         getVar(vars.animValUnval),
         getVar(vars.animInvUninv),
     ],
-}]};
-const validationStates = {
+};
+export const validationStates = {
     // all initial states are none:
 
     [vars.animValUnval] : ecssProps.animNone,
@@ -357,7 +357,7 @@ const validationStates = {
     ],
 };
 
-const fnVars = {extend:[ Controls.fnVars, validationFnVars, { // copy Control's fnVars
+export const fnVars = {extend:[ Controls.fnVars, validationFnVars, { // copy Control's fnVars
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
@@ -395,30 +395,29 @@ const fnVars = {extend:[ Controls.fnVars, validationFnVars, { // copy Control's 
         },
     },
 }]};
-const states = {extend:[ Controls.states, validationStates, { // copy Control's states
+export const states = {extend:[ Controls.states, validationStates, { // copy Control's states
     // specific states:
     extend:[
         fnVars,
     ],
 }]};
 
-const styles = {
-    basic: {
-        extend: [
-            Controls.styles.basic,      // copy styles from Control
-            filterValidProps(cssProps), // apply our filtered cssProps
-        ],
-    },
+export const basicStyle = {
+    extend: [
+        Controls.basicStyle,        // copy basicStyle from Control
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, /// apply our basicStyle
+            states,     // apply our states
         ],
     },
 };
 
-const useStyles = createUseStyles(styles);
-export { validationThemesIf, validationFnVars, validationStates, fnVars, states, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

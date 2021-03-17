@@ -96,8 +96,8 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
-const fnVars = Contents.fnVars; // copy Content's fnVars
-const states = Contents.states; // copy Content's states
+export const fnVars = Contents.fnVars; // copy Content's fnVars
+export const states = Contents.states; // copy Content's states
 
 const image = {
     display: 'block', // remove unecessary space to the next sibling
@@ -120,7 +120,6 @@ const image = {
         marginBottom: ccssProps.paddingY,
     },
 };
-
 const cardItem = {
     display: 'block',
 
@@ -155,33 +154,32 @@ const cardItem = {
     },
     '& >figure, & >img': image,
 };
+export const basicStyle = {
+    extend: [
+        Contents.basicStyle,        // copy basicStyle from Content
+        filterValidProps(cssProps), // apply our filtered cssProps
+        // themes, // no changes
+        // sizes,  // no changes
+    ],
 
-const styles = {
-    basic: {
-        extend: [
-            Contents.styles.basic,      // copy styles from Content
-            filterValidProps(cssProps), // apply our filtered cssProps
-            // themes, // no changes
-            // sizes,  // no changes
-        ],
+    display        : 'flex',
+    flexDirection  : 'column',
 
-        display: 'flex',
-        flexDirection: 'column',
+    overflow       : 'hidden', // clip the children at rounded corners
 
-        overflow: 'hidden', // clip the children at rounded corners
+    // move paddings to [header, body, footer]:
+    paddingX       : undefined,
+    paddingY       : undefined,
 
-        // move paddings to [header, body, footer]:
-        paddingX: undefined,
-        paddingY: undefined,
-
-        minWidth: 0, // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
-        wordWrap: 'break-word',
-        backgroundClip: 'border-box',
-    },
+    minWidth       : 0, // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
+    wordWrap       : 'break-word',
+    backgroundClip : 'border-box',
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
     header: {
@@ -222,8 +220,7 @@ const styles = {
     cardOutline: Elements.styles.outline,
 };
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

@@ -266,13 +266,13 @@ export const applyStateActive = () => ({
 
 
 
-const themesIf = {
+export const themesIf = {
     // define active (primary) colors:
     [vars.colorIfAct]        : colors.primaryText,
     [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
     [vars.colorOutlineIfAct] : colors.primary,
 };
-const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
+export const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
@@ -298,7 +298,7 @@ const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
         },
     },
 }]};
-const states = {extend:[ Elements.states, { // copy Element's states
+export const states = {extend:[ Elements.states, { // copy Element's states
     // all initial states are none:
 
     [vars.filterEnableDisable] : ecssProps.filterNone,
@@ -352,23 +352,22 @@ const states = {extend:[ Elements.states, { // copy Element's states
     ],
 }]};
 
-const styles = {
-    basic: {
-        extend: [
-            Elements.styles.basic,      // copy styles from Element
-            filterValidProps(cssProps), // apply our filtered cssProps
-        ],
-    },
+export const basicStyle = {
+    extend: [
+        Elements.basicStyle,        // copy basicStyle from Element
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
 };
 
-const useStyles = createUseStyles(styles);
-export { themesIf, fnVars, states, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

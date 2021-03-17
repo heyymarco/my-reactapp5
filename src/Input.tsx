@@ -94,57 +94,56 @@ export { config, cssProps };
 
 const inpElm  = '& >:first-child';
 
-const fnVars = ETxtControls.fnVars; // copy ETxtControl's fnVars
-const states = ETxtControls.states; // copy ETxtControl's states
+export const fnVars = ETxtControls.fnVars; // copy ETxtControl's fnVars
+export const states = ETxtControls.states; // copy ETxtControl's states
 
-const styles = {
-    basic: {
+export const basicStyle = {
+    extend: [
+        ETxtControls.basicStyle,    // copy basicStyle from ETxtControl
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+
+    '--elm-backgGrad': cssProps.backgGrad,
+    
+    // appearance settings:
+    display    : 'flex',
+    alignItems : center,
+
+    // typo settings:
+    verticalAlign  : 'baseline',
+
+
+    [inpElm]: {
         extend: [
-            ETxtControls.styles.basic,  // copy styles from ETxtControl
-            filterValidProps(cssProps), // apply our filtered cssProps
+            stripOuts.textbox,
         ],
 
-        '--elm-backgGrad': cssProps.backgGrad,
-        
         // appearance settings:
-        display    : 'flex',
-        alignItems : center,
-
-        // typo settings:
-        verticalAlign  : 'baseline',
-
-
-        [inpElm]: {
-            extend: [
-                stripOuts.textbox,
-            ],
-
-            // appearance settings:
-            display  : inherit,
-            marginX  : [['calc(0px -', ecssProps.paddingX, ')']],
-            marginY  : [['calc(0px -', ecssProps.paddingY, ')']],
-            paddingX : ecssProps.paddingX,
-            paddingY : ecssProps.paddingY,
+        display  : inherit,
+        marginX  : [['calc(0px -', ecssProps.paddingX, ')']],
+        marginY  : [['calc(0px -', ecssProps.paddingY, ')']],
+        paddingX : ecssProps.paddingX,
+        paddingY : ecssProps.paddingY,
 
 
-            // strip out prop [size]:
-            fallbacks: [
-                {width: '-webkit-fill-available'},
-                {width: '-moz-available'},
-            ],
-        },
+        // strip out prop [size]:
+        fallbacks: [
+            {width: '-webkit-fill-available'},
+            {width: '-moz-available'},
+        ],
     },
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
     inpOutline: Controls.styles.outline,
 };
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

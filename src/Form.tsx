@@ -174,23 +174,24 @@ const states = {extend:[ Elements.states, EditControls.validationStates, { // co
     },
 }]};
 
+const basicStyle = {
+    extend: [
+        Elements.basicStyle,        // copy basicStyle from Element
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+};
+
 const styles = {
-    basic: {
-        extend: [
-            Elements.styles.basic,      // copy styles from Element
-            filterValidProps(cssProps), // apply our filtered cssProps
-        ],
-    },
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply basic styles
+            states,     // apply our states
         ],
     },
 };
 
 const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export { fnVars, states, basicStyle, styles, useStyles };
 
 
 export type ValidatorHandler = () => Val.Result;

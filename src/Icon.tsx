@@ -119,7 +119,7 @@ const customFont = {
     textDecoration : config.font.textDecoration,
 };
 
-const themes = {};
+export const themes = {};
 Elements.defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     // overwrite the color prop
     // we ignore the color prop if the theme applied
@@ -127,7 +127,7 @@ Elements.defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     '--ico-color': themeColor,
 }));
 
-const sizes  = {};
+export const sizes  = {};
 const cssPropsAny = cssProps as any;
 Elements.defineSizes(sizes, (size, Size, sizeProp) => ({
     // overwrite the props with the props{Size}:
@@ -135,24 +135,24 @@ Elements.defineSizes(sizes, (size, Size, sizeProp) => ({
     '--ico-size': (size === '1em') ? '1em' : cssPropsAny[`size${Size}`],
 }), ['sm', 'nm', 'md', 'lg', '1em']);
 
+export const basicStyle = {
+    extend: [
+        Elements.filterValidProps(cssProps),
+    ],
+
+    display       : 'inline-block',
+    verticalAlign : 'middle',
+
+    color         : undefined, // delete
+
+    size          : undefined, // delete
+    height        : cssProps.size,
+    width         : 'min-content',
+};
 const styles = {
-    basic: {
-        extend: [
-            Elements.filterValidProps(cssProps),
-        ],
-
-        display       : 'inline-block',
-        verticalAlign : 'middle',
-
-        color         : undefined, // delete
-
-        size          : undefined, // delete
-        height        : cssProps.size,
-        width         : 'min-content',
-    },
     main: {
         extend: [
-            'basic', // apply basic styles
+            basicStyle, // apply our basicStyle
         ],
     },
     '@font-face': [
@@ -214,10 +214,10 @@ const styles = {
     ...themes,
     ...sizes,
 };
-
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeNm'|'sizeMd'|'sizeLg'|'size1em', object>);
-const useStyles = createUseStyles(styles2);
-export { themes, sizes, styles2 as styles, useStyles };
+export { styles2 as styles };
+
+export const useStyles = createUseStyles(styles2);
 
 
 

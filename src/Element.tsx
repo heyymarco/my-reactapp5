@@ -254,13 +254,13 @@ export const filterPrefixProps = <TCssProps,>(cssProps: TCssProps, prefix: strin
     return cssPropsCopy;
 }
 
-const themesIf = {
+export const themesIf = {
     // define default colors:
     [vars.colorIf]        : cssProps.color,
     [vars.backgIf]        : getVar(vars.backgNo),
     [vars.colorOutlineIf] : cssProps.color,
 };
-const fnVars = {
+export const fnVars = {
     // customize final foreground color:
     [vars.colorFn] : getVar(
         vars.colorIfIf, // first  priority
@@ -304,7 +304,7 @@ const fnVars = {
         cssProps.anim,
     ],
 };
-const states = {
+export const states = {
     // customize none background.
     [vars.backgNo] : 'linear-gradient(transparent,transparent)',
 
@@ -316,7 +316,7 @@ const states = {
     ],
 };
 
-const themes = {};
+export const themes = {};
 export function defineThemes(themes: object, handler: ((theme: string, Theme: string, themeProp: string, themeColor: string) => object)) {
     for(const [theme, themeColor] of Object.entries(color.themes)) {
         const Theme = pascalCase(theme);
@@ -340,7 +340,7 @@ defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     [vars.colorOutlineTh] : themeColor,
 }));
 
-const sizes = {};
+export const sizes = {};
 export function defineSizes(sizes: object, handler: ((size: string, Size: string, sizeProp: string) => object), options = ['sm', 'lg']) {
     for(const size of options) {
         const Size = pascalCase(size);
@@ -361,27 +361,27 @@ defineSizes(sizes, (size, Size, sizeProp) => ({
     '--elm-borderRadius' : cssPropsAny[`borderRadius${Size}`],
 }));
 
+export const basicStyle = {
+    extend: [
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+
+
+
+    // apply final foreground color:
+    color : getVar(vars.colorFn),
+
+    // apply final composite background(s):
+    backg : getVar(vars.backgFn),
+
+    // apply final composite animation(s):
+    anim  : getVar(vars.animFn),
+};
 const styles = {
-    basic: {
-        extend: [
-            filterValidProps(cssProps), // apply our filtered cssProps
-        ],
-
-
-
-        // apply final foreground color:
-        color : getVar(vars.colorFn),
-
-        // apply final composite background(s):
-        backg : getVar(vars.backgFn),
-
-        // apply final composite animation(s):
-        anim  : getVar(vars.animFn),
-    },
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
     outline: {
@@ -403,10 +403,10 @@ const styles = {
     ...themes,
     ...sizes,
 };
-
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
-const useStyles = createUseStyles(styles2);
-export { themesIf, fnVars, states, themes, sizes, styles2 as styles, useStyles };
+export { styles2 as styles };
+
+export const useStyles = createUseStyles(styles2);
 
 
 

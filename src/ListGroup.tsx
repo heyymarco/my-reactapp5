@@ -86,8 +86,8 @@ export { config, cssProps };
 const wrapElm  = '& >li';
 const mainElm = '& >.lg-wrapper';
 
-const fnVars = Contents.fnVars; // copy Content's fnVars
-const states = {extend:[ Contents.states, { // copy Content's states
+export const fnVars = Contents.fnVars; // copy Content's fnVars
+export const states = {extend:[ Contents.states, { // copy Content's states
     // customize the anim prop to be forwarded to another element(s):
     [vars.animFw]: getVar(vars.animFn),
 
@@ -98,62 +98,62 @@ const states = {extend:[ Contents.states, { // copy Content's states
     // ],
 }]};
 
-const styles = {
-    basic: {
-        extend: [
-            stripOuts.list, // clear browser's default styles
-            filterValidProps(cssProps), // apply our filtered cssProps
-        ],
+export const basicStyle = {
+    extend: [
+        stripOuts.list, // clear browser's default styles
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
 
-        // flex settings:
-        display        : 'flex',
-        flexDirection  : cssProps.orientation,
-        justifyContent : 'start',
-        alignItems     : 'stretch',
-
-
-
-        [wrapElm]: { // wrapper element
-            display: 'block',
-    
-
-
-            // make a nicely rounded corners:
-            border         : ecssProps.border, // moved from children
-            overflow       : 'hidden', // clip the children at rounded corners
-            '& + li': {
-                borderTopWidth: 0, // remove duplicate border
-            },
-            '&:first-child': {extend:[
-                border.radius.top(ecssProps.borderRadius),    // moved from children
-            ]},
-            '&:last-child' : {extend:[
-                border.radius.bottom(ecssProps.borderRadius), // moved from children
-            ]},
+    // flex settings:
+    display        : 'flex',
+    flexDirection  : cssProps.orientation,
+    justifyContent : 'start',
+    alignItems     : 'stretch',
 
 
 
-            [mainElm]: { // main child elements
-                extend:[
-                    Elements.styles.basic, // copy styles from Element
-                ],
-
-                display       : 'block',
-                position      : 'relative',
-
-                border        : undefined, // move to parent
-                borderRadius  : undefined, // move to parent
+    [wrapElm]: { // wrapper element
+        display: 'block',
 
 
 
-                [vars.animFn] : getVar(vars.animFw),
-            } // main child elements
-        }, // wrapper element
-    },
+        // make a nicely rounded corners:
+        border         : ecssProps.border, // moved from children
+        overflow       : 'hidden', // clip the children at rounded corners
+        '& + li': {
+            borderTopWidth: 0, // remove duplicate border
+        },
+        '&:first-child': {extend:[
+            border.radius.top(ecssProps.borderRadius),    // moved from children
+        ]},
+        '&:last-child' : {extend:[
+            border.radius.bottom(ecssProps.borderRadius), // moved from children
+        ]},
+
+
+
+        [mainElm]: { // main child elements
+            extend:[
+                Elements.basicStyle, // copy basicStyle from Element
+            ],
+
+            display       : 'block',
+            position      : 'relative',
+
+            border        : undefined, // move to parent
+            borderRadius  : undefined, // move to parent
+
+
+
+            [vars.animFn] : getVar(vars.animFw),
+        } // main child elements
+    }, // wrapper element
+};
+export const styles = {
     main: {
         extend: [
-            'basic',   // apply basic styles
-            // states, // NOT apply our states here, but in child <li>
+            basicStyle, // apply our basicStyle
+            // states,  // NOT apply our states here, but in child <li>
         ],
 
 
@@ -169,8 +169,7 @@ const styles = {
     },
 };
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

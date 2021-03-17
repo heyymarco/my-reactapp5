@@ -70,22 +70,21 @@ createJss().setup({plugins:[
 
 
 
-const styles = {
-    basic: {
-        paddingX : cssProps.x,
-        paddingY : cssProps.y,
+export const basicStyle = {
+    paddingX : cssProps.x,
+    paddingY : cssProps.y,
 
-        display  : 'block',
-    },
+    display  : 'block',
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
+            basicStyle, // apply our basicStyle
         ],
     },
 };
 
-const useStyles = createUseStyles(styles);
-export { styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

@@ -99,10 +99,10 @@ export { config, cssProps };
 
 
 
-const fnVars = Controls.fnVars; // copy Control's fnVars
-const states = Controls.states; // copy Control's states
+export const fnVars = Controls.fnVars; // copy Control's fnVars
+export const states = Controls.states; // copy Control's states
 
-const sizes = { ...Elements.sizes, }; // copy Element's sizes
+export const sizes = { ...Elements.sizes, }; // copy Element's sizes
 const cssPropsAny = cssProps as any;
 defineSizes(sizes, (size, Size, sizeProp) => ({
     // overwrite the props with the props{Size}:
@@ -118,32 +118,32 @@ const linkStyles = {
     padding        : spacers.xs,
     borderRadius   : border.radiuses.sm,
 };
+export const basicStyle = {
+    extend: [
+        Controls.basicStyle,        // copy basicStyle from Control
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+    
+    // layout:
+    display        : 'inline-flex',
+    flexDirection  : cssProps.orientation,
+    justifyContent : center,
+    alignItems     : center,
+
+    // sizings:
+    boxSizing      : 'content-box',
+
+    // typo settings:
+    textAlign      : center,
+    verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
+
+    userSelect     : none, // disable selecting button's text
+};
 const styles = {
-    basic: {
-        extend: [
-            Controls.styles.basic,      // copy styles from Control
-            filterValidProps(cssProps), // apply our filtered cssProps
-        ],
-        
-        // layout:
-        display        : 'inline-flex',
-        flexDirection  : cssProps.orientation,
-        justifyContent : center,
-        alignItems     : center,
-
-        // sizings:
-        boxSizing      : 'content-box',
-
-        // typo settings:
-        textAlign      : center,
-        verticalAlign  : 'baseline', // button's text should aligned with sibling text, so the button behave like <span> wrapper
-
-        userSelect     : none, // disable selecting button's text
-    },
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
     btnOutline: Controls.styles.outline,
@@ -175,10 +175,10 @@ const styles = {
     },
     ...sizes,
 };
-
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
-const useStyles = createUseStyles(styles2);
-export { fnVars, states, sizes, styles2 as styles, useStyles };
+export { styles2 as styles };
+
+export const useStyles = createUseStyles(styles2);
 
 
 

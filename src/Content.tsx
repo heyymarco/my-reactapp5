@@ -146,7 +146,7 @@ export { config, cssProps };
 
 
 
-const fnVars = {extend:[ Indicators.fnVars, { // copy Indicator's fnVars
+export const fnVars = {extend:[ Indicators.fnVars, { // copy Indicator's fnVars
     // customize final foreground color at active state:
     [vars.colorActiveFn] : getVar(
         vars.colorActiveTh, // first  priority
@@ -166,7 +166,7 @@ const fnVars = {extend:[ Indicators.fnVars, { // copy Indicator's fnVars
         ecssProps.backg,
     ],
 }]};
-const states = {extend:[ Indicators.states, { // copy Indicator's states
+export const states = {extend:[ Indicators.states, { // copy Indicator's states
     extend:[
         // change the Indicator's behavior when in active state:
         stateActivePassive({
@@ -185,7 +185,7 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
     ],
 }]};
 
-const themes = {};
+export const themes = {};
 defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     // customize the backg & color
 
@@ -207,7 +207,7 @@ defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     [vars.backgActiveTh]  : `linear-gradient(${themeColor},${themeColor})`,
 }));
 
-const sizes = { ...Elements.sizes, }; // copy Element's sizes
+export const sizes = { ...Elements.sizes, }; // copy Element's sizes
 const cssPropsAny = cssProps as any;
 defineSizes(sizes, (size, Size, sizeProp) => ({
     // overwrite the props with the props{Size}:
@@ -216,25 +216,24 @@ defineSizes(sizes, (size, Size, sizeProp) => ({
     '--ct-paddingY' : cssPropsAny[`paddingY${Size}`],
 }));
 
-const styles = {
-    basic: {
-        extend: [
-            Indicators.styles.basic,    // copy styles from Indicator
-            filterValidProps(cssProps), // apply our filtered cssProps
-        ],
-    },
+export const basicStyle = {
+    extend: [
+        Indicators.basicStyle,      // copy basicStyle from Indicator
+        filterValidProps(cssProps), // apply our filtered cssProps
+    ],
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            states,  // apply our states
+            basicStyle, // apply our basicStyle
+            states,     // apply our states
         ],
     },
     ...themes,
     ...sizes,
 };
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, themes, sizes, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 

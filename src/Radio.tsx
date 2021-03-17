@@ -89,8 +89,8 @@ export { config, cssProps };
 
 
 
-const fnVars = Checks.fnVars; // copy Check's fnVars
-const states = Checks.states; // copy Check's states
+export const fnVars = Checks.fnVars; // copy Check's fnVars
+export const states = Checks.states; // copy Check's states
 
 const chkStyles = {
     extend: [
@@ -105,21 +105,20 @@ const chkStyles = {
         [vars.img]: cssProps.img,
     },
 };
-const styles = {
-    basic: {
-        // the main "checkbox" element:
-        '& >:first-child': chkStyles,
-    },
+export const basicStyle = {
+    // the main "checkbox" element:
+    '& >:first-child': chkStyles,
+};
+export const styles = {
     main: {
         extend: [
-            'basic', // apply basic styles
-            // states, // no changes
+            basicStyle, // apply our basicStyle
+            // states,  // no changes
         ],
     },
 };
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export const useStyles = createUseStyles(styles);
 
 
 
