@@ -10,7 +10,7 @@ import {
     
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterPrefixProps,
 
@@ -33,7 +33,7 @@ export {
     
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterPrefixProps,
 

@@ -237,16 +237,6 @@ export { config, cssProps };
 
 
 
-export const applyStateDefault = () => ({
-    // apply default colors:
-
-    [vars.colorIf]        : cssProps.color,
-    [vars.backgIf]        : getVar(vars.backgNo),
-    [vars.colorOutlineIf] : cssProps.color,
-});
-
-
-
 export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     const cssPropsCopy: { [key: string]: any } = { };
     for (const [key, value] of Object.entries(cssProps)) {
@@ -264,6 +254,12 @@ export const filterPrefixProps = <TCssProps,>(cssProps: TCssProps, prefix: strin
     return cssPropsCopy;
 }
 
+const themesIf = {
+    // define default colors:
+    [vars.colorIf]        : cssProps.color,
+    [vars.backgIf]        : getVar(vars.backgNo),
+    [vars.colorOutlineIf] : cssProps.color,
+};
 const fnVars = {
     // customize final foreground color:
     [vars.colorFn] : getVar(
@@ -308,7 +304,6 @@ const fnVars = {
         cssProps.anim,
     ],
 };
-
 const states = {
     // customize none background.
     [vars.backgNo] : 'linear-gradient(transparent,transparent)',
@@ -316,10 +311,7 @@ const states = {
 
 
     extend: [
-        applyStateDefault(),
-
-
-
+        themesIf,
         fnVars,
     ],
 };
@@ -329,7 +321,10 @@ export function defineThemes(themes: object, handler: ((theme: string, Theme: st
     for(const [theme, themeColor] of Object.entries(color.themes)) {
         const Theme = pascalCase(theme);
         const themeProp = `theme${Theme}`;
-        (themes as any)[themeProp] = handler(theme, Theme, themeProp, themeColor as string);
+        (themes as any)[themeProp] = {
+            ...(themes as any)[themeProp],
+            ...handler(theme, Theme, themeProp, themeColor as string),
+        };
     }
 }
 defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
@@ -350,7 +345,10 @@ export function defineSizes(sizes: object, handler: ((size: string, Size: string
     for(const size of options) {
         const Size = pascalCase(size);
         const sizeProp = `size${Size}`;
-        (sizes as any)[sizeProp] = handler(size, Size, sizeProp);
+        (sizes as any)[sizeProp] = {
+            ...(sizes as any)[sizeProp],
+            ...handler(size, Size, sizeProp),
+        };
     }
 }
 const cssPropsAny = cssProps as any;
@@ -408,7 +406,7 @@ const styles = {
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 const useStyles = createUseStyles(styles2);
-export { fnVars, states, themes, sizes, styles2 as styles, useStyles };
+export { themesIf, fnVars, states, themes, sizes, styles2 as styles, useStyles };
 
 
 

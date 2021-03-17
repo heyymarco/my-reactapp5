@@ -105,19 +105,15 @@ export { config, cssProps };
 
 
 
-export const applyStateDefault = () => ({
-    [vars.colorIf]             : colors.secondaryCont,
-    [vars.backgIf]             : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
-    // [vars.colorOutlineIf]   : colors.secondary,       // still same as Control's
-    // [vars.boxShadowFocusIf] : colors.secondaryTransp, // still same as Control's
-});
-
-
-
 const iconElm = '&::after';
 
-const fnVars = EditControls.fnVars; // copy EditControl's fnVars
-const states = {extend:[ EditControls.states, { // copy EditControl's states
+const themesIf = {
+    // define default (secondary) colors:
+    [vars.colorIf]              : colors.secondaryCont,
+    [vars.backgIf]              : `linear-gradient(${colors.secondaryThin},${colors.secondaryThin})`,
+    // [vars.colorOutlineIf]    : colors.secondary,       // still same as Control's
+    // [vars.boxShadowFocusIf]  : colors.secondaryTransp, // still same as Control's
+
     // define active (primary) colors:
     [vars.colorIfAct]           : colors.primaryCont,
     [vars.backgIfAct]           : `linear-gradient(${colors.primaryThin},${colors.primaryThin})`,
@@ -137,9 +133,9 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
     [vars.backgIfInv]           : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
     // [vars.colorOutlineIfInv]    : colors.danger,        // still same as EditControl's
     // [vars.boxShadowFocusIfInv]  : colors.dangerTransp,  // still same as EditControl's
-
-
-
+};
+const fnVars = EditControls.fnVars; // copy EditControl's fnVars
+const states = {extend:[ EditControls.states, { // copy EditControl's states
     // all initial states are none:
 
     [vars.backgValInv]  : getVar(vars.backgNo),
@@ -166,11 +162,8 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
 
 
 
-        applyStateDefault(),
-
-
-
-        fnVars,
+        themesIf,
+        // fnVars, // no changes
     ],
 }]};
 
@@ -215,7 +208,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { fnVars, states, themes, styles, useStyles };
+export { themesIf, fnVars, states, themes, styles, useStyles };
 
 
 

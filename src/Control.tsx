@@ -306,13 +306,6 @@ export const applyStateNoAnimStartup = () =>
             )
         )
     );
-export const applyStateDefault = () => ({
-    // apply default (secondary) colors:
-    [vars.colorIf]          : colors.secondaryText,
-    [vars.backgIf]          : `linear-gradient(${colors.secondary},${colors.secondary})`,
-    [vars.colorOutlineIf]   : colors.secondary,
-    [vars.boxShadowFocusIf] : colors.secondaryTransp,
-});
 export const applyStateActive = () => ({
     // apply active (primary) colors:
     [vars.colorIf]          : getVar(vars.colorIfAct),
@@ -323,6 +316,13 @@ export const applyStateActive = () => ({
 
 
 
+const themesIf = {extend:[ Indicators.themesIf, { // copy Indicator's themesIf
+    // define default (secondary) colors:
+    [vars.colorIf]                : colors.secondaryText,
+    [vars.backgIf]                : `linear-gradient(${colors.secondary},${colors.secondary})`,
+    [vars.colorOutlineIf]         : colors.secondary,
+    [vars.boxShadowFocusIf]       : colors.secondaryTransp,
+}]};
 const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     // customize final box-shadow at focused state:
     [vars.boxShadowFocusFn]: [[
@@ -368,14 +368,6 @@ const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     },
 }]};
 const states = {extend:[ Elements.states, { // not copy from Indicator's states because Indicator's states are too different than our states - we also overrides some Indicator's state mixins.
-    // define active (primary) colors:
-    [vars.colorIfAct]          : colors.primaryText,
-    [vars.backgIfAct]          : `linear-gradient(${colors.primary},${colors.primary})`,
-    [vars.colorOutlineIfAct]   : colors.primary,
-    // [vars.boxShadowFocusIfAct] : colors.primaryTransp,
-
-
-
     // all initial states are none:
 
     [vars.filterEnableDisable] : ecssProps.filterNone,
@@ -460,15 +452,12 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
 
 
 
-        applyStateDefault(),
-
-
-
+        themesIf,
         fnVars,
     ],
 }]};
 
-const themes = {extend:[ Elements.themes, ]}; // copy Element's themes
+const themes = { ...Elements.themes, }; // copy Element's themes
 defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     // customize themed box-shadow at focused state:
     [vars.boxShadowFocusTh]: (colors as any)[`${theme}Transp`],
@@ -500,7 +489,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { fnVars, states, themes, styles, useStyles };
+export { themesIf, fnVars, states, themes, styles, useStyles };
 
 
 

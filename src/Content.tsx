@@ -10,7 +10,7 @@ import {
     
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -32,7 +32,7 @@ export {
     
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -207,7 +207,7 @@ defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     [vars.backgActiveTh]  : `linear-gradient(${themeColor},${themeColor})`,
 }));
 
-const sizes = {extend:[ Elements.sizes, ]}; // copy Element's sizes
+const sizes = { ...Elements.sizes, }; // copy Element's sizes
 const cssPropsAny = cssProps as any;
 defineSizes(sizes, (size, Size, sizeProp) => ({
     // overwrite the props with the props{Size}:

@@ -17,7 +17,7 @@ import {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -43,7 +43,7 @@ export {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -305,15 +305,7 @@ export const applyStateInvalid = () => ({
 
 
 
-const validationFnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
-    // customize the anim:
-    [vars.animFn]: [
-        ecssProps.anim,
-        getVar(vars.animValUnval),
-        getVar(vars.animInvUninv),
-    ],
-}]};
-const validationStates = {
+const validationThemesIf = {
     // define valid (success) colors:
     [vars.colorIfVal]           : colors.successText,
     [vars.backgIfVal]           : `linear-gradient(${colors.success},${colors.success})`,
@@ -325,9 +317,16 @@ const validationStates = {
     [vars.backgIfInv]           : `linear-gradient(${colors.danger},${colors.danger})`,
     [vars.colorOutlineIfInv]    : colors.danger,
     [vars.boxShadowFocusIfInv]  : colors.dangerTransp,
-
-
-
+};
+const validationFnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
+    // customize the anim:
+    [vars.animFn]: [
+        ecssProps.anim,
+        getVar(vars.animValUnval),
+        getVar(vars.animInvUninv),
+    ],
+}]};
+const validationStates = {
     // all initial states are none:
 
     [vars.animValUnval] : ecssProps.animNone,
@@ -353,9 +352,11 @@ const validationStates = {
 
 
 
+        validationThemesIf,
         validationFnVars,
     ],
 };
+
 const fnVars = {extend:[ Controls.fnVars, validationFnVars, { // copy Control's fnVars
     // customize the anim:
     [vars.animFn]: [
@@ -397,17 +398,6 @@ const fnVars = {extend:[ Controls.fnVars, validationFnVars, { // copy Control's 
 const states = {extend:[ Controls.states, validationStates, { // copy Control's states
     // specific states:
     extend:[
-        // supress activating by mouse/keyboard (:active)
-        // but still responsive activating programatically (.active & .actived)
-        stateActive({ // [activating, actived]
-            '&:active:not(.active):not(.actived)': {
-                [vars.filterActivePassive] : ecssProps.filterNone,
-                [vars.animActivePassive]   : ecssProps.animNone,
-            },
-        }),
-
-
-
         fnVars,
     ],
 }]};
@@ -428,7 +418,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { validationFnVars, validationStates, fnVars, states, styles, useStyles };
+export { validationThemesIf, validationFnVars, validationStates, fnVars, states, styles, useStyles };
 
 
 

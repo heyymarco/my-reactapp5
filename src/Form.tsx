@@ -22,7 +22,7 @@ import {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -32,6 +32,7 @@ import {
     useStateLeave, useStateFocusBlur,
     useNativeValidator, useStateValidInvalid,
 }                          from './EditableControl';
+import * as ETxtControls   from './EditableTextControl';
 import colors              from './colors';
 import * as validations    from './validations';
 import type * as Val       from './validations';
@@ -52,7 +53,7 @@ export {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -144,20 +145,23 @@ export { config, cssProps };
 
 
 
+const themesIf = {extend:[ ETxtControls.themesIf, { // copy ETxtControl's fnVars
+    // define default (secondary) colors:
+    [vars.colorIf]              : undefined, // delete
+    [vars.backgIf]              : undefined, // delete
+
+    // define active (primary) colors:
+    [vars.colorIfAct]           : undefined, // delete
+    [vars.backgIfAct]           : undefined, // delete
+}]};
 const fnVars = {extend:[ Elements.fnVars, EditControls.validationFnVars, { // copy Element's fnVars + EditControl's validationFnVars
 }]};
 const states = {extend:[ Elements.states, EditControls.validationStates, { // copy Element's states + EditControl's validationStates
-    // define valid (success) colors:
-    [vars.colorIfVal]           : colors.successCont,
-    [vars.backgIfVal]           : `linear-gradient(${colors.successThin},${colors.successThin})`,
-    // [vars.colorOutlineIfVal]    : colors.success,       // still same as EditControl's
-    // [vars.boxShadowFocusIfVal]  : colors.successTransp, // still same as EditControl's
-
-    // define invalid (danger) colors:
-    [vars.colorIfInv]           : colors.dangerCont,
-    [vars.backgIfInv]           : `linear-gradient(${colors.dangerThin},${colors.dangerThin})`,
-    // [vars.colorOutlineIfInv]    : colors.danger,        // still same as EditControl's
-    // [vars.boxShadowFocusIfInv]  : colors.dangerTransp,  // still same as EditControl's
+    // specific states:
+    extend:[
+        themesIf,
+        fnVars,
+    ],
 
 
 
@@ -173,7 +177,7 @@ const states = {extend:[ Elements.states, EditControls.validationStates, { // co
 const styles = {
     basic: {
         extend: [
-            Elements.styles.basic,      // copy styles from Control
+            Elements.styles.basic,      // copy styles from Element
             filterValidProps(cssProps), // apply our filtered cssProps
         ],
     },

@@ -6,6 +6,8 @@ import './App.css';
 import Element from './Element';
 import Indicator from './Indicator';
 import Control from './Control';
+import EditControl from './EditableControl';
+import ETxtControl from './EditableTextControl';
 import Content from './Content';
 import Button from './Button';
 import Icon from './Icon';
@@ -113,6 +115,8 @@ export default function App (props: any) {
 				<Element theme={theme} enableGradient={enableGrad} size={size}></Element>
 				<Indicator theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active}></Indicator>
 				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}></Control>
+				<EditControl theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} enableValidation={false}></EditControl>
+				<ETxtControl theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} enableValidation={false}></ETxtControl>
 				<Content theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active}>
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 					<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>

@@ -10,8 +10,6 @@ import {
     escapeSvg,
     getVar,
 
-    applyStateDefault,
-
     filterValidProps, filterPrefixProps,
     
     defineSizes, defineThemes,
@@ -26,8 +24,6 @@ import JssVarCollection    from './jss-var-collection';
 export {
     escapeSvg,
     getVar,
-
-    applyStateDefault,
     
     filterValidProps, filterPrefixProps,
 
@@ -270,6 +266,12 @@ export const applyStateActive = () => ({
 
 
 
+const themesIf = {
+    // define active (primary) colors:
+    [vars.colorIfAct]        : colors.primaryText,
+    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
+    [vars.colorOutlineIfAct] : colors.primary,
+};
 const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     // customize the anim:
     [vars.animFn]: [
@@ -297,13 +299,6 @@ const fnVars = {extend:[ Elements.fnVars, { // copy Element's fnVars
     },
 }]};
 const states = {extend:[ Elements.states, { // copy Element's states
-    // define active (primary) colors:
-    [vars.colorIfAct]        : colors.primaryText,
-    [vars.backgIfAct]        : `linear-gradient(${colors.primary},${colors.primary})`,
-    [vars.colorOutlineIfAct] : colors.primary,
-
-
-
     // all initial states are none:
 
     [vars.filterEnableDisable] : ecssProps.filterNone,
@@ -352,6 +347,7 @@ const states = {extend:[ Elements.states, { // copy Element's states
 
 
 
+        themesIf,
         fnVars,
     ],
 }]};
@@ -372,7 +368,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export { themesIf, fnVars, states, styles, useStyles };
 
 
 

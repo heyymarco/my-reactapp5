@@ -12,7 +12,7 @@ import {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -38,7 +38,7 @@ export {
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
     stateHover, stateNotHover, stateLeaving, stateNotLeave, stateHoverLeave, stateNotHoverLeave,
     stateFocus, stateNotFocus, stateBlurring, stateNotBlur, stateFocusBlur, stateNotFocusBlur,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -99,10 +99,10 @@ export { config, cssProps };
 
 
 
-const fnVars = Controls.fnVars;
-const states = Controls.states;
+const fnVars = Controls.fnVars; // copy Control's fnVars
+const states = Controls.states; // copy Control's states
 
-const sizes = {extend:[ Elements.sizes, ]}; // copy Element's sizes
+const sizes = { ...Elements.sizes, }; // copy Element's sizes
 const cssPropsAny = cssProps as any;
 defineSizes(sizes, (size, Size, sizeProp) => ({
     // overwrite the props with the props{Size}:

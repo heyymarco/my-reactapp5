@@ -10,7 +10,7 @@ import {
     
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -33,7 +33,7 @@ export {
     
     stateEnable, stateNotEnable, stateDisabling, stateDisable, stateNotDisable, stateEnableDisable, stateNotEnableDisable, stateNotEnablingDisabling,
     stateActivating, stateActive, stateNotActive, statePassivating, stateNotPassive, stateActivePassive, stateNotActivePassive, stateNotActivatingPassivating,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive,
+    applyStateNoAnimStartup, applyStateActive,
 
     filterValidProps, filterPrefixProps,
 
@@ -90,6 +90,12 @@ const fnVars = Contents.fnVars; // copy Content's fnVars
 const states = {extend:[ Contents.states, { // copy Content's states
     // customize the anim prop to be forwarded to another element(s):
     [vars.animFw]: getVar(vars.animFn),
+
+
+    // // specific states:
+    // extend:[
+    //     // fnVars, // no changes
+    // ],
 }]};
 
 const styles = {

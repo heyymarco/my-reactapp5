@@ -21,7 +21,7 @@ import {
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
     applyStateNoAnimStartup as base_applyStateNoAnimStartup,
-    applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -53,7 +53,7 @@ export {
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
     // applyStateNoAnimStartup,
-    applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -408,7 +408,22 @@ const iconElm        = '&::before';
 const nextElm        = '& >:nth-child(1n+2)';
 const selfAndNextElm = '&,& ~*';
 
-const fnVars = EditControls.fnVars; // copy EditControl's fnVars
+const chkThemesIf = {
+    // define default (secondary) colors:
+    [vars.colorLabelIf]    : colors.secondaryCont,
+
+    // define active (primary) colors:
+    [vars.colorLabelIfAct] : colors.primaryCont,
+
+
+
+    // define valid (success) colors:
+    [vars.colorLabelIfVal] : colors.successCont,
+
+    // define invalid (danger) colors:
+    [vars.colorLabelIfInv] : colors.dangerCont,
+};
+const chkFnVars = EditControls.fnVars; // copy EditControl's fnVars
 const chkStates = {
     // specific states:
     extend:[
@@ -426,10 +441,10 @@ const chkStates = {
                     [vars.boxShadowFocusBlur] : getVar(vars.boxShadowFocusFn),
                     [vars.animFocusBlur]      : ccssProps.animFocus,
                     
-                    // apply active (primary) colors:
-                    [vars.colorIf]            : getVar(vars.colorIfAct),
-                    [vars.backgIf]            : getVar(vars.backgIfAct),
-                    [vars.colorOutlineIf]     : getVar(vars.colorOutlineIfAct),
+
+                    extend:[
+                        applyStateActive(),
+                    ],
 
                     // apply active (primary) color on label:
                     [vars.colorLabelIf]       : getVar(vars.colorLabelIfAct),
@@ -442,8 +457,15 @@ const chkStates = {
 
     // because we redefine the props above target on the [selfAndNextElm] =>
     // we should redefine the fnVars here:
-    [selfAndNextElm]: fnVars,
+    [selfAndNextElm]: {
+        extend: [
+            chkThemesIf,
+            chkFnVars,
+        ],
+    },
 };
+
+const fnVars = EditControls.fnVars; // copy EditControl's fnVars
 const states = {extend:[ EditControls.states, { // copy EditControl's states
     [nextElm]: {
         // customize final foreground color for the label:
@@ -452,20 +474,6 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
             vars.colorLabelTh,   // second priority
             vars.colorLabelIf    // third  priority
         ),
-
-
-
-        // apply inactive (secondary) color for the label:
-        [vars.colorLabelIf]    : colors.secondaryCont,
-
-        // define active (primary) color for the label:
-        [vars.colorLabelIfAct] : colors.primaryCont,
-
-        // define valid (success) color for the label:
-        [vars.colorLabelIfVal] : colors.successCont,
-
-        // define invalid (danger) color for the label:
-        [vars.colorLabelIfInv] : colors.dangerCont,
     },
 
 
@@ -526,10 +534,10 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
             [nextElm]: { // transfer the check/clear state to the "next" element(s):
                 [vars.animActivePassive]   : icssProps.animActive,
 
-                // apply active colors:
-                [vars.colorIf]             : getVar(vars.colorIfAct),
-                [vars.backgIf]             : getVar(vars.backgIfAct),
-                [vars.colorOutlineIf]      : getVar(vars.colorOutlineIfAct),
+
+                extend:[
+                    applyStateActive(),
+                ],
             },
         }),
         stateClearing({ // [clearing]
@@ -552,10 +560,14 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
                 }),
             },
         },
+
+
+
+        // fnVars, // no changes
     ],
 }]};
 
-const themes = {extend:[ Controls.themes, ]}; // copy Control's themes
+const themes = { ...Controls.themes, }; // copy Control's themes
 defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     // customize the label's text color:
     [vars.colorLabelTh] : (colors as any)[`${theme}Cont`],

@@ -12,7 +12,7 @@ import {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -40,7 +40,7 @@ export {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 

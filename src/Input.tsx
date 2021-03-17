@@ -16,7 +16,7 @@ import {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -45,7 +45,7 @@ export {
     stateValidating, stateValid, stateNotValid, stateUnvalidating, stateNotUnvalid, stateValidUnvalid, stateNotValidUnvalid, stateNotValidatingUnvalidating,
     stateInvalidating, stateInvalid, stateNotInvalid, stateUninvalidating, stateNotUninvalid, stateInvalidUninvalid, stateNotInvalidUninvalid, stateNotInvalidatingUninvalidating,
     stateValidationDisabled, stateValidationEnabled,
-    applyStateNoAnimStartup, applyStateDefault, applyStateActive, applyStateValid, applyStateInvalid,
+    applyStateNoAnimStartup, applyStateActive, applyStateValid, applyStateInvalid,
 
     filterValidProps, filterPrefixProps,
 
@@ -95,17 +95,7 @@ export { config, cssProps };
 const inpElm  = '& >:first-child';
 
 const fnVars = ETxtControls.fnVars; // copy ETxtControl's fnVars
-const states = {extend:[ ETxtControls.states, { // copy ETxtControl's states
-    // specific states:
-    extend:[
-        stateValidationEnabled({
-            [inpElm]: {
-                '&:valid': {
-                },
-            },
-        }),
-    ],
-}]};
+const states = ETxtControls.states; // copy ETxtControl's states
 
 const styles = {
     basic: {
