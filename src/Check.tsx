@@ -555,6 +555,12 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
     ],
 }]};
 
+const themes = {extend:[ Controls.themes, ]}; // copy Control's themes
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize the label's text color:
+    [vars.colorLabelTh] : (colors as any)[`${theme}Cont`],
+}));
+
 const inheritStyles = {
     fontSize           : undefined, // inherit
     fontFamily         : undefined, // inherit
@@ -762,21 +768,11 @@ const styles = {
 
         [chkElm]: Controls.styles.outline,
     },
+    ...themes,
 };
 
-defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    extend: [
-        // copy the themes from Control:
-        (Controls.styles as any)[themeProp],
-    ],
-
-
-    // customize the label's text color:
-    [vars.colorLabelTh] : (colors as any)[`${theme}Cont`],
-}));
-
 const useStyles = createUseStyles(styles);
-export { fnVars, chkStates, states, chkStyles, styles, useStyles };
+export { fnVars, states, themes, styles, useStyles };
 
 
 
@@ -803,13 +799,13 @@ export interface Props
     text?    : string
 }
 export function CheckBase(styleMain: string | null, props: Props, inputType: string) {
-    const styles          =          useStyles();
     const elmStyles       = Elements.useStyles();
+    const chkStyles       =          useStyles();
 
     const variSize        = Elements.useVariantSize(props, elmStyles);
-    const variTheme       = Elements.useVariantTheme(props, styles);
+    const variTheme       = Elements.useVariantTheme(props, chkStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
-    const variCheck       =          useVariantCheck(props, styles);
+    const variCheck       =          useVariantCheck(props, chkStyles);
 
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
@@ -825,7 +821,7 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
     return (
         <label className={[
                 styleMain,
-                styles.main,
+                chkStyles.main,
 
                 variSize.class,
                 variTheme.class,

@@ -185,6 +185,37 @@ const states = {extend:[ Indicators.states, { // copy Indicator's states
     ],
 }]};
 
+const themes = {};
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize the backg & color
+
+    // customize themed foreground color with softer color:
+    [vars.colorTh]        : (colors as any)[`${theme}Cont`],
+
+    // customize themed background color with softer color:
+    [vars.backgTh]        : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
+    
+    // customize themed foreground color at outlined state:
+    [vars.colorOutlineTh] : themeColor,
+    
+
+    
+    // customize themed foreground color at active state:
+    [vars.colorActiveTh]  : (colors as any)[`${theme}Text`],
+    
+    // customize themed background color at active state:
+    [vars.backgActiveTh]  : `linear-gradient(${themeColor},${themeColor})`,
+}));
+
+const sizes = {extend:[ Elements.sizes, ]}; // copy Element's sizes
+const cssPropsAny = cssProps as any;
+defineSizes(sizes, (size, Size, sizeProp) => ({
+    // overwrite the props with the props{Size}:
+
+    '--ct-paddingX' : cssPropsAny[`paddingX${Size}`],
+    '--ct-paddingY' : cssPropsAny[`paddingY${Size}`],
+}));
+
 const styles = {
     basic: {
         extend: [
@@ -198,47 +229,12 @@ const styles = {
             states,  // apply our states
         ],
     },
+    ...themes,
+    ...sizes,
 };
 
-const cssPropsAny = cssProps as any;
-defineSizes(styles, (size, Size, sizeProp) => ({
-    extend: [
-        // copy the size specific props from Element:
-        (Elements.styles as any)[sizeProp],
-    ],
-
-
-    // overwrite the props with the props{Size}:
-
-    '--ct-paddingX' : cssPropsAny[`paddingX${Size}`],
-    '--ct-paddingY' : cssPropsAny[`paddingY${Size}`],
-}));
-
-defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    // customize the backg & color
-
-    // customize themed foreground color with softer color:
-    [vars.colorTh]        : (colors as any)[`${theme}Cont`],
-
-    // customize themed background color with softer color:
-    [vars.backgTh]        : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
-    
-
-
-    // customize themed foreground color at outlined state:
-    [vars.colorOutlineTh] : themeColor,
-    
-
-    
-    // customize themed foreground color at active state:
-    [vars.colorActiveTh]  : (colors as any)[`${theme}Text`],
-    
-    // customize themed background color at active state:
-    [vars.backgActiveTh]  : `linear-gradient(${themeColor},${themeColor})`,
-}));
-
 const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export { fnVars, states, themes, sizes, styles, useStyles };
 
 
 
@@ -249,11 +245,11 @@ export interface Props
     children?    : React.ReactNode
 }
 export default function ListGroup(props: Props) {
-    const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
+    const ctStyles       =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, styles);
-    const variTheme      = Elements.useVariantTheme(props, styles);
+    const variSize       = Elements.useVariantSize(props, ctStyles);
+    const variTheme      = Elements.useVariantTheme(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
     const stateEnbDis    = useStateEnableDisable(props);
@@ -263,7 +259,7 @@ export default function ListGroup(props: Props) {
     
     return (
         <div className={[
-                styles.main,
+                ctStyles.main,
 
                 variSize.class,
                 variTheme.class,

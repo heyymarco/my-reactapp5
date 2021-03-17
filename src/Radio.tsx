@@ -89,6 +89,9 @@ export { config, cssProps };
 
 
 
+const fnVars = Checks.fnVars; // copy Check's fnVars
+const states = Checks.states; // copy Check's states
+
 const chkStyles = {
     extend: [
         filterValidProps(cssProps), // apply our filtered cssProps
@@ -103,14 +106,20 @@ const chkStyles = {
     },
 };
 const styles = {
-    main: {
+    basic: {
         // the main "checkbox" element:
         '& >:first-child': chkStyles,
+    },
+    main: {
+        extend: [
+            'basic', // apply basic styles
+            // states, // no changes
+        ],
     },
 };
 
 const useStyles = createUseStyles(styles);
-export { chkStyles, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 

@@ -468,6 +468,12 @@ const states = {extend:[ Elements.states, { // not copy from Indicator's states 
     ],
 }]};
 
+const themes = {extend:[ Elements.themes, ]}; // copy Element's themes
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize themed box-shadow at focused state:
+    [vars.boxShadowFocusTh]: (colors as any)[`${theme}Transp`],
+}));
+
 const styles = {
     basic: {
         extend: [
@@ -490,21 +496,11 @@ const styles = {
             }),
         ],
     },
+    ...themes,
 };
 
-defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    extend: [
-        // copy the themes from Element:
-        (Elements.styles as any)[themeProp],
-    ],
-
-
-    // customize themed box-shadow at focused state:
-    [vars.boxShadowFocusTh]: (colors as any)[`${theme}Transp`],
-}));
-
 const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export { fnVars, states, themes, styles, useStyles };
 
 
 
@@ -645,11 +641,11 @@ export interface Props
     focus?:   boolean
 }
 export default function Control(props: Props) {
-    const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
+    const ctrlStyles     =          useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
-    const variTheme      = Elements.useVariantTheme(props, styles);
+    const variTheme      = Elements.useVariantTheme(props, ctrlStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
     const stateEnbDis    = useStateEnableDisable(props);
@@ -661,7 +657,7 @@ export default function Control(props: Props) {
 
     return (
         <button className={[
-                styles.main,
+                ctrlStyles.main,
 
                 variSize.class,
                 variTheme.class,

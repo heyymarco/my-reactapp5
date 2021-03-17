@@ -86,6 +86,7 @@ export { config, cssProps };
 const wrapElm  = '& >li';
 const mainElm = '& >.lg-wrapper';
 
+const fnVars = Contents.fnVars; // copy Content's fnVars
 const states = {extend:[ Contents.states, { // copy Content's states
     // customize the anim prop to be forwarded to another element(s):
     [vars.animFw]: getVar(vars.animFn),
@@ -163,7 +164,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 
@@ -174,18 +175,18 @@ export interface Props
     orientation? : Css.Orientation
 }
 export default function ListGroup(props: Props) {
-    const styles         =          useStyles();
     const ctStyles       = Contents.useStyles();
+    const lgStyles       =          useStyles();
 
     const variSize       = Elements.useVariantSize(props, ctStyles);
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
-    const variGradient   = Elements.useVariantGradient(props, styles);
+    const variGradient   = Elements.useVariantGradient(props, lgStyles);
 
     
     
     return (
         <ul className={[
-                styles.main,
+                lgStyles.main,
 
                 variSize.class,
                 variTheme.class,

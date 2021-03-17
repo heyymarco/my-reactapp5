@@ -116,7 +116,7 @@ export const applyStateDefault = () => ({
 
 const iconElm = '&::after';
 
-const fnVars = EditControls.fnVars;
+const fnVars = EditControls.fnVars; // copy EditControl's fnVars
 const states = {extend:[ EditControls.states, { // copy EditControl's states
     // define active (primary) colors:
     [vars.colorIfAct]           : colors.primaryCont,
@@ -174,6 +174,8 @@ const states = {extend:[ EditControls.states, { // copy EditControl's states
     ],
 }]};
 
+const themes = {extend:[ Controls.themes, Contents.themes, ]}; // copy Control's + Content's themes
+
 const styles = {
     basic: {
         extend: [
@@ -209,20 +211,11 @@ const styles = {
             states,  // apply our states
         ],
     },
+    ...themes,
 };
 
-defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    extend: [
-        // copy the themes from Control:
-        (Controls.styles as any)[themeProp],
-
-        // then overwrite the themes from Content:
-        (Contents.styles as any)[themeProp],
-    ],
-}));
-
 const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export { fnVars, states, themes, styles, useStyles };
 
 
 
@@ -236,11 +229,11 @@ export interface Props<TElement, TValue>
     pattern?   : string
 }
 export default function EditableTextControl(props: Props<HTMLTextAreaElement, string>) {
-    const styles          =          useStyles();
     const elmStyles       = Elements.useStyles();
+    const etctrlStyles    =          useStyles();
 
     const variSize        = Elements.useVariantSize(props, elmStyles);
-    const variTheme       = Elements.useVariantTheme(props, styles);
+    const variTheme       = Elements.useVariantTheme(props, etctrlStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
 
     const stateEnbDis     = useStateEnableDisable(props);
@@ -253,7 +246,7 @@ export default function EditableTextControl(props: Props<HTMLTextAreaElement, st
 
     return (
         <textarea className={[
-                styles.main,
+                etctrlStyles.main,
 
                 variSize.class,
                 variTheme.class,

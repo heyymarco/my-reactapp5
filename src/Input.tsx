@@ -94,6 +94,7 @@ export { config, cssProps };
 
 const inpElm  = '& >:first-child';
 
+const fnVars = ETxtControls.fnVars; // copy ETxtControl's fnVars
 const states = {extend:[ ETxtControls.states, { // copy ETxtControl's states
     // specific states:
     extend:[
@@ -153,7 +154,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 
@@ -181,14 +182,14 @@ export interface Props<TElement, TValue>
     placeholder?  : string
 }
 export default function Input(props: Props<HTMLInputElement, string>) {
-    const styles          =          useStyles();
     const elmStyles       = Elements.useStyles();
-    const eTxtCtrlStyles  = ETxtControls.useStyles();
+    const etctrlStyles    = ETxtControls.useStyles();
+    const inpStyles       =          useStyles();
 
     const variSize        = Elements.useVariantSize(props, elmStyles);
-    const variTheme       = Elements.useVariantTheme(props, eTxtCtrlStyles);
+    const variTheme       = Elements.useVariantTheme(props, etctrlStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
-    const variInput       =          useVariantInput(props, styles);
+    const variInput       =          useVariantInput(props, inpStyles);
 
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
@@ -200,7 +201,7 @@ export default function Input(props: Props<HTMLInputElement, string>) {
 
     return (
         <span className={[
-                styles.main,
+                inpStyles.main,
 
                 variSize.class,
                 variTheme.class,

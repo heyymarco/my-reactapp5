@@ -324,6 +324,45 @@ const states = {
     ],
 };
 
+const themes = {};
+export function defineThemes(themes: object, handler: ((theme: string, Theme: string, themeProp: string, themeColor: string) => object)) {
+    for(const [theme, themeColor] of Object.entries(color.themes)) {
+        const Theme = pascalCase(theme);
+        const themeProp = `theme${Theme}`;
+        (themes as any)[themeProp] = handler(theme, Theme, themeProp, themeColor as string);
+    }
+}
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize the backg & color
+
+    // customize themed foreground color:
+    [vars.colorTh]        : (colors as any)[`${theme}Text`],
+
+    // customize themed background color:
+    [vars.backgTh]        : `linear-gradient(${themeColor},${themeColor})`,
+
+    // customize themed foreground color at outlined state:
+    [vars.colorOutlineTh] : themeColor,
+}));
+
+const sizes = {};
+export function defineSizes(sizes: object, handler: ((size: string, Size: string, sizeProp: string) => object), options = ['sm', 'lg']) {
+    for(const size of options) {
+        const Size = pascalCase(size);
+        const sizeProp = `size${Size}`;
+        (sizes as any)[sizeProp] = handler(size, Size, sizeProp);
+    }
+}
+const cssPropsAny = cssProps as any;
+defineSizes(sizes, (size, Size, sizeProp) => ({
+    // overwrite the props with the props{Size}:
+
+    '--elm-fontSize'     : cssPropsAny[`fontSize${Size}`],
+    '--elm-paddingX'     : cssPropsAny[`paddingX${Size}`],
+    '--elm-paddingY'     : cssPropsAny[`paddingY${Size}`],
+    '--elm-borderRadius' : cssPropsAny[`borderRadius${Size}`],
+}));
+
 const styles = {
     basic: {
         extend: [
@@ -363,48 +402,13 @@ const styles = {
         // customize background gradient:
         [vars.backgGradTg]: cssProps.backgGrad,
     },
+    ...themes,
+    ...sizes,
 };
-
-export function defineSizes(styles: object, handler: ((size: string, Size: string, sizeProp: string) => object), sizes = ['sm', 'lg']) {
-    for(const size of sizes) {
-        const Size = pascalCase(size);
-        const sizeProp = `size${Size}`;
-        (styles as any)[sizeProp] = handler(size, Size, sizeProp);
-    }
-}
-const cssPropsAny = cssProps as any;
-defineSizes(styles, (size, Size, sizeProp) => ({
-    // overwrite the props with the props{Size}:
-
-    '--elm-fontSize'     : cssPropsAny[`fontSize${Size}`],
-    '--elm-paddingX'     : cssPropsAny[`paddingX${Size}`],
-    '--elm-paddingY'     : cssPropsAny[`paddingY${Size}`],
-    '--elm-borderRadius' : cssPropsAny[`borderRadius${Size}`],
-}));
-
-export function defineThemes(styles: object, handler: ((theme: string, Theme: string, themeProp: string, themeColor: string) => object)) {
-    for(const [theme, themeColor] of Object.entries(color.themes)) {
-        const Theme = pascalCase(theme);
-        const themeProp = `theme${Theme}`;
-        (styles as any)[themeProp] = handler(theme, Theme, themeProp, themeColor as string);
-    }
-}
-defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    // customize the backg & color
-
-    // customize themed foreground color:
-    [vars.colorTh]        : (colors as any)[`${theme}Text`],
-
-    // customize themed background color:
-    [vars.backgTh]        : `linear-gradient(${themeColor},${themeColor})`,
-
-    // customize themed foreground color at outlined state:
-    [vars.colorOutlineTh] : themeColor,
-}));
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 const useStyles = createUseStyles(styles2);
-export { fnVars, states, styles2 as styles, useStyles };
+export { fnVars, states, themes, sizes, styles2 as styles, useStyles };
 
 
 
@@ -444,17 +448,17 @@ export interface Props
 {
 }
 export default function Element(props: Props) {
-    const styles       = useStyles();
+    const elmStyles    = useStyles();
 
-    const variSize     = useVariantSize(props, styles);
-    const variTheme    = useVariantTheme(props, styles);
-    const variGradient = useVariantGradient(props, styles);
+    const variSize     = useVariantSize(props, elmStyles);
+    const variTheme    = useVariantTheme(props, elmStyles);
+    const variGradient = useVariantGradient(props, elmStyles);
 
 
 
     return (
         <div className={[
-                styles.main,
+                elmStyles.main,
                 
                 variSize.class,
                 variTheme.class,

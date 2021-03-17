@@ -96,7 +96,8 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
-const states = Contents.states;
+const fnVars = Contents.fnVars; // copy Content's fnVars
+const states = Contents.states; // copy Content's states
 
 const image = {
     display: 'block', // remove unecessary space to the next sibling
@@ -160,6 +161,8 @@ const styles = {
         extend: [
             Contents.styles.basic,      // copy styles from Content
             filterValidProps(cssProps), // apply our filtered cssProps
+            // themes, // no changes
+            // sizes,  // no changes
         ],
 
         display: 'flex',
@@ -220,7 +223,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { states, styles, useStyles };
+export { fnVars, states, styles, useStyles };
 
 
 
@@ -243,14 +246,14 @@ export interface Props
     footer? : React.ReactNode
 }
 export default function ListGroup(props: Props) {
-    const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
     const ctStyles       = Contents.useStyles();
+    const crdStyles      =          useStyles();
 
     const variSize       = Elements.useVariantSize(props, ctStyles);
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
-    const variCard       =          useVariantCard(props, styles);
+    const variCard       =          useVariantCard(props, crdStyles);
 
     const stateEnbDis    = useStateEnableDisable(props);
     const stateActPass   = useStateActivePassive(props, stateEnbDis);
@@ -259,7 +262,7 @@ export default function ListGroup(props: Props) {
     
     return (
         <article className={[
-                styles.main,
+                crdStyles.main,
 
                 variSize.class,
                 variTheme.class,
@@ -276,19 +279,19 @@ export default function ListGroup(props: Props) {
             }}
         >
             {props.header && (
-                <header className={styles.header}>
+                <header className={crdStyles.header}>
                     {props.header}
                 </header>
             )}
 
             {props.children && (
-                <div className={styles.body}>
+                <div className={crdStyles.body}>
                     {props.children}
                 </div>
             )}
 
             {props.footer && (
-                <footer className={styles.footer}>
+                <footer className={crdStyles.footer}>
                     {props.footer}
                 </footer>
             )}

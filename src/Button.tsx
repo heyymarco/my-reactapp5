@@ -99,7 +99,17 @@ export { config, cssProps };
 
 
 
+const fnVars = Controls.fnVars;
 const states = Controls.states;
+
+const sizes = {extend:[ Elements.sizes, ]}; // copy Element's sizes
+const cssPropsAny = cssProps as any;
+defineSizes(sizes, (size, Size, sizeProp) => ({
+    // overwrite the props with the props{Size}:
+
+    '--btn-gapX' : cssPropsAny[`gapX${Size}`],
+    '--btn-gapY' : cssPropsAny[`gapY${Size}`],
+}));
 
 const linkStyles = {
     textDecoration : 'underline',
@@ -163,25 +173,12 @@ const styles = {
         // apply linkStyles & force to win conflict with main
         '&:not(._)': linkStyles,
     },
+    ...sizes,
 };
-
-const cssPropsAny = cssProps as any;
-defineSizes(styles, (size, Size, sizeProp) => ({
-    extend: [
-        // copy the size specific props from Element:
-        (Elements.styles as any)[sizeProp],
-    ],
-
-
-    // overwrite the props with the props{Size}:
-
-    '--btn-gapX' : cssPropsAny[`gapX${Size}`],
-    '--btn-gapY' : cssPropsAny[`gapY${Size}`],
-}));
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 const useStyles = createUseStyles(styles2);
-export { states, styles2 as styles, useStyles };
+export { fnVars, states, sizes, styles2 as styles, useStyles };
 
 
 
@@ -222,15 +219,15 @@ export interface Props
     whiteSpace?  : Css.WhiteSpace
 }
 export default function Button(props: Props) {
-    const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
     const ctrlStyles     = Controls.useStyles();
+    const btnStyles      =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, styles);
+    const variSize       = Elements.useVariantSize(props, btnStyles);
     const variThemeDef   =          useVariantThemeDefault(props);
     const variTheme      = Elements.useVariantTheme(props, ctrlStyles, variThemeDef);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
-    const variButton     =          useVariantButton(props, styles);
+    const variButton     =          useVariantButton(props, btnStyles);
 
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
@@ -241,7 +238,7 @@ export default function Button(props: Props) {
 
     return (
         <button className={[
-                styles.main,
+                btnStyles.main,
 
                 variSize.class,
                 variTheme.class,

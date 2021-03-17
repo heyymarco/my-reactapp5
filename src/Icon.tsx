@@ -119,6 +119,22 @@ const customFont = {
     textDecoration : config.font.textDecoration,
 };
 
+const themes = {};
+Elements.defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // overwrite the color prop
+    // we ignore the color prop if the theme applied
+
+    '--ico-color': themeColor,
+}));
+
+const sizes  = {};
+const cssPropsAny = cssProps as any;
+Elements.defineSizes(sizes, (size, Size, sizeProp) => ({
+    // overwrite the props with the props{Size}:
+
+    '--ico-size': (size === '1em') ? '1em' : cssPropsAny[`size${Size}`],
+}), ['sm', 'nm', 'md', 'lg', '1em']);
+
 const styles = {
     basic: {
         extend: [
@@ -194,26 +210,14 @@ const styles = {
             visibility : 'hidden !important',
             height     : '100%', // follow parent's height
         },
-    }
+    },
+    ...themes,
+    ...sizes,
 };
-
-const cssPropsAny = cssProps as any;
-Elements.defineSizes(styles, (size, Size, sizeProp) => ({
-    // overwrite the props with the props{Size}:
-
-    '--ico-size': (size === '1em') ? '1em' : cssPropsAny[`size${Size}`],
-}), ['sm', 'nm', 'md', 'lg', '1em']);
-
-Elements.defineThemes(styles, (theme, Theme, themeProp, themeColor) => ({
-    // overwrite the color prop
-    // we ignore the color prop if the theme applied
-
-    '--ico-color': themeColor,
-}));
 
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeNm'|'sizeMd'|'sizeLg'|'size1em', object>);
 const useStyles = createUseStyles(styles2);
-export { styles2 as styles, useStyles };
+export { themes, sizes, styles2 as styles, useStyles };
 
 
 
@@ -226,10 +230,10 @@ export interface Props
     'aria-hidden'? : boolean
 }
 export default function Icon(props: Props) {
-    const styles       = useStyles();
+    const icoStyles    = useStyles();
 
-    const variSize     = Elements.useVariantSize(props, styles);
-    const variTheme    = Elements.useVariantTheme(props, styles);
+    const variSize     = Elements.useVariantSize(props, icoStyles);
+    const variTheme    = Elements.useVariantTheme(props, icoStyles);
 
 
 
@@ -247,8 +251,8 @@ export default function Icon(props: Props) {
 
     return (
         <span className={[
-                styles.main,
-                (imgIcon ? styles.img : (fontIcon ? styles.font : null)),
+                icoStyles.main,
+                (imgIcon ? icoStyles.img : (fontIcon ? icoStyles.font : null)),
                 
                 variSize.class,
                 variTheme.class,

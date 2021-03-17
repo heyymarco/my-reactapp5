@@ -342,9 +342,9 @@ export interface Props
     footer?     : React.ReactNode
 }
 export default function Modal(props: Props) {
-    const styles       = useStyles();
+    const modStyles    = useStyles();
 
-    const variAlign    = useVariantAlign(props, styles);
+    const variAlign    = useVariantAlign(props, modStyles);
 
     const stateActPass = useStateActivePassive(props);
 
@@ -360,7 +360,7 @@ export default function Modal(props: Props) {
         // create default header:
         if ((cardProps.header === undefined) || (typeof(cardProps.header) === 'string')) {
             cardProps.header = (
-                <h5 className={styles.title}>
+                <h5 className={modStyles.title}>
                     {cardProps.header}
                     <ButtonIcon btnStyle='link' theme='secondary' aria-label='Close' icon='close' onClick={() => props.onClose?.('ui')} />
                 </h5>
@@ -370,7 +370,7 @@ export default function Modal(props: Props) {
         // create default footer:
         if ((cardProps.footer === undefined) || (typeof(cardProps.footer) === 'string')) {
             cardProps.footer = (
-                <p className={styles.actionBar}>
+                <p className={modStyles.actionBar}>
                     {cardProps.footer}
                     <Button theme='primary' text='Close' onClick={() => props.onClose?.('ui')} />
                 </p>
@@ -379,7 +379,7 @@ export default function Modal(props: Props) {
 
 
         return cardProps;
-    }, [props, styles.title, styles.actionBar]);
+    }, [props, modStyles.title, modStyles.actionBar]);
 
 
     // if actived => auto focus the ui:
@@ -392,8 +392,8 @@ export default function Modal(props: Props) {
 
     return (
         <section className={[
-                styles.main,
-                (props.scrollable ? styles.scollable : null),
+                modStyles.main,
+                (props.scrollable ? modStyles.scollable : null),
 
                 variAlign.class,
 

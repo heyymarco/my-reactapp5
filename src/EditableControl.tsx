@@ -305,7 +305,58 @@ export const applyStateInvalid = () => ({
 
 
 
-const fnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
+const validationFnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
+    // customize the anim:
+    [vars.animFn]: [
+        ecssProps.anim,
+        getVar(vars.animValUnval),
+        getVar(vars.animInvUninv),
+    ],
+}]};
+const validationStates = {
+    // define valid (success) colors:
+    [vars.colorIfVal]           : colors.successText,
+    [vars.backgIfVal]           : `linear-gradient(${colors.success},${colors.success})`,
+    [vars.colorOutlineIfVal]    : colors.success,
+    [vars.boxShadowFocusIfVal]  : colors.successTransp,
+
+    // define invalid (danger) colors:
+    [vars.colorIfInv]           : colors.dangerText,
+    [vars.backgIfInv]           : `linear-gradient(${colors.danger},${colors.danger})`,
+    [vars.colorOutlineIfInv]    : colors.danger,
+    [vars.boxShadowFocusIfInv]  : colors.dangerTransp,
+
+
+
+    // all initial states are none:
+
+    [vars.animValUnval] : ecssProps.animNone,
+    [vars.animInvUninv] : ecssProps.animNone,
+
+    // specific states:
+    extend:[
+        stateValidating({
+            [vars.animValUnval]       : cssProps.animValid,
+        }),
+        stateValid(applyStateValid()),
+        stateUnvalidating({
+            [vars.animValUnval]       : cssProps.animUnvalid,
+        }),
+
+        stateInvalidating({
+            [vars.animInvUninv]       : cssProps.animInvalid,
+        }),
+        stateInvalid(applyStateInvalid()),
+        stateUninvalidating({
+            [vars.animInvUninv]       : cssProps.animUninvalid,
+        }),
+
+
+
+        validationFnVars,
+    ],
+};
+const fnVars = {extend:[ Controls.fnVars, validationFnVars, { // copy Control's fnVars
     // customize the anim:
     [vars.animFn]: [
         ecssProps.anim,
@@ -343,26 +394,7 @@ const fnVars = {extend:[ Controls.fnVars, { // copy Control's fnVars
         },
     },
 }]};
-const states = {extend:[ Controls.states, { // copy Control's states
-    // define valid (success) colors:
-    [vars.colorIfVal]           : colors.successText,
-    [vars.backgIfVal]           : `linear-gradient(${colors.success},${colors.success})`,
-    [vars.colorOutlineIfVal]    : colors.success,
-    [vars.boxShadowFocusIfVal]  : colors.successTransp,
-
-    // define invalid (danger) colors:
-    [vars.colorIfInv]           : colors.dangerText,
-    [vars.backgIfInv]           : `linear-gradient(${colors.danger},${colors.danger})`,
-    [vars.colorOutlineIfInv]    : colors.danger,
-    [vars.boxShadowFocusIfInv]  : colors.dangerTransp,
-
-
-
-    // all initial states are none:
-
-    [vars.animValUnval] : ecssProps.animNone,
-    [vars.animInvUninv] : ecssProps.animNone,
-
+const states = {extend:[ Controls.states, validationStates, { // copy Control's states
     // specific states:
     extend:[
         // supress activating by mouse/keyboard (:active)
@@ -372,24 +404,6 @@ const states = {extend:[ Controls.states, { // copy Control's states
                 [vars.filterActivePassive] : ecssProps.filterNone,
                 [vars.animActivePassive]   : ecssProps.animNone,
             },
-        }),
-
-
-
-        stateValidating({
-            [vars.animValUnval]       : cssProps.animValid,
-        }),
-        stateValid(applyStateValid()),
-        stateUnvalidating({
-            [vars.animValUnval]       : cssProps.animUnvalid,
-        }),
-
-        stateInvalidating({
-            [vars.animInvUninv]       : cssProps.animInvalid,
-        }),
-        stateInvalid(applyStateInvalid()),
-        stateUninvalidating({
-            [vars.animInvUninv]       : cssProps.animUninvalid,
         }),
 
 
@@ -414,7 +428,7 @@ const styles = {
 };
 
 const useStyles = createUseStyles(styles);
-export { fnVars, states, styles, useStyles };
+export { validationFnVars, validationStates, fnVars, states, styles, useStyles };
 
 
 
@@ -440,13 +454,13 @@ export function useNativeValidator(customValidator?: CustomValidatorHandler) {
          * 
          * @returns true = valid, false = invalid, undefined = UI is still loading, validator is not ready to validate
          */
-        validator    : (() => isValid) as ValidatorHandler,
+        validator    : ((): Val.Result => isValid) as ValidatorHandler,
 
         handleInit   : handleInit,
         handleChange : handleChange,
     };
 }
-export function useStateValidInvalid<TElement, TValue>(props: Props<TElement, TValue>, validator?: ValidatorHandler) {
+export function useStateValidInvalid(props: Val.Validation, validator?: ValidatorHandler) {
     const valContext          = useContext(validations.Context);
     const defaultValided: Val.Result  = null; // if [isValid] nor validator was not specified => the default value is isValid=null (neither error nor success)
     const [valided,      setValided     ] = useState((): (Val.Result|undefined) => {
@@ -601,9 +615,9 @@ export interface Props<TElement, TValue>
     required?        : boolean
 }
 export default function EditableControl(props: Props<HTMLTextAreaElement, string>) {
-    const styles          =          useStyles();
     const elmStyles       = Elements.useStyles();
     const ctrlStyles      = Controls.useStyles();
+    const ectrlStyles     =          useStyles();
 
     const variSize        = Elements.useVariantSize(props, elmStyles);
     const variTheme       = Elements.useVariantTheme(props, ctrlStyles);
@@ -620,7 +634,7 @@ export default function EditableControl(props: Props<HTMLTextAreaElement, string
 
     return (
         <textarea className={[
-                styles.main,
+                ectrlStyles.main,
 
                 variSize.class,
                 variTheme.class,

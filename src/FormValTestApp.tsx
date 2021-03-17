@@ -10,6 +10,7 @@ import type * as Inputs from './Input';
 import Input from './Input';
 import Check from './Check';
 import Button from './Button';
+import Form from './Form';
 import ValidationProvider from './validations';
 // import Icon from './Icon';
 
@@ -52,10 +53,10 @@ export default function App (props: any) {
 	return (
         <JssProvider jss={jss}>
             <Container style={{minHeight: '100vh'}}>
-				<form>
-					<ValidationProvider
-						enableValidation={enableVal}
-					>
+				<ValidationProvider
+					enableValidation={enableVal}
+				>
+					<Form>
 						<Input 
 							type='text'
 							required={true}
@@ -87,8 +88,8 @@ export default function App (props: any) {
 							/>
 							enable validation
 						</label>
-					</ValidationProvider>
-				</form>
+					</Form>
+				</ValidationProvider>
             </Container>
         </JssProvider>
     );

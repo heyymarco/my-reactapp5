@@ -503,8 +503,8 @@ export interface Props
     active?:  boolean
 }
 export default function Indicator(props: Props) {
-    const styles         =          useStyles();
     const elmStyles      = Elements.useStyles();
+    const indiStyles     =          useStyles();
 
     const variSize       = Elements.useVariantSize(props, elmStyles);
     const variTheme      = Elements.useVariantTheme(props, elmStyles);
@@ -517,7 +517,7 @@ export default function Indicator(props: Props) {
 
     return (
         <div className={[
-                styles.main,
+                indiStyles.main,
 
                 variSize.class,
                 variTheme.class,
