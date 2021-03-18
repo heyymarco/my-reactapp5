@@ -4,7 +4,6 @@ import React               from 'react';
 
 import * as Elements       from './Element';
 import * as Contents       from './Content';
-import * as Controls       from './Control';
 import * as EditControls   from './EditableControl';
 import {
     escapeSvg,
@@ -21,7 +20,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -50,7 +49,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -107,6 +106,11 @@ export { config, cssProps };
 
 const iconElm = '&::after';
 
+
+export const themes = {extend:[ EditControls.themes, Contents.themes, ]}; // copy EditControl's + Content's themes
+export const sizes  =           EditControls.sizes;                       // copy EditControl's sizes
+
+
 export const themesIf = {
     // define default (secondary) colors:
     [vars.colorIf]              : colors.secondaryCont,
@@ -134,7 +138,7 @@ export const themesIf = {
     // [vars.colorOutlineIfInv]    : colors.danger,        // still same as EditControl's
     // [vars.boxShadowFocusIfInv]  : colors.dangerTransp,  // still same as EditControl's
 };
-export const fnVars = EditControls.fnVars; // copy EditControl's fnVars
+export const fnVars =           EditControls.fnVars;   // copy EditControl's fnVars
 export const states = {extend:[ EditControls.states, { // copy EditControl's states
     // all initial states are none:
 
@@ -167,7 +171,6 @@ export const states = {extend:[ EditControls.states, { // copy EditControl's sta
     ],
 }]};
 
-export const themes = {extend:[ Controls.themes, Contents.themes, ]}; // copy Control's + Content's themes
 
 export const basicStyle = {
     extend: [
@@ -201,12 +204,16 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
     },
-    ...themes,
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -224,13 +231,16 @@ export default function EditableTextControl(props: Props<HTMLTextAreaElement, st
     const elmStyles       = Elements.useStyles();
     const etctrlStyles    =          useStyles();
 
-    const variSize        = Elements.useVariantSize(props, elmStyles);
+    // themes:
     const variTheme       = Elements.useVariantTheme(props, etctrlStyles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
 
+    // states:
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
     const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
+    const stateActPass    = useStateActivePassive(props, stateEnbDis);
     const nativeValidator = useNativeValidator(props.customValidator);
     const stateValInval   = useStateValidInvalid(props, nativeValidator.validator);
 
@@ -240,13 +250,16 @@ export default function EditableTextControl(props: Props<HTMLTextAreaElement, st
         <textarea className={[
                 etctrlStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
 
+                // states:
                 stateEnbDis.class,
                 stateLeave.class,
                 stateFocusBlur.class,
+                stateActPass.class,
                 stateValInval.class,
             ].join(' ')}
 
@@ -273,10 +286,15 @@ export default function EditableTextControl(props: Props<HTMLTextAreaElement, st
             onMouseLeave={stateLeave.handleMouseLeave}
             onFocus={stateFocusBlur.handleFocus}
             onBlur={stateFocusBlur.handleBlur}
+            // onMouseDown={stateActPass.handleMouseDown}
+            // onKeyDown={stateActPass.handleKeyDown}
+            // onMouseUp={stateActPass.handleMouseUp}
+            // onKeyUp={stateActPass.handleKeyUp}
             onAnimationEnd={(e) => {
                 stateEnbDis.handleAnimationEnd(e);
                 stateLeave.handleAnimationEnd(e);
                 stateFocusBlur.handleAnimationEnd(e);
+                stateActPass.handleAnimationEnd(e);
                 stateValInval.handleAnimationEnd(e);
             }}
         >

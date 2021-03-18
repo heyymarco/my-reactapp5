@@ -14,7 +14,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 }                          from './Indicator';
@@ -36,7 +36,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 };
@@ -146,6 +146,38 @@ export { config, cssProps };
 
 
 
+export const themes = {}; // create themes from zero, not copy from Indicator's themes
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize the backg & color
+
+    // customize themed foreground color with softer color:
+    [vars.colorTh]        : (colors as any)[`${theme}Cont`],
+
+    // customize themed background color with softer color:
+    [vars.backgTh]        : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
+    
+    // customize themed foreground color at outlined state:
+    [vars.colorOutlineTh] : themeColor,
+    
+
+    
+    // customize themed foreground color at active state:
+    [vars.colorActiveTh]  : (colors as any)[`${theme}Text`],
+    
+    // customize themed background color at active state:
+    [vars.backgActiveTh]  : `linear-gradient(${themeColor},${themeColor})`,
+}));
+
+export const sizes = {extend:[ Indicators.sizes, ]}; // copy Indicator's sizes
+const cssPropsAny = cssProps as any;
+defineSizes(sizes, (size, Size, sizeProp) => ({
+    // overwrite the props with the props{Size}:
+
+    '--ct-paddingX' : cssPropsAny[`paddingX${Size}`],
+    '--ct-paddingY' : cssPropsAny[`paddingY${Size}`],
+}));
+
+
 export const fnVars = {extend:[ Indicators.fnVars, { // copy Indicator's fnVars
     // customize final foreground color at active state:
     [vars.colorActiveFn] : getVar(
@@ -185,36 +217,6 @@ export const states = {extend:[ Indicators.states, { // copy Indicator's states
     ],
 }]};
 
-export const themes = {};
-defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
-    // customize the backg & color
-
-    // customize themed foreground color with softer color:
-    [vars.colorTh]        : (colors as any)[`${theme}Cont`],
-
-    // customize themed background color with softer color:
-    [vars.backgTh]        : `linear-gradient(${(colors as any)[`${theme}Thin`]},${(colors as any)[`${theme}Thin`]})`,
-    
-    // customize themed foreground color at outlined state:
-    [vars.colorOutlineTh] : themeColor,
-    
-
-    
-    // customize themed foreground color at active state:
-    [vars.colorActiveTh]  : (colors as any)[`${theme}Text`],
-    
-    // customize themed background color at active state:
-    [vars.backgActiveTh]  : `linear-gradient(${themeColor},${themeColor})`,
-}));
-
-export const sizes = { ...Elements.sizes, }; // copy Element's sizes
-const cssPropsAny = cssProps as any;
-defineSizes(sizes, (size, Size, sizeProp) => ({
-    // overwrite the props with the props{Size}:
-
-    '--ct-paddingX' : cssPropsAny[`paddingX${Size}`],
-    '--ct-paddingY' : cssPropsAny[`paddingY${Size}`],
-}));
 
 export const basicStyle = {
     extend: [
@@ -226,13 +228,16 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
     },
-    ...themes,
-    ...sizes,
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -247,10 +252,12 @@ export default function ListGroup(props: Props) {
     const elmStyles      = Elements.useStyles();
     const ctStyles       =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, ctStyles);
+    // themes:
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
+    const variSize       = Elements.useVariantSize(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
+    // states:
     const stateEnbDis    = useStateEnableDisable(props);
     const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
@@ -260,10 +267,12 @@ export default function ListGroup(props: Props) {
         <div className={[
                 ctStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
 
+                // states:
                 stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateActPass.class,
             ].join(' ')}

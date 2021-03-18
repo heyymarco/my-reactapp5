@@ -9,6 +9,7 @@ import
 }                          from 'react';
 
 import * as Elements       from './Element';
+import * as Contents       from './Content';
 import * as Controls       from './Control';
 import * as EditControls   from './EditableControl';
 import {
@@ -26,7 +27,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -57,7 +58,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -68,6 +69,7 @@ export {
 
 export interface CssProps {
 }
+const initial = 'initial';
 // const unset   = 'unset';
 // const none    = 'none';
 // const inherit = 'inherit';
@@ -145,7 +147,11 @@ export { config, cssProps };
 
 
 
-const themesIf = {extend:[ ETxtControls.themesIf, { // copy ETxtControl's fnVars
+export const themes = Contents.themes; // copy Content's themes
+export const sizes  = Contents.sizes;  // copy Content's sizes
+
+
+export const themesIf = {extend:[ ETxtControls.themesIf, { // copy ETxtControl's fnVars
     // define default (secondary) colors:
     [vars.colorIf]              : undefined, // delete
     [vars.backgIf]              : undefined, // delete
@@ -154,9 +160,9 @@ const themesIf = {extend:[ ETxtControls.themesIf, { // copy ETxtControl's fnVars
     [vars.colorIfAct]           : undefined, // delete
     [vars.backgIfAct]           : undefined, // delete
 }]};
-const fnVars = {extend:[ Elements.fnVars, EditControls.validationFnVars, { // copy Element's fnVars + EditControl's validationFnVars
+export const fnVars = {extend:[ Elements.fnVars, EditControls.validationFnVars, { // copy Element's fnVars + EditControl's validationFnVars
 }]};
-const states = {extend:[ Elements.states, EditControls.validationStates, { // copy Element's states + EditControl's validationStates
+export const states = {extend:[ Elements.states, EditControls.validationStates, { // copy Element's states + EditControl's validationStates
     // specific states:
     extend:[
         themesIf,
@@ -167,31 +173,45 @@ const states = {extend:[ Elements.states, EditControls.validationStates, { // co
 
     // undo inherited states to children:
     '& >*': {
-        [vars.colorIfIf]          : 'initial',
-        [vars.backgIfIf]          : 'initial',
-        [vars.colorOutlineIfIf]   : 'initial',
-        [vars.boxShadowFocusIfIf] : 'initial',
+        [vars.colorTh]            : initial,
+        [vars.backgTh]            : initial,
+        [vars.colorOutlineTh]     : initial,
+
+        [vars.colorIfIf]          : initial,
+        [vars.backgIfIf]          : initial,
+        [vars.colorOutlineIfIf]   : initial,
+        [vars.boxShadowFocusIfIf] : initial,
+
+        // [vars.colorIf]            : initial,
+        // [vars.backgIf]            : initial,
+        // [vars.colorOutlineIf]     : initial,
+        // [vars.boxShadowFocusIf]   : initial,
     },
 }]};
 
-const basicStyle = {
+
+export const basicStyle = {
     extend: [
         Elements.basicStyle,        // copy basicStyle from Element
         filterValidProps(cssProps), // apply our filtered cssProps
     ],
 };
-
-const styles = {
+export const styles = {
     main: {
         extend: [
             basicStyle, // apply basic styles
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
     },
 };
+export const useStyles = createUseStyles(styles);
 
-const useStyles = createUseStyles(styles);
-export { fnVars, states, basicStyle, styles, useStyles };
 
 
 export type ValidatorHandler = () => Val.Result;
@@ -223,6 +243,8 @@ export function useFormValidator(customValidator?: CustomValidatorHandler) {
     };
 }
 
+
+
 export interface Props<TElement, TValue>
     extends
         Controls.Props,
@@ -244,13 +266,15 @@ export interface Props<TElement, TValue>
     children?    : React.ReactNode
 }
 export default function EditableControl(props: Props<HTMLTextAreaElement, string>) {
-    const styles          =          useStyles();
     const elmStyles       = Elements.useStyles();
+    const formStyles      =          useStyles();
 
-    const variSize        = Elements.useVariantSize(props, elmStyles);
-    const variTheme       = Elements.useVariantTheme(props, elmStyles);
+    // themes:
+    const variTheme       = Elements.useVariantTheme(props, formStyles);
+    const variSize        = Elements.useVariantSize(props, formStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
 
+    // states:
     const formValidator   = useFormValidator(props.customValidator);
     const stateValInval   = useStateValidInvalid(props, formValidator.validator);
 
@@ -258,12 +282,14 @@ export default function EditableControl(props: Props<HTMLTextAreaElement, string
 
     return (
         <form className={[
-                styles.main,
+                formStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
 
+                // states:
                 // stateEnbDis.class,
                 // stateLeave.class,
                 // stateFocusBlur.class,

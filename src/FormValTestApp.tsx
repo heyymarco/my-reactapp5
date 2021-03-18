@@ -50,13 +50,25 @@ const jss = createJss().setup({plugins:[
 export default function App (props: any) {
 	const [enableVal, setEnableVal] = useState(false);
 
+	const [size,  setSize ] = useState<'sm'|'lg'|undefined>(undefined);
+	const [theme, setTheme] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>(undefined);
+
+	const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSize((e.target.value || undefined) as ('sm'|'lg'|undefined));
+	}
+	const handleChangeTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined));
+	}
+
+
+
 	return (
         <JssProvider jss={jss}>
             <Container style={{minHeight: '100vh'}}>
 				<ValidationProvider
 					enableValidation={enableVal}
 				>
-					<Form>
+					<Form size={size} theme={theme}>
 						<Input 
 							type='text'
 							required={true}
@@ -78,6 +90,8 @@ export default function App (props: any) {
 						/>
 						<hr/>
 
+						<Button text='reset' />
+						<Button text='reset' theme='warning' />
 						<Button text='submit' theme='primary' onClick={() =>
 							setEnableVal(true)
 						} />
@@ -90,6 +104,50 @@ export default function App (props: any) {
 						</label>
 					</Form>
 				</ValidationProvider>
+				<hr />
+
+				<p>
+					Size:
+					<label>
+						<input type='radio'
+							value='sm'
+							checked={size==='sm'}
+							onChange={handleChangeSize}
+						/>
+						sm
+					</label>
+					<label>
+						<input type='radio'
+							value=''
+							checked={!size}
+							onChange={handleChangeSize}
+						/>
+						unset
+					</label>
+					<label>
+						<input type='radio'
+							value='lg'
+							checked={size==='lg'}
+							onChange={handleChangeSize}
+						/>
+						lg
+					</label>
+				</p>
+				<p>
+					Theme:
+					{
+						[undefined,'primary','secondary','success','info','warning','danger','light','dark'].map(t =>
+							<label key={t ?? ''}>
+								<input type='radio'
+									value={t}
+									checked={theme===t}
+									onChange={handleChangeTheme}
+								/>
+								{`${t}`}
+							</label>
+						)
+					}
+				</p>
             </Container>
         </JssProvider>
     );

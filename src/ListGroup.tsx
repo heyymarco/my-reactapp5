@@ -14,7 +14,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 }                          from './Content';
@@ -37,7 +37,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 };
@@ -86,6 +86,11 @@ export { config, cssProps };
 const wrapElm  = '& >li';
 const mainElm = '& >.lg-wrapper';
 
+
+export const themes = Contents.themes; // copy Content's themes
+export const sizes  = Contents.sizes;  // copy Content's sizes
+
+
 export const fnVars = Contents.fnVars; // copy Content's fnVars
 export const states = {extend:[ Contents.states, { // copy Content's states
     // customize the anim prop to be forwarded to another element(s):
@@ -97,6 +102,7 @@ export const states = {extend:[ Contents.states, { // copy Content's states
     //     // fnVars, // no changes
     // ],
 }]};
+
 
 export const basicStyle = {
     extend: [
@@ -153,7 +159,13 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
-            // states,  // NOT apply our states here, but in child <li>
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
+            // states,  // NOT apply our states here, but in the [wrapElm]
         ],
 
 
@@ -168,7 +180,6 @@ export const styles = {
         '& >li >.lg-wrapper': Elements.styles.gradient,
     },
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -183,8 +194,9 @@ export default function ListGroup(props: Props) {
     const ctStyles       = Contents.useStyles();
     const lgStyles       =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, ctStyles);
+    // themes:
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
+    const variSize       = Elements.useVariantSize(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, lgStyles);
 
     
@@ -193,8 +205,9 @@ export default function ListGroup(props: Props) {
         <ul className={[
                 lgStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
             ].join(' ')}
         >

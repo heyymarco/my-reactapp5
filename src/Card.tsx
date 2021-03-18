@@ -14,7 +14,7 @@ import {
 
     filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 }                          from './Content';
@@ -37,7 +37,7 @@ export {
 
     filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 };
@@ -96,10 +96,17 @@ export const filterValidProps = <TCssProps,>(cssProps: TCssProps) => {
     return cssPropsCopy;
 }
 
+
+
+export const themes = Contents.themes; // copy Content's themes
+export const sizes  = Contents.sizes;  // copy Content's sizes
+
+
 export const fnVars = Contents.fnVars; // copy Content's fnVars
 export const states = Contents.states; // copy Content's states
 
-const image = {
+
+const imageStyle = {
     display: 'block', // remove unecessary space to the next sibling
 
     // maximum width including parent's paddings:
@@ -120,7 +127,7 @@ const image = {
         marginBottom: ccssProps.paddingY,
     },
 };
-const cardItem = {
+const cardItemStyle = {
     display: 'block',
 
     // default card's items are unresizeable (excepts for card's body):
@@ -152,14 +159,12 @@ const cardItem = {
             width: '100%',
         }
     },
-    '& >figure, & >img': image,
+    '& >figure, & >img': imageStyle,
 };
 export const basicStyle = {
     extend: [
         Contents.basicStyle,        // copy basicStyle from Content
         filterValidProps(cssProps), // apply our filtered cssProps
-        // themes, // no changes
-        // sizes,  // no changes
     ],
 
     display        : 'flex',
@@ -179,12 +184,18 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
     },
     header: {
         extend: [
-            cardItem,
+            cardItemStyle,
 
             // apply cssProps ending with ***Cap:
             filterPrefixProps(cssProps, 'cap'),
@@ -192,7 +203,7 @@ export const styles = {
     },
     footer: {
         extend: [
-            cardItem,
+            cardItemStyle,
 
             // apply cssProps ending with ***Cap:
             filterPrefixProps(cssProps, 'cap'),
@@ -200,7 +211,7 @@ export const styles = {
     },
     body: {
         extend: [
-            cardItem,
+            cardItemStyle,
         ],
 
         // Enable `flex-grow: 1` for decks and groups so that card blocks take up
@@ -219,7 +230,6 @@ export const styles = {
 
     cardOutline: Elements.styles.outline,
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -234,6 +244,8 @@ export function useVariantCard(props: VariantCard, styles: Record<string, string
     };
 }
 
+
+
 export interface Props
     extends
         Contents.Props,
@@ -247,11 +259,13 @@ export default function ListGroup(props: Props) {
     const ctStyles       = Contents.useStyles();
     const crdStyles      =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, ctStyles);
+    // themes:
     const variTheme      = Elements.useVariantTheme(props, ctStyles);
+    const variSize       = Elements.useVariantSize(props, ctStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variCard       =          useVariantCard(props, crdStyles);
 
+    // states:
     const stateEnbDis    = useStateEnableDisable(props);
     const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
@@ -261,11 +275,13 @@ export default function ListGroup(props: Props) {
         <article className={[
                 crdStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
                 variCard.class,
 
+                // states:
                 stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateActPass.class,
             ].join(' ')}

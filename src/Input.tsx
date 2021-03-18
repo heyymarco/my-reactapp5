@@ -20,7 +20,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -49,7 +49,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -94,8 +94,14 @@ export { config, cssProps };
 
 const inpElm  = '& >:first-child';
 
+
+export const themes = ETxtControls.themes; // copy ETxtControl's themes
+export const sizes  = ETxtControls.sizes;  // copy ETxtControl's sizes
+
+
 export const fnVars = ETxtControls.fnVars; // copy ETxtControl's fnVars
 export const states = ETxtControls.states; // copy ETxtControl's states
+
 
 export const basicStyle = {
     extend: [
@@ -137,12 +143,17 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
     },
     inpOutline: Controls.styles.outline,
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -156,6 +167,8 @@ export function useVariantInput(props: VariantInput, styles: Record<string, stri
         class: props.inpStyle ? (styles as any)[`inp${pascalCase(props.inpStyle)}`] : null,
     };
 }
+
+
 
 export interface Props<TElement, TValue>
     extends
@@ -175,11 +188,13 @@ export default function Input(props: Props<HTMLInputElement, string>) {
     const etctrlStyles    = ETxtControls.useStyles();
     const inpStyles       =          useStyles();
 
-    const variSize        = Elements.useVariantSize(props, elmStyles);
+    // themes:
     const variTheme       = Elements.useVariantTheme(props, etctrlStyles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
     const variInput       =          useVariantInput(props, inpStyles);
 
+    // states:
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
     const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
@@ -192,11 +207,13 @@ export default function Input(props: Props<HTMLInputElement, string>) {
         <span className={[
                 inpStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
                 variInput.class,
 
+                // states:
                 stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateLeave.class,
                 stateFocusBlur.class ?? (stateFocusBlur.focus ? 'focus' : null),
@@ -241,39 +258,6 @@ export default function Input(props: Props<HTMLInputElement, string>) {
                 onFocus={stateFocusBlur.handleFocus}
                 onBlur={stateFocusBlur.handleBlur}
             />
-
         </span>
     );
-    // return (
-    //     <input className={[
-    //             styles.main,
-
-    //             variSize.class,
-    //             variTheme.class,
-    //             variGradient.class,
-    //             variInput.class,
-
-    //             stateEnbDis.class,
-    //             stateLeave.class,
-    //             stateFocusBlur.class,
-    //             stateValInval.class,
-    //         ].join(' ')}
-
-    //         disabled={stateEnbDis.disabled}
-
-    //         type={props.type ?? 'text'}
-    //         defaultValue={props.defaultValue}
-        
-    //         onMouseEnter={stateLeave.handleMouseEnter}
-    //         onMouseLeave={stateLeave.handleMouseLeave}
-    //         onFocus={stateFocusBlur.handleFocus}
-    //         onBlur={stateFocusBlur.handleBlur}
-    //         onAnimationEnd={(e) => {
-    //             stateEnbDis.handleAnimationEnd(e);
-    //             stateLeave.handleAnimationEnd(e);
-    //             stateFocusBlur.handleAnimationEnd(e);
-    //             stateValInval.handleAnimationEnd(e);
-    //         }}
-    //     />
-    // );
 }

@@ -119,6 +119,7 @@ const customFont = {
     textDecoration : config.font.textDecoration,
 };
 
+
 export const themes = {};
 Elements.defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
     // overwrite the color prop
@@ -134,6 +135,7 @@ Elements.defineSizes(sizes, (size, Size, sizeProp) => ({
 
     '--ico-size': (size === '1em') ? '1em' : cssPropsAny[`size${Size}`],
 }), ['sm', 'nm', 'md', 'lg', '1em']);
+
 
 export const basicStyle = {
     extend: [
@@ -153,6 +155,10 @@ const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
         ],
     },
     '@font-face': [
@@ -211,12 +217,9 @@ const styles = {
             height     : '100%', // follow parent's height
         },
     },
-    ...themes,
-    ...sizes,
 };
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeNm'|'sizeMd'|'sizeLg'|'size1em', object>);
 export { styles2 as styles };
-
 export const useStyles = createUseStyles(styles2);
 
 
@@ -232,8 +235,9 @@ export interface Props
 export default function Icon(props: Props) {
     const icoStyles    = useStyles();
 
-    const variSize     = Elements.useVariantSize(props, icoStyles);
+    // themes:
     const variTheme    = Elements.useVariantTheme(props, icoStyles);
+    const variSize     = Elements.useVariantSize(props, icoStyles);
 
 
 
@@ -254,8 +258,9 @@ export default function Icon(props: Props) {
                 icoStyles.main,
                 (imgIcon ? icoStyles.img : (fontIcon ? icoStyles.font : null)),
                 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
             ].join(' ')}
 
             style={imgIcon ? ({[vars.img]: `url("${imgIcon}")`} as React.CSSProperties) : undefined}

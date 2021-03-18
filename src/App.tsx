@@ -64,19 +64,27 @@ const jss = createJss().setup({plugins:[
 ]});
 
 export default function App (props: any) {
+	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
+	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
 	const [enableGrad, setEnableGrad] = useState(false);
+
 	const [enable,     setEnable    ] = useState(true);
 	const [active, 	   setActive    ] = useState(false);
 	const [focus, 	   setFocus     ] = useState(false);
-	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
-	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
 	const [btnStyle,   setBtnStyle  ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
 	const cardStyle = btnStyle==='outline' ? 'outline' : undefined;
 
 
+	const handleChangeTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined));
+	}
+	const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSize((e.target.value || undefined) as ('sm'|'lg'|undefined));
+	}
 	const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnableGrad(e.target.checked);
 	}
+
 	const handleChangeEnable = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnable(e.target.checked);
 	}
@@ -85,12 +93,6 @@ export default function App (props: any) {
 	}
 	const handleChangeFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFocus(e.target.checked);
-	}
-	const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSize((e.target.value || undefined) as ('sm'|'lg'|undefined));
-	}
-	const handleChangeTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined));
 	}
 	const handleChangeBtnStyle = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setBtnStyle((e.target.value || undefined) as ('outline'|'link'|'outlineLink'|undefined));
@@ -112,24 +114,25 @@ export default function App (props: any) {
 				>
 					Learn React
 				</a>
-				<Element theme={theme} enableGradient={enableGrad} size={size}></Element>
-				<Indicator theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active}></Indicator>
-				<Control theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus}></Control>
-				<EditControl theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} enableValidation={false}></EditControl>
-				<ETxtControl theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} enableValidation={false}></ETxtControl>
-				<Content theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active}>
+				<Element theme={theme} size={size} enableGradient={enableGrad}></Element>
+				<Indicator theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active}></Indicator>
+				<Control theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus}></Control>
+				<EditControl theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} enableValidation={false}></EditControl>
+				<ETxtControl theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} enableValidation={false}></ETxtControl>
+				<Content theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active}>Content</Content>
+				<Content theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active}>
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 					<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 					<Button  theme='success'>Hello Button</Button>
 					Ipsum aliquam aperiam magni sint eum!
 				</Content>
-				{/* <Button  theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+				{/* <Button  theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
 				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
-				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
+				<ButtonIcon icon="whatsapp" theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>
 					<span>hey</span>
 				</ButtonIcon>
-				<ButtonIcon icon="whatsapp" theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} btnStyle={btnStyle}>
+				<ButtonIcon icon="whatsapp" theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} btnStyle={btnStyle}>
 					<span>hey</span>
 				</ButtonIcon>
 				<ButtonIcon
@@ -142,7 +145,7 @@ export default function App (props: any) {
 					btnStyle={btnStyle}
 				>
 				</ButtonIcon>
-				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>{[
+				<ListGroup theme={theme} size={size} enableGradient={enableGrad}>{[
 					'An item',
 					<ListGroupItem key={199} enabled={enable} active={active}>
 						<Button  theme='danger' enableGradient={enableGrad} size={size} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
@@ -161,14 +164,14 @@ export default function App (props: any) {
 					'A eighth item',
 				]}
 				</ListGroup>
-				<ListGroup theme={theme} enableGradient={enableGrad} size={size}>
+				<ListGroup theme={theme} size={size} enableGradient={enableGrad}>
 					An item
 				</ListGroup>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}>
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 					Lorem ipsum dolor sit amet consectetur adipisicing elit.
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 					
@@ -180,30 +183,30 @@ export default function App (props: any) {
 						'dolor sit amet'
 					
 				/>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}>
 					<h5>Card title</h5>
 					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
 					<a href='/'>Card link</a>
 					<a href='/'>Another link</a>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}>
 					<h5>Card title</h5>
 					<h6>Card subtitle</h6>
 					<p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
 					<a href='/'>Card link</a>
 					<a href='/'>Another link</a>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}>
 					<img src='https://picsum.photos/300/200' alt='' />
 					<h5>Card title</h5>
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 
@@ -212,20 +215,7 @@ export default function App (props: any) {
 				>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
-					header=
-						'Lorem ipsum dolor'
-
-					footer=
-						'dolor sit amet'
-				>
-					<img src='https://picsum.photos/300/200' alt='' />
-					<h5>Card title</h5>
-					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
-					</br>This content is a little bit longer.</p>
-					<p>Last updated 3 mins ago</p>
-				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}
 					header=
 						'Lorem ipsum dolor'
 
@@ -237,6 +227,19 @@ export default function App (props: any) {
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
 					</br>This content is a little bit longer.</p>
 					<p>Last updated 3 mins ago</p>
+				</Card>
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}
+					header=
+						'Lorem ipsum dolor'
+
+					footer=
+						'dolor sit amet'
+				>
+					<img src='https://picsum.photos/300/200' alt='' />
+					<h5>Card title</h5>
+					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
+					</br>This content is a little bit longer.</p>
+					<p>Last updated 3 mins ago</p>
 					<img src='https://picsum.photos/300/200' alt='' />
 					<h5>Card title</h5>
 					<p>This is a wider card with supporting text below as a natural lead-in to additional content.<br>
@@ -244,7 +247,7 @@ export default function App (props: any) {
 					<p>Last updated 3 mins ago</p>
 					<img src='https://picsum.photos/300/200' alt='' />
 				</Card>
-				<Card theme={theme} enableGradient={enableGrad} size={size} enabled={enable} active={active} cardStyle={cardStyle}>
+				<Card theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} cardStyle={cardStyle}>
 					<figure>
 						<img src='https://picsum.photos/300/200' alt='' />
 
@@ -269,34 +272,21 @@ export default function App (props: any) {
 					<p>Last updated 3 mins ago</p>
 				</Modal> */}
 				<hr style={{flexBasis: '100%'}} />
-				<label>
-					<input type='checkbox'
-						checked={enableGrad}
-						onChange={handleChangeEnableGrad}
-					/>
-					enable gradient
-				</label>
-				<label>
-					<input type='checkbox'
-						checked={enable}
-						onChange={handleChangeEnable}
-					/>
-					enabled
-				</label>
-				<label>
-					<input type='checkbox'
-						checked={active}
-						onChange={handleChangeActive}
-					/>
-					active
-				</label>
-				<label>
-					<input type='checkbox'
-						checked={focus}
-						onChange={handleChangeFocus}
-					/>
-					focus
-				</label>
+				<p>
+					Theme:
+					{
+						[undefined,'primary','secondary','success','info','warning','danger','light','dark'].map(t =>
+							<label key={t ?? ''}>
+								<input type='radio'
+									value={t}
+									checked={theme===t}
+									onChange={handleChangeTheme}
+								/>
+								{`${t}`}
+							</label>
+						)
+					}
+				</p>
 				<p>
 					Size:
 					<label>
@@ -325,20 +315,36 @@ export default function App (props: any) {
 					</label>
 				</p>
 				<p>
-					Theme:
-					{
-						[undefined,'primary','secondary','success','info','warning','danger','light','dark'].map(t =>
-							<label key={t ?? ''}>
-								<input type='radio'
-									value={t}
-									checked={theme===t}
-									onChange={handleChangeTheme}
-								/>
-								{`${t}`}
-							</label>
-						)
-					}
+					<label>
+						<input type='checkbox'
+							checked={enableGrad}
+							onChange={handleChangeEnableGrad}
+						/>
+						enable gradient
+					</label>
 				</p>
+
+				<label>
+					<input type='checkbox'
+						checked={enable}
+						onChange={handleChangeEnable}
+					/>
+					enabled
+				</label>
+				<label>
+					<input type='checkbox'
+						checked={active}
+						onChange={handleChangeActive}
+					/>
+					active
+				</label>
+				<label>
+					<input type='checkbox'
+						checked={focus}
+						onChange={handleChangeFocus}
+					/>
+					focus
+				</label>
 				<p>
 					BtnStyle:
 					<label>

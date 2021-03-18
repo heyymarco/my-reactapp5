@@ -254,6 +254,53 @@ export const filterPrefixProps = <TCssProps,>(cssProps: TCssProps, prefix: strin
     return cssPropsCopy;
 }
 
+
+export const themes = {};
+export function defineThemes(themes: object, handler: ((theme: string, Theme: string, themeProp: string, themeColor: string) => object)) {
+    for(const [theme, themeColor] of Object.entries(color.themes)) {
+        const Theme = pascalCase(theme);
+        const themeProp = `&.th${Theme}`;
+        (themes as any)[themeProp] = {
+            ...(themes as any)[themeProp],
+            ...handler(theme, Theme, themeProp, themeColor as string),
+        };
+    }
+}
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize the backg & color
+
+    // customize themed foreground color:
+    [vars.colorTh]        : (colors as any)[`${theme}Text`],
+
+    // customize themed background color:
+    [vars.backgTh]        : `linear-gradient(${themeColor},${themeColor})`,
+
+    // customize themed foreground color at outlined state:
+    [vars.colorOutlineTh] : themeColor,
+}));
+
+export const sizes = {};
+export function defineSizes(sizes: object, handler: ((size: string, Size: string, sizeProp: string) => object), options = ['sm', 'lg']) {
+    for(const size of options) {
+        const Size = pascalCase(size);
+        const sizeProp = `&.sz${Size}`;
+        (sizes as any)[sizeProp] = {
+            ...(sizes as any)[sizeProp],
+            ...handler(size, Size, sizeProp),
+        };
+    }
+}
+const cssPropsAny = cssProps as any;
+defineSizes(sizes, (size, Size, sizeProp) => ({
+    // overwrite the props with the props{Size}:
+
+    '--elm-fontSize'     : cssPropsAny[`fontSize${Size}`],
+    '--elm-paddingX'     : cssPropsAny[`paddingX${Size}`],
+    '--elm-paddingY'     : cssPropsAny[`paddingY${Size}`],
+    '--elm-borderRadius' : cssPropsAny[`borderRadius${Size}`],
+}));
+
+
 export const themesIf = {
     // define default colors:
     [vars.colorIf]        : cssProps.color,
@@ -316,50 +363,6 @@ export const states = {
     ],
 };
 
-export const themes = {};
-export function defineThemes(themes: object, handler: ((theme: string, Theme: string, themeProp: string, themeColor: string) => object)) {
-    for(const [theme, themeColor] of Object.entries(color.themes)) {
-        const Theme = pascalCase(theme);
-        const themeProp = `theme${Theme}`;
-        (themes as any)[themeProp] = {
-            ...(themes as any)[themeProp],
-            ...handler(theme, Theme, themeProp, themeColor as string),
-        };
-    }
-}
-defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
-    // customize the backg & color
-
-    // customize themed foreground color:
-    [vars.colorTh]        : (colors as any)[`${theme}Text`],
-
-    // customize themed background color:
-    [vars.backgTh]        : `linear-gradient(${themeColor},${themeColor})`,
-
-    // customize themed foreground color at outlined state:
-    [vars.colorOutlineTh] : themeColor,
-}));
-
-export const sizes = {};
-export function defineSizes(sizes: object, handler: ((size: string, Size: string, sizeProp: string) => object), options = ['sm', 'lg']) {
-    for(const size of options) {
-        const Size = pascalCase(size);
-        const sizeProp = `size${Size}`;
-        (sizes as any)[sizeProp] = {
-            ...(sizes as any)[sizeProp],
-            ...handler(size, Size, sizeProp),
-        };
-    }
-}
-const cssPropsAny = cssProps as any;
-defineSizes(sizes, (size, Size, sizeProp) => ({
-    // overwrite the props with the props{Size}:
-
-    '--elm-fontSize'     : cssPropsAny[`fontSize${Size}`],
-    '--elm-paddingX'     : cssPropsAny[`paddingX${Size}`],
-    '--elm-paddingY'     : cssPropsAny[`paddingY${Size}`],
-    '--elm-borderRadius' : cssPropsAny[`borderRadius${Size}`],
-}));
 
 export const basicStyle = {
     extend: [
@@ -381,6 +384,12 @@ const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+
+            // states:
             states,     // apply our states
         ],
     },
@@ -400,24 +409,12 @@ const styles = {
         // customize background gradient:
         [vars.backgGradTg]: cssProps.backgGrad,
     },
-    ...themes,
-    ...sizes,
 };
-const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
+const styles2 = styles as unknown as (typeof styles & Record<'szSm'|'szLg', object>);
 export { styles2 as styles };
-
 export const useStyles = createUseStyles(styles2);
 
 
-
-export interface VariantSize {
-    size?: 'sm' | 'lg' | string
-}
-export function useVariantSize(props: VariantSize, styles: Record<string, string>) {
-    return {
-        class: props.size ? (styles as any)[`size${pascalCase(props.size)}`] : null,
-    };
-}
 
 export interface VariantTheme {
     theme?: string
@@ -425,7 +422,16 @@ export interface VariantTheme {
 export function useVariantTheme(props: VariantTheme, styles: Record<string, string>, themeDefault?: () => (string|undefined)) {
     const theme = props.theme ?? themeDefault?.();
     return {
-        class: theme ? (styles as any)[`theme${pascalCase(theme)}`] : null,
+        class: theme ? `th${pascalCase(theme)}` : null,
+    };
+}
+
+export interface VariantSize {
+    size?: 'sm' | 'lg' | string
+}
+export function useVariantSize(props: VariantSize, styles: Record<string, string>) {
+    return {
+        class: props.size ? `sz${pascalCase(props.size)}` : null,
     };
 }
 
@@ -438,18 +444,21 @@ export function useVariantGradient(props: VariantGradient, styles: Record<'gradi
     };
 }
 
+
+
 export interface Props
     extends
-        VariantSize,
         VariantTheme,
+        VariantSize,
         VariantGradient
 {
 }
 export default function Element(props: Props) {
     const elmStyles    = useStyles();
 
-    const variSize     = useVariantSize(props, elmStyles);
+    // themes:
     const variTheme    = useVariantTheme(props, elmStyles);
+    const variSize     = useVariantSize(props, elmStyles);
     const variGradient = useVariantGradient(props, elmStyles);
 
 
@@ -458,8 +467,9 @@ export default function Element(props: Props) {
         <div className={[
                 elmStyles.main,
                 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
             ].join(' ')}
         >

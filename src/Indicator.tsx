@@ -12,7 +12,7 @@ import {
 
     filterValidProps, filterPrefixProps,
     
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 }                          from './Element';
 import colors              from './colors';
 
@@ -27,7 +27,7 @@ export {
     
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 };
 
 
@@ -266,6 +266,10 @@ export const applyStateActive = () => ({
 
 
 
+export const themes = Elements.themes; // copy Element's themes
+export const sizes  = Elements.sizes;  // copy Element's sizes
+
+
 export const themesIf = {
     // define active (primary) colors:
     [vars.colorIfAct]        : colors.primaryText,
@@ -352,6 +356,7 @@ export const states = {extend:[ Elements.states, { // copy Element's states
     ],
 }]};
 
+
 export const basicStyle = {
     extend: [
         Elements.basicStyle,        // copy basicStyle from Element
@@ -362,11 +367,16 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+
+            // states:
             states,     // apply our states
         ],
     },
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -489,6 +499,8 @@ export function useStateActivePassive(props: Props, stateEnbDis: {enabled: boole
     };
 }
 
+
+
 export interface Props
     extends
         Elements.Props
@@ -501,10 +513,12 @@ export default function Indicator(props: Props) {
     const elmStyles      = Elements.useStyles();
     const indiStyles     =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
+    // themes:
     const variTheme      = Elements.useVariantTheme(props, elmStyles);
+    const variSize       = Elements.useVariantSize(props, elmStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
+    // states:
     const stateEnbDis    = useStateEnableDisable(props);
     const stateActPass   = useStateActivePassive(props, stateEnbDis);
 
@@ -514,10 +528,12 @@ export default function Indicator(props: Props) {
         <div className={[
                 indiStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
 
+                // states:
                 stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateActPass.class,
             ].join(' ')}

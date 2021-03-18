@@ -15,7 +15,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 }                          from './Indicator';
@@ -35,7 +35,7 @@ export {
 
     filterValidProps, filterPrefixProps,
     
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
 };
@@ -316,6 +316,15 @@ export const applyStateActive = () => ({
 
 
 
+export const themes = {extend:[ Indicators.themes, ]}; // copy Indicator's themes
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize themed box-shadow at focused state:
+    [vars.boxShadowFocusTh]: (colors as any)[`${theme}Transp`],
+}));
+
+export const sizes  = Indicators.sizes;                // copy Indicator's sizes
+
+
 export const themesIf = {extend:[ Indicators.themesIf, { // copy Indicator's themesIf
     // define default (secondary) colors:
     [vars.colorIf]                : colors.secondaryText,
@@ -457,11 +466,6 @@ export const states = {extend:[ Elements.states, { // not copy from Indicator's 
     ],
 }]};
 
-export const themes = { ...Elements.themes, }; // copy Element's themes
-defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
-    // customize themed box-shadow at focused state:
-    [vars.boxShadowFocusTh]: (colors as any)[`${theme}Transp`],
-}));
 
 export const basicStyle = {
     extend: [
@@ -474,6 +478,12 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+
+            // states:
             states,     // apply our states
         ],
     },
@@ -485,9 +495,7 @@ export const styles = {
             }),
         ],
     },
-    ...themes,
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -621,6 +629,8 @@ export function useStateFocusBlur(props: Props, stateEnbDis: {enabled: boolean})
     };
 }
 
+
+
 export interface Props
     extends
         Indicators.Props
@@ -632,10 +642,12 @@ export default function Control(props: Props) {
     const elmStyles      = Elements.useStyles();
     const ctrlStyles     =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, elmStyles);
+    // themes:
     const variTheme      = Elements.useVariantTheme(props, ctrlStyles);
+    const variSize       = Elements.useVariantSize(props, elmStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
 
+    // states:
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
@@ -647,10 +659,12 @@ export default function Control(props: Props) {
         <button className={[
                 ctrlStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
 
+                // states:
                 stateEnbDis.class,
                 stateLeave.class,
                 stateFocusBlur.class,

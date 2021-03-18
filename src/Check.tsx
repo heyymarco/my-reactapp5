@@ -25,7 +25,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -57,7 +57,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -408,6 +408,16 @@ const iconElm        = '&::before';
 const nextElm        = '& >:nth-child(1n+2)';
 const selfAndNextElm = '&,& ~*';
 
+
+export const themes = {extend:[ EditControls.themes, ]}; // copy EditControl's themes
+defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
+    // customize the label's text color:
+    [vars.colorLabelTh] : (colors as any)[`${theme}Cont`],
+}));
+
+export const sizes  =           EditControls.sizes;      // copy EditControl's sizes
+
+
 const chkThemesIf = {
     // define default (secondary) colors:
     [vars.colorLabelIf]    : colors.secondaryCont,
@@ -464,6 +474,7 @@ const chkStates = {
         ],
     },
 };
+
 
 export const fnVars = EditControls.fnVars; // copy EditControl's fnVars
 export const states = {extend:[ EditControls.states, { // copy EditControl's states
@@ -567,11 +578,6 @@ export const states = {extend:[ EditControls.states, { // copy EditControl's sta
     ],
 }]};
 
-export const themes = { ...Controls.themes, }; // copy Control's themes
-defineThemes(themes, (theme, Theme, themeProp, themeColor) => ({
-    // customize the label's text color:
-    [vars.colorLabelTh] : (colors as any)[`${theme}Cont`],
-}));
 
 const inheritStyles = {
     fontSize           : undefined, // inherit
@@ -686,6 +692,12 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
 
@@ -780,9 +792,7 @@ export const styles = {
 
         [chkElm]: Controls.styles.outline,
     },
-    ...themes,
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -796,6 +806,8 @@ export function useVariantCheck(props: VariantCheck, styles: Record<string, stri
         class: props.chkStyle ? (styles as any)[`chk${pascalCase(props.chkStyle)}`] : null,
     };
 }
+
+
 
 export interface Props
     extends
@@ -813,11 +825,13 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
     const elmStyles       = Elements.useStyles();
     const chkStyles       =          useStyles();
 
-    const variSize        = Elements.useVariantSize(props, elmStyles);
+    // themes:
     const variTheme       = Elements.useVariantTheme(props, chkStyles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
     const variCheck       =          useVariantCheck(props, chkStyles);
 
+    // states:
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
     const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
@@ -834,11 +848,13 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
                 styleMain,
                 chkStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
                 variCheck.class,
 
+                // states:
                 stateEnbDis.class ?? (stateEnbDis.disabled ? 'disabled' : null),
                 stateLeave.class,
                 // stateFocusBlur.class,
@@ -865,10 +881,12 @@ export function CheckBase(styleMain: string | null, props: Props, inputType: str
             // }}
         >
             <input className={[
-                    // variSize.class,
+                    // themes:
                     // variTheme.class,
+                    // variSize.class,
                     // variGradient.class,
 
+                    // states:
                     // stateEnbDis.class,
                     // stateLeave.class,
                     stateFocusBlur.class,

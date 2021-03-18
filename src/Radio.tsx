@@ -16,7 +16,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -44,7 +44,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -89,8 +89,13 @@ export { config, cssProps };
 
 
 
+export const themes = Checks.themes; // copy Check's themes
+export const sizes  = Checks.sizes;  // copy Check's sizes
+
+
 export const fnVars = Checks.fnVars; // copy Check's fnVars
 export const states = Checks.states; // copy Check's states
+
 
 const chkStyles = {
     extend: [
@@ -113,11 +118,16 @@ export const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            // themes,  // no changes
+            // sizes,   // no changes
+            
+            // states:
             // states,  // no changes
         ],
     },
 };
-
 export const useStyles = createUseStyles(styles);
 
 

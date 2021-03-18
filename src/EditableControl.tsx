@@ -21,7 +21,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -47,7 +47,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -305,6 +305,10 @@ export const applyStateInvalid = () => ({
 
 
 
+export const themes = Controls.themes; // copy Control's themes
+export const sizes  = Controls.sizes;  // copy Control's sizes
+
+
 export const validationThemesIf = {
     // define valid (success) colors:
     [vars.colorIfVal]           : colors.successText,
@@ -357,6 +361,7 @@ export const validationStates = {
     ],
 };
 
+
 export const fnVars = {extend:[ Controls.fnVars, validationFnVars, { // copy Control's fnVars
     // customize the anim:
     [vars.animFn]: [
@@ -402,6 +407,7 @@ export const states = {extend:[ Controls.states, validationStates, { // copy Con
     ],
 }]};
 
+
 export const basicStyle = {
     extend: [
         Controls.basicStyle,        // copy basicStyle from Control
@@ -411,12 +417,17 @@ export const basicStyle = {
 export const styles = {
     main: {
         extend: [
-            basicStyle, /// apply our basicStyle
+            basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
     },
 };
-
 export const useStyles = createUseStyles(styles);
 
 
@@ -586,6 +597,8 @@ export function useStateValidInvalid(props: Val.Validation, validator?: Validato
     };
 }
 
+
+
 export interface Props<TElement, TValue>
     extends
         Controls.Props,
@@ -608,10 +621,12 @@ export default function EditableControl(props: Props<HTMLTextAreaElement, string
     const ctrlStyles      = Controls.useStyles();
     const ectrlStyles     =          useStyles();
 
-    const variSize        = Elements.useVariantSize(props, elmStyles);
+    // themes:
     const variTheme       = Elements.useVariantTheme(props, ctrlStyles);
+    const variSize        = Elements.useVariantSize(props, elmStyles);
     const variGradient    = Elements.useVariantGradient(props, elmStyles);
 
+    // states:
     const stateEnbDis     = useStateEnableDisable(props);
     const stateLeave      = useStateLeave(stateEnbDis);
     const stateFocusBlur  = useStateFocusBlur(props, stateEnbDis);
@@ -625,10 +640,12 @@ export default function EditableControl(props: Props<HTMLTextAreaElement, string
         <textarea className={[
                 ectrlStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
 
+                // states:
                 stateEnbDis.class,
                 stateLeave.class,
                 stateFocusBlur.class,

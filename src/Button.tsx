@@ -16,7 +16,7 @@ import {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -42,7 +42,7 @@ export {
 
     filterValidProps, filterPrefixProps,
 
-    defineSizes, defineThemes,
+    defineThemes, defineSizes,
 
     useStateEnableDisable, useStateActivePassive,
     useStateLeave, useStateFocusBlur,
@@ -99,10 +99,9 @@ export { config, cssProps };
 
 
 
-export const fnVars = Controls.fnVars; // copy Control's fnVars
-export const states = Controls.states; // copy Control's states
+export const themes = Controls.themes; // copy Control's themes
 
-export const sizes = { ...Elements.sizes, }; // copy Element's sizes
+export const sizes  = Controls.sizes;  // copy Control's sizes
 const cssPropsAny = cssProps as any;
 defineSizes(sizes, (size, Size, sizeProp) => ({
     // overwrite the props with the props{Size}:
@@ -110,6 +109,11 @@ defineSizes(sizes, (size, Size, sizeProp) => ({
     '--btn-gapX' : cssPropsAny[`gapX${Size}`],
     '--btn-gapY' : cssPropsAny[`gapY${Size}`],
 }));
+
+
+export const fnVars = Controls.fnVars; // copy Control's fnVars
+export const states = Controls.states; // copy Control's states
+
 
 const linkStyles = {
     textDecoration : 'underline',
@@ -143,6 +147,12 @@ const styles = {
     main: {
         extend: [
             basicStyle, // apply our basicStyle
+
+            // themes:
+            themes,     // variant themes
+            sizes,      // variant sizes
+            
+            // states:
             states,     // apply our states
         ],
     },
@@ -173,11 +183,9 @@ const styles = {
         // apply linkStyles & force to win conflict with main
         '&:not(._)': linkStyles,
     },
-    ...sizes,
 };
 const styles2 = styles as unknown as (typeof styles & Record<'sizeSm'|'sizeLg', object>);
 export { styles2 as styles };
-
 export const useStyles = createUseStyles(styles2);
 
 
@@ -202,6 +210,8 @@ export function useVariantThemeDefault(props: VariantButton) {
     };
 }
 
+
+
 export interface Props
     extends
         Controls.Props,
@@ -223,12 +233,14 @@ export default function Button(props: Props) {
     const ctrlStyles     = Controls.useStyles();
     const btnStyles      =          useStyles();
 
-    const variSize       = Elements.useVariantSize(props, btnStyles);
+    // themes:
     const variThemeDef   =          useVariantThemeDefault(props);
     const variTheme      = Elements.useVariantTheme(props, ctrlStyles, variThemeDef);
+    const variSize       = Elements.useVariantSize(props, btnStyles);
     const variGradient   = Elements.useVariantGradient(props, elmStyles);
     const variButton     =          useVariantButton(props, btnStyles);
 
+    // states:
     const stateEnbDis    = useStateEnableDisable(props);
     const stateLeave     = useStateLeave(stateEnbDis);
     const stateFocusBlur = useStateFocusBlur(props, stateEnbDis);
@@ -240,11 +252,13 @@ export default function Button(props: Props) {
         <button className={[
                 btnStyles.main,
 
-                variSize.class,
+                // themes:
                 variTheme.class,
+                variSize.class,
                 variGradient.class,
                 variButton.class,
 
+                // states:
                 stateEnbDis.class,
                 stateLeave.class,
                 stateFocusBlur.class,
