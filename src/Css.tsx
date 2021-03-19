@@ -1,5 +1,5 @@
-export type Variable        = string
-export type Expression      = Variable | string |          (Variable|string|number)[][]
+export type Prop            = string
+export type Expr            = Prop   | string |          (Prop|string|number)[][]
 
 export type FontSize        = string |          (string|number)[][]
 export type FontFamily      = string | string[]

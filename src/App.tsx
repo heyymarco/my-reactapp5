@@ -3,7 +3,8 @@ import
     useState }            from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Element from './Element';
+// import Element from './Element';
+import Element from './Element2';
 import Indicator from './Indicator';
 import Control from './Control';
 import EditControl from './EditableControl';
@@ -67,6 +68,7 @@ export default function App (props: any) {
 	const [theme, 	   setTheme     ] = useState<'primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|'dark'|undefined>('primary');
 	const [size, 	   setSize      ] = useState<'sm'|'lg'|undefined>(undefined);
 	const [enableGrad, setEnableGrad] = useState(false);
+	const [outline,    setOutline   ] = useState(false);
 
 	const [enable,     setEnable    ] = useState(true);
 	const [active, 	   setActive    ] = useState(false);
@@ -74,16 +76,6 @@ export default function App (props: any) {
 	const [btnStyle,   setBtnStyle  ] = useState<'outline'|'link'|'outlineLink'|undefined>(undefined);
 	const cardStyle = btnStyle==='outline' ? 'outline' : undefined;
 
-
-	const handleChangeTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined));
-	}
-	const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSize((e.target.value || undefined) as ('sm'|'lg'|undefined));
-	}
-	const handleChangeEnableGrad = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setEnableGrad(e.target.checked);
-	}
 
 	const handleChangeEnable = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEnable(e.target.checked);
@@ -114,7 +106,9 @@ export default function App (props: any) {
 				>
 					Learn React
 				</a>
-				<Element theme={theme} size={size} enableGradient={enableGrad}></Element>
+				<Element theme={theme} size={size} enableGradient={enableGrad}
+					//@ts-ignore
+					outline={outline}></Element>
 				<Indicator theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active}></Indicator>
 				<Control theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus}></Control>
 				<EditControl theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} enableValidation={false}></EditControl>
@@ -280,20 +274,19 @@ export default function App (props: any) {
 								<input type='radio'
 									value={t}
 									checked={theme===t}
-									onChange={handleChangeTheme}
+									onChange={(e) => setTheme((e.target.value || undefined) as ('primary'|'secondary'|'success'|'info'|'warning'|'danger'|'light'|undefined))}
 								/>
 								{`${t}`}
 							</label>
 						)
 					}
 				</p>
-				<p>
+				<p onChange={(e) => setSize(((e.target as any).value || undefined) as ('sm'|'lg'|undefined))}>
 					Size:
 					<label>
 						<input type='radio'
 							value='sm'
 							checked={size==='sm'}
-							onChange={handleChangeSize}
 						/>
 						sm
 					</label>
@@ -301,7 +294,6 @@ export default function App (props: any) {
 						<input type='radio'
 							value=''
 							checked={!size}
-							onChange={handleChangeSize}
 						/>
 						unset
 					</label>
@@ -309,7 +301,6 @@ export default function App (props: any) {
 						<input type='radio'
 							value='lg'
 							checked={size==='lg'}
-							onChange={handleChangeSize}
 						/>
 						lg
 					</label>
@@ -318,9 +309,18 @@ export default function App (props: any) {
 					<label>
 						<input type='checkbox'
 							checked={enableGrad}
-							onChange={handleChangeEnableGrad}
+							onChange={(e) => setEnableGrad(e.target.checked)}
 						/>
 						enable gradient
+					</label>
+				</p>
+				<p>
+					<label>
+						<input type='checkbox'
+							checked={outline}
+							onChange={(e) => setOutline(e.target.checked)}
+						/>
+						outline
 					</label>
 				</p>
 

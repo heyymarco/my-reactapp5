@@ -1,34 +1,43 @@
-import JssVarCollection from './jss-var-collection';
-import Color            from 'color';
+// jss   (builds css  using javascript):
+import type * as Css       from './Css'                // ts defs support for jss
+import JssVarCollection    from './jss-var-collection' // stores css props on the :root as global vars
+import type { Dictionary } from './jss-var-collection' // ts defs support for jss
+
+// other libs:
+import Color               from 'color'                // color utilities
+
+
+
+type ColorVal = (Color | string) | Css.Prop;
 
 
 
 export let transpLevel = 0.5;
-const transpColor = (color: Color) => color.alpha(transpLevel)                     as (Color | string);
-const textColor   = (color: Color) => (color.isLight() ? themes.dark : themes.light)    as (Color | string);
+const transpColor = (color: Color) => color.alpha(transpLevel)                       as ColorVal;
+const textColor   = (color: Color) => (color.isLight() ? themes.dark : themes.light) as ColorVal;
 export let thinLevel = 0.2;
-const thinColor   = (color: Color) => color.alpha(thinLevel)                       as (Color | string);
-const contColor   = (color: Color) => color.mix(page2.foreg as Color, 0.8)              as (Color | string);
+const thinColor   = (color: Color) => color.alpha(thinLevel)                         as ColorVal;
+const contColor   = (color: Color) => color.mix(page2.foreg as Color, 0.8)           as ColorVal;
 
 
 
 // define default cssProps' value to be stored into css vars:
 const basics = {
-    blue        : Color('#0d6efd') as (Color | string),
-    indigo      : Color('#6610f2') as (Color | string),
-    purple      : Color('#6f42c1') as (Color | string),
-    pink        : Color('#d63384') as (Color | string),
-    red         : Color('#dc3545') as (Color | string),
-    orange      : Color('#fd7e14') as (Color | string),
-    yellow      : Color('#ffc107') as (Color | string),
-    green       : Color('#198754') as (Color | string),
-    teal        : Color('#20c997') as (Color | string),
-    cyan        : Color('#0dcaf0') as (Color | string),
+    blue        : Color('#0d6efd') as ColorVal,
+    indigo      : Color('#6610f2') as ColorVal,
+    purple      : Color('#6f42c1') as ColorVal,
+    pink        : Color('#d63384') as ColorVal,
+    red         : Color('#dc3545') as ColorVal,
+    orange      : Color('#fd7e14') as ColorVal,
+    yellow      : Color('#ffc107') as ColorVal,
+    green       : Color('#198754') as ColorVal,
+    teal        : Color('#20c997') as ColorVal,
+    cyan        : Color('#0dcaf0') as ColorVal,
 
-    black       : Color('#000000') as (Color | string),
-    white       : Color('#ffffff') as (Color | string),
-    gray        : Color('#6c757d') as (Color | string),
-    grayDark    : Color('#343a40') as (Color | string),
+    black       : Color('#000000') as ColorVal,
+    white       : Color('#ffffff') as ColorVal,
+    gray        : Color('#6c757d') as ColorVal,
+    grayDark    : Color('#343a40') as ColorVal,
 };
 
 const themes = {
@@ -38,8 +47,8 @@ const themes = {
     info      : basics.cyan,
     warning   : basics.yellow,
     danger    : basics.red,
-    light     : Color('#f8f9fa') as (Color | string),
-    dark      : Color('#212529') as (Color | string),
+    light     : Color('#f8f9fa') as ColorVal,
+    dark      : Color('#212529') as ColorVal,
 };
 
 const page = {
@@ -132,15 +141,16 @@ export { config, varProps as colors, valProps as colorValues };
 export default varProps;
 
 
+
 const themesProxy = new Proxy(themes, {
-    get: (items, name: string)        => (varProps  as { [index: string]: Color})[name],
-    set: (items, name: string, value) => (varProps  as { [index: string]: Color})[name] = value,
-});
+    get: (items, name: string)        => (varProps  as Dictionary<Css.Prop>)[name],
+    set: (items, name: string, value) => (varProps  as Dictionary<ColorVal>)[name] = value,
+}) as typeof themes;
 export { themesProxy as themes };
 
 
 const themesTextProxy = new Proxy(themesText, {
-    get: (items, name: string)        => (varProps  as { [index: string]: Color})[name],
-    set: (items, name: string, value) => (varProps  as { [index: string]: Color})[name] = value,
-});
+    get: (items, name: string)        => (varProps  as Dictionary<Css.Prop>)[name],
+    set: (items, name: string, value) => (varProps  as Dictionary<ColorVal>)[name] = value,
+}) as typeof themesText;
 export { themesTextProxy as themesText };

@@ -53,7 +53,7 @@ const matchKeyframeName = /(?<=@keyframes\s+).+/;
 
 
 
-type Dictionary<TValue> = { [index: string]: TValue };
+export type Dictionary<TValue> = { [index: string]: TValue };
 
 /*
     set varProps.foo       = Color(255, 0, 0)      => TItem

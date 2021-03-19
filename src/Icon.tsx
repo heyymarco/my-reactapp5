@@ -38,11 +38,11 @@ function formatOf(file: string) {
 export interface CssProps {
     color      : Css.Color
     
-    size       : Css.Height | Css.Expression
-    sizeSm     : Css.Height | Css.Expression
-    sizeNm     : Css.Height | Css.Expression
-    sizeMd     : Css.Height | Css.Expression
-    sizeLg     : Css.Height | Css.Expression
+    size       : Css.Height | Css.Expr
+    sizeSm     : Css.Height | Css.Expr
+    sizeNm     : Css.Height | Css.Expr
+    sizeMd     : Css.Height | Css.Expr
+    sizeLg     : Css.Height | Css.Expr
 }
 // const unset   = 'unset';
 const none    = 'none';
