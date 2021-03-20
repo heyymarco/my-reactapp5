@@ -1,32 +1,97 @@
 // react (builds html using javascript):
-import React               from 'react'                // base technology of our nodestrap components
+import React               from 'react'             // base technology of our nodestrap components
 
 // jss   (builds css  using javascript):
-import { createUseStyles } from 'react-jss'            // base technology of our nodestrap components
-import type { Classes }    from 'jss'                  // ts defs support for jss
-import type * as Css       from './Css'                // ts defs support for jss
-import JssVarCollection    from './jss-var-collection' // stores css props on the :root as global vars
-import type { Dictionary } from './jss-var-collection' // ts defs support for jss
-import { pascalCase }      from 'pascal-case'          // pascal-case support for jss
-import { camelCase }       from 'camel-case'           // camel-case  support for jss
+import { createUseStyles } from 'react-jss'         // base technology of our nodestrap components
+import type { Classes }    from 'jss'               // ts defs support for jss
+import type * as Css       from './Css'             // ts defs support for jss
+import CssPropsManager     from './CssPropsManager' // stores css props on the :root as global vars
+import type { Dictionary } from './CssPropsManager' // ts defs support for jss
+import { pascalCase }      from 'pascal-case'       // pascal-case support for jss
+import { camelCase }       from 'camel-case'        // camel-case  support for jss
 
 // nodestrap (modular web components):
 import
     colors,
-    * as color             from './colors'             // configurable colors & theming defs
+    * as color             from './colors'          // configurable colors & theming defs
 import
     borders,
-    * as border            from './borders'            // configurable borders & border radiuses defs
-import spacers             from './spacers'            // configurable spaces defs
-import typos,
-    { base as typoBase }   from './typos/index'        // configurable typography (texting) defs
+    * as border            from './borders'         // configurable borders & border radiuses defs
+import spacers             from './spacers'         // configurable spaces defs
+import typos               from './typos/index'     // configurable typography (texting) defs
 
 
 
 // jss:
 
-export type ColorsAny   = Dictionary<Css.Prop|undefined> & typeof colors;
-export type CssPropsAny = Dictionary<Css.Prop|undefined>;
+/**
+ * A css manager that manages & update the `cssProps` stored at `:root` level.  
+ */
+const cssPropsManager = new CssPropsManager(() => {
+    // common css values:
+    // const unset   = 'unset';
+    // const none    = 'none';
+    const inherit = 'inherit';
+    // const center  = 'center';
+    // const middle  = 'middle';
+
+
+    const keyframesNone = { };
+
+    return {
+        fontSize          : typos.fontSizeNm,
+        fontSizeSm        : [['calc((', (typos.fontSizeSm as string), '+', (typos.fontSizeNm as string), ')/2)']],
+        fontSizeLg        : typos.fontSizeMd,
+        fontFamily        : inherit,
+        fontWeight        : inherit,
+        fontStyle         : inherit,
+        textDecoration    : inherit,
+        lineHeight        : inherit,
+
+        color             : 'currentColor',
+        backg             : 'transparent',
+        backgGrad         : [['linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(0,0,0, 0.2))', 'border-box']],
+
+        opacity           : 1,
+
+        paddingX          : [['calc((', (spacers.sm as string), '+', (spacers.md as string), ')/2)']],
+        paddingY          : [['calc((', (spacers.xs as string), '+', (spacers.sm as string), ')/2)']],
+        paddingXSm        : spacers.sm as string,
+        paddingYSm        : spacers.xs as string,
+        paddingXLg        : spacers.md as string,
+        paddingYLg        : spacers.sm as string,
+        border            : borders.default,
+        borderRadius      : border.radiuses.md,
+        borderRadiusSm    : border.radiuses.sm,
+        borderRadiusLg    : border.radiuses.lg,
+
+
+        // anim props:
+
+        transition        : [
+            ['background' , '300ms', 'ease-out'],
+            ['color'      , '300ms', 'ease-out'],
+            ['border'     , '300ms', 'ease-out'],
+            ['font-size'  , '300ms', 'ease-out'],
+            ['width'      , '300ms', 'ease-out'],
+            ['height'     , '300ms', 'ease-out'],
+        ],
+
+        boxShadowNone     : [[0, 0, 'transparent']],
+        boxShadow         : [[0, 0, 'transparent']],
+
+        filterNone        : 'brightness(100%)',
+        filter            : 'brightness(100%)',
+
+        '@keyframes none' : keyframesNone,
+        animNone          : [[keyframesNone]],
+        anim              : [[keyframesNone]],
+    };
+}, 'elm');
+export const cssProps = cssPropsManager.refs;
+export const cssDecls = cssPropsManager.decls;
+
+
 
 /**
  * A css builder for styling our components.
@@ -34,36 +99,13 @@ export type CssPropsAny = Dictionary<Css.Prop|undefined>;
  * Supports many states.
  * Exposes configurable css props.
  */
-export class StylesBuilder<TCssProps> {
+export class StylesBuilder {
     //#region global css props
     /**
      * Defines the prefix name of the `cssProps` stored at `:root` level.  
      * Useful to avoid name collision if working with another css frameworks.
      */
     protected readonly varPfx   : string;
-
-    /**
-     * Creates the default values of the `cssProps` to be stored at `:root` level.
-     */
-    protected defCssProps()     { return {} as TCssProps; }
-
-    /**
-     * A css manager that manages & update the `cssProps` stored at `:root` level.  
-     */
-    protected cssManager        : JssVarCollection<any>;
-
-    /**
-     * Provides the configuring access to the `cssManager`.
-     */
-    public    readonly config   : Dictionary<string>;
-
-    /**
-     * Gets the prop name of the generated `cssProps`.  
-     * Returning the name of the css prop wrapped with 'var(...)', not the *direct* value.  
-     * or  
-     * Sets the *direct* value of the generated `cssProps`.
-     */
-    public    readonly cssProps : TCssProps;
 
     /**
      * Excludes the special names of the specified `cssProps`.  
@@ -146,8 +188,7 @@ export class StylesBuilder<TCssProps> {
                         theme,     // camel  case
                         Theme,     // pascal case
                         themeProp, // prop name
-                        themeColor as Css.Prop, // current theme color css prop
-                        colors     as ColorsAny, // the reference of colors casted to less restrictive type.
+                        themeColor as Css.Prop // current theme color css prop
                     );
 
                     const extend = (themes[themeProp] as any)?.extend;
@@ -169,10 +210,9 @@ export class StylesBuilder<TCssProps> {
      * @param Theme The current theme name written in pascal case.
      * @param themeProp The prop name of current `theme`.
      * @param themeColor The backg color of current `theme`.
-     * @param colors The reference of *nodestrap's colors* casted to less restrictive type.
      * @returns An `object` represents the color definitions for the current `theme`.
      */
-    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Prop, colors: ColorsAny) { return {}; }
+    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Prop) { return {}; }
 
     /**
      * Creates sizing definitions *for each* size option.
@@ -188,10 +228,9 @@ export class StylesBuilder<TCssProps> {
                 ...sizes[sizeProp],
                 extend: (() => {
                     const newEntry = this.sizeOf(
-                        size,     // camel  case
-                        Size,     // pascal case
-                        sizeProp, // prop name
-                        this.cssProps as (CssPropsAny & TCssProps) // the reference of cssProps casted to less restrictive type.
+                        size,    // camel  case
+                        Size,    // pascal case
+                        sizeProp // prop name
                     );
 
                     const extend = (sizes[sizeProp] as any)?.extend;
@@ -212,10 +251,9 @@ export class StylesBuilder<TCssProps> {
      * @param size The current size name written in camel case.
      * @param Size The current size name written in pascal case.
      * @param sizeProp The prop name of current `size`.
-     * @param cssProps The reference of `this.cssProps` casted to less restrictive type.
      * @returns An `object` represents the sizing definitions for the current `size`.
      */
-    protected sizeOf(size: string, Size: string, sizeProp: string, cssProps: (CssPropsAny & TCssProps)) { return {}; }
+    protected sizeOf(size: string, Size: string, sizeProp: string) { return {}; }
 
     /**
      * Creates gradient definitions for if the gradient feature is enabled.
@@ -310,12 +348,6 @@ export class StylesBuilder<TCssProps> {
     ) {
         // global css props:
         this.varPfx     = varPfx;
-        this.cssManager = new JssVarCollection(
-            /*cssProps :*/ this.defCssProps() as Dictionary<any>,
-            /*config   :*/ { varPrefix: this.varPfx }
-        );
-        this.config     = this.cssManager.config;
-        this.cssProps   = this.cssManager.varProps as TCssProps;
     }
 
 
@@ -353,115 +385,9 @@ export class StylesBuilder<TCssProps> {
     }
 }
 
-export interface CssProps
-    extends typoBase.CssProps {
-
-    fontSizeSm        : Css.FontSize
-    fontSizeLg        : Css.FontSize
-
-    color             : Css.Color
-    backg             : Css.Background
-    backgGrad         : Css.Background
-
-    opacity           : Css.Opacity
-
-    paddingX          : Css.PaddingXY
-    paddingY          : Css.PaddingXY
-    paddingXSm        : Css.PaddingXY
-    paddingYSm        : Css.PaddingXY
-    paddingXLg        : Css.PaddingXY
-    paddingYLg        : Css.PaddingXY
-
-    border            : Css.Border
-    borderRadius      : Css.BorderRadius
-    borderRadiusSm    : Css.BorderRadius
-    borderRadiusLg    : Css.BorderRadius
-
-
-    // anim props:
-
-    transition        : Css.Transition
-
-    boxShadowNone     : Css.BoxShadow
-    boxShadow         : Css.BoxShadow
-
-    filterNone        : 'brightness(100%)'
-    filter            : Css.Filter
-
-    '@keyframes none' : { }
-    animNone          : { }[][]
-    anim              : Css.Animation
-}
-
-class ElementStylesBuilder extends StylesBuilder<CssProps> {
+class ElementStylesBuilder extends StylesBuilder {
     constructor() {
         super('elm');
-    }
-
-
-
-    // global css props:
-    protected defCssProps() {
-        // common css values:
-        // const unset   = 'unset';
-        // const none    = 'none';
-        const inherit = 'inherit';
-        // const center  = 'center';
-        // const middle  = 'middle';
-
-
-        const keyframesNone = { };
-
-        const cssProps : CssProps = {
-            fontSize          : typos.fontSizeNm,
-            fontSizeSm        : [['calc((', (typos.fontSizeSm as string), '+', (typos.fontSizeNm as string), ')/2)']],
-            fontSizeLg        : typos.fontSizeMd,
-            fontFamily        : inherit,
-            fontWeight        : inherit,
-            fontStyle         : inherit,
-            textDecoration    : inherit,
-            lineHeight        : inherit,
-
-            color             : 'currentColor',
-            backg             : 'transparent',
-            backgGrad         : [['linear-gradient(180deg, rgba(255,255,255, 0.2), rgba(0,0,0, 0.2))', 'border-box']],
-
-            opacity           : 1,
-
-            paddingX          : [['calc((', (spacers.sm as string), '+', (spacers.md as string), ')/2)']],
-            paddingY          : [['calc((', (spacers.xs as string), '+', (spacers.sm as string), ')/2)']],
-            paddingXSm        : spacers.sm as string,
-            paddingYSm        : spacers.xs as string,
-            paddingXLg        : spacers.md as string,
-            paddingYLg        : spacers.sm as string,
-            border            : borders.default,
-            borderRadius      : border.radiuses.md,
-            borderRadiusSm    : border.radiuses.sm,
-            borderRadiusLg    : border.radiuses.lg,
-
-
-            // anim props:
-
-            transition        : [
-                ['background' , '300ms', 'ease-out'],
-                ['color'      , '300ms', 'ease-out'],
-                ['border'     , '300ms', 'ease-out'],
-                ['font-size'  , '300ms', 'ease-out'],
-                ['width'      , '300ms', 'ease-out'],
-                ['height'     , '300ms', 'ease-out'],
-            ],
-
-            boxShadowNone     : [[0, 0, 'transparent']],
-            boxShadow         : [[0, 0, 'transparent']],
-
-            filterNone        : 'brightness(100%)',
-            filter            : 'brightness(100%)',
-
-            '@keyframes none' : keyframesNone,
-            animNone          : [[keyframesNone]],
-            anim              : [[keyframesNone]],
-        };
-        return cssProps;
     }
 
 
@@ -555,11 +481,11 @@ class ElementStylesBuilder extends StylesBuilder<CssProps> {
 
 
     // themes:
-    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Prop, colors: ColorsAny) { return {
+    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Prop) { return {
         // customize the backg & foreg
     
         // customize themed foreground color:
-        [this._colorTh]        : colors[`${theme}Text`], // light on dark backg | dark on light backg
+        [this._colorTh]        : (colors as any)[`${theme}Text`] as Css.Prop, // light on dark backg | dark on light backg
     
         // customize themed background color:
         [this._backgTh]        : this.solidBackg(themeColor),
@@ -567,18 +493,17 @@ class ElementStylesBuilder extends StylesBuilder<CssProps> {
         // customize themed foreground color at outlined state:
         [this._colorOutlineTh] : themeColor,
     }}
-    protected sizeOf(size: string, Size: string, sizeProp: string, cssProps: (CssPropsAny & CssProps)) { return {
+    protected sizeOf(size: string, Size: string, sizeProp: string) { return {
         // overwrite the props with the props{Size}:
 
-        //TODO: defProps:
-        '--elm-fontSize'     : cssProps[`fontSize${Size}`],
-        '--elm-paddingX'     : cssProps[`paddingX${Size}`],
-        '--elm-paddingY'     : cssProps[`paddingY${Size}`],
-        '--elm-borderRadius' : cssProps[`borderRadius${Size}`],
+        [cssDecls.fontSize]     : (cssProps as any)[`fontSize${Size}`]     as Css.Prop,
+        [cssDecls.paddingX]     : (cssProps as any)[`paddingX${Size}`]     as Css.Prop,
+        [cssDecls.paddingY]     : (cssProps as any)[`paddingY${Size}`]     as Css.Prop,
+        [cssDecls.borderRadius] : (cssProps as any)[`borderRadius${Size}`] as Css.Prop,
     }}
     protected gradient() { return {
         // customize background gradient:
-        [this._backgGradTg]: this.cssProps.backgGrad,
+        [this._backgGradTg]: cssProps.backgGrad,
     }}
     protected outline() { return {
         // apply func foreground color at outlined state:
@@ -618,7 +543,7 @@ class ElementStylesBuilder extends StylesBuilder<CssProps> {
             ),
 
             // bottom layer:
-            this.cssProps.backg,
+            cssProps.backg,
         ],
     
     
@@ -640,14 +565,14 @@ class ElementStylesBuilder extends StylesBuilder<CssProps> {
     
         // customize func composite animation(s):
         [this._animFn] : [
-            this.cssProps.anim,
+            cssProps.anim,
         ],
     }}
     protected themesIf() { return {
         // define default colors:
-        [this._colorIf]        : this.cssProps.color,
+        [this._colorIf]        : cssProps.color,
         [this._backgIf]        : this.getProp(this._backgNo),
-        [this._colorOutlineIf] : this.cssProps.color,
+        [this._colorOutlineIf] : cssProps.color,
     }}
     protected states() { return {
         // customize none background.
@@ -659,7 +584,7 @@ class ElementStylesBuilder extends StylesBuilder<CssProps> {
     // styles:
     protected basicStyle() { return {
         extend: [
-            this.filterValidProps(this.cssProps), // apply our filtered cssProps
+            this.filterValidProps(cssProps), // apply our filtered cssProps
         ],
     
     
@@ -724,8 +649,11 @@ export interface Props
     extends
         VariantTheme,
         VariantSize,
-        VariantGradient
+        VariantGradient,
+        React.DOMAttributes<HTMLOrSVGElement>
 {
+    tag?     : keyof JSX.IntrinsicElements
+    classes? : string[]
 }
 export default function Element(props: Props) {
     const elmStyles    = styles.useStyles();
@@ -738,8 +666,9 @@ export default function Element(props: Props) {
 
 
 
+    const Tag = (props.tag ?? 'div');
     return (
-        <div className={[
+        <Tag className={[
                 elmStyles.main,
                 
                 // themes:
@@ -747,9 +676,11 @@ export default function Element(props: Props) {
                 variSize.class,
                 variGradient.class,
                 variOutline.class,
-            ].join(' ')}
+
+                ...(props.classes ?? []),
+            ].filter((c) => !!c).join(' ')}
         >
-            {(props as React.PropsWithChildren<Props>)?.children ?? 'Base Element'}
-        </div>
+            {(props as React.PropsWithChildren<Props>)?.children}
+        </Tag>
     );
 };
