@@ -63,6 +63,20 @@ const matchKeyframeName = /(?<=@keyframes\s+).+/;
 
 
 
+/**
+ * A *css custom property* manager that manages & update the *css props* stored at *:root* level (default) or at specified selector.  
+ * Supports get property by *declaration*, eg:  
+ * `cssPropsManager.decls.myFavColor` => returns `'--myFavColor'`.  
+ *   
+ * Supports get property by *reference*,   eg:  
+ * `cssPropsManager.refs.myFavColor`  => returns `'var(--myFooProp)'`.  
+ *   
+ * Supports get property by *value*, eg:  
+ * `cssPropsManager.vals.myFavColor`  => returns `'#ff0000'`.  
+ *   
+ * Supports set property,                  eg:  
+ * `cssPropsManager.vals.myFavColor = 'red'`
+ */
 export default class CssPropsManager<TCssProps, TProp extends TCssProps[keyof TCssProps]> {
     /**
      * Holds the prefix name of the generated css props.  
@@ -196,6 +210,8 @@ export default class CssPropsManager<TCssProps, TProp extends TCssProps[keyof TC
     private setDirect(prop: string, newValue: TProp) {
         if ((newValue === undefined) || (newValue === null)) {
             delete this._cssProps[prop];
+
+            this.rebuildJss(); // setting changed => need to rebuild the jss
         }
         else
         {
