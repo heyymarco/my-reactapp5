@@ -64,7 +64,7 @@ const matchKeyframeName = /(?<=@keyframes\s+).+/;
 
 
 /**
- * A *css custom property* manager that manages & update the *css props* stored at *:root* level (default) or at specified selector.  
+ * A *css custom property* manager that manages & update the *css props* stored at *:root* level (default) or at specified `rule`.  
  * Supports get property by *declaration*, eg:  
  * `cssPropsManager.decls.myFavColor` => returns `'--myFavColor'`.  
  *   
@@ -80,28 +80,28 @@ const matchKeyframeName = /(?<=@keyframes\s+).+/;
 export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]> {
     // settings:
 
-    //#region selector
+    //#region rule
     /**
      * Holds the declaring location (selector) of the generated css props.  
      * If changed, causing the `_genProps` needs to rebuild.
      */
-    private _selector : string;
+    private _rule : string;
     
     /**
      * Gets the declaring location (selector) of the generated css props.
      */
-    public  get selector() { return this._selector; }
+    public  get rule() { return this._rule; }
     
     /**
      * Sets the declaring location (selector) of the generated css props.
      */
-    public  set selector(newValue: string) {
-        if (this._selector === newValue) return; // still the same => no changes needed
-        this._selector = newValue;
+    public  set rule(newValue: string) {
+        if (this._rule === newValue) return; // still the same => no changes needed
+        this._rule = newValue;
 
         this.refresh(); // setting changed => need to rebuild the jss
     }
-    //#endregion selector
+    //#endregion rule
 
     //#region prefix
     /**
@@ -173,7 +173,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
     /**
      * Generated *css dom* resides on html document.
      */
-    private          _css        : Jss.StyleSheet<'@global'> | null = null;
+    private          _sheet      : Jss.StyleSheet<'@global'> | null = null;
 
     /**
      * Converts the origin prop name to the generated prop name, eg: `'favColor'` => `'--my-favColor'`.
@@ -325,13 +325,13 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
     // constructions:
 
     constructor(
-        props    : TProps | (() => TProps),
-        prefix   = '',
-        selector = ':root'
+        props  : TProps | (() => TProps),
+        prefix = '',
+        rule   = ':root'
     ) {
         // settings:
-        this._selector = selector;
-        this._prefix   = prefix;
+        this._rule   = rule;
+        this._prefix = prefix;
 
 
 
@@ -396,16 +396,12 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
     
 
     private rebuild() {
-        this._css?.detach();
-
-
-        
-        const keyframes: Dictionary<object> = {};
-        const replaceDuplicates = <TSrc, TRef>(srcProps: Dictionary<TSrc>, refProps: Dictionary<TRef>, propRename?: ((prop: string) => string)) => {
+        const genKeyframes: Dictionary<Css.Keyframes> = {};
+        const transformDuplicates = <TSrcProp, TRefProp>(srcProps: Dictionary<TSrcProp>, refProps: Dictionary<TRefProp>, propRename?: ((prop: string) => string)) => {
             const propRenameDefault = (prop: string) => prop;
             if (!propRename) propRename = propRenameDefault; // if no custom renamer => set default handler
             let globalModified = false; // a flag determines the outProps is different than srcProps
-            const outProps: Dictionary<TSrc|Css.Expr> = {}; // an object for storing unmodified & modified properties from srcProps
+            const outProps: Dictionary<TSrcProp|Css.Expr> = {}; // an object for storing unmodified & modified properties from srcProps
 
 
             const isCombinable = <TVal,>(value: TVal) => {
@@ -438,7 +434,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                 const foundKf = name.match(matchKeyframeName)?.[0];
                 if (foundKf) {
                     // if current keyframe equals to one of stored keyframes => use the matched stored keyframe
-                    const found = Object.entries(keyframes).find(ent => (ent[1] === (value as unknown as object)));
+                    const found = Object.entries(genKeyframes).find(ent => (ent[1] === (value as unknown as Css.Keyframes)));
                     if (found) {
                         outProps[propRename(name)] = found[0]; // replace with the stored keyframe's name
 
@@ -449,7 +445,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
                     // if not found => generate a unique keyframe's name
                     const kfName = generateKeyframeName(foundKf);
-                    keyframes[`@keyframes ${kfName}`] = (value as unknown as object);
+                    genKeyframes[`@keyframes ${kfName}`] = (value as unknown as Css.Keyframes);
                     outProps[propRename(name)] = kfName; // replace with the new keyframe's name
 
                     globalModified = true;
@@ -514,49 +510,85 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
             return null; // null means no modification
         }
+
+
+        
         const props = this._props;
-        this._genProps = replaceDuplicates(props, props, (prop) => this.getGenProp(prop)) ?? props;
+        this._genProps = transformDuplicates(props, props, (prop) => this.getGenProp(prop)) ?? props;
         
 
 
-        // prop             : keyframes
-        // string           : object
-        // '@keyframes foo' : {... '12%': {}, ...}
-        for (const [id, keyframe] of Object.entries(keyframes)) {
-            if ((keyframe === undefined) || (keyframe === null)) continue;
+        //#region transform the keyframes
+        /*
+            kfName            : kfProp
+            ------------------:---------------------------
+            string            : Dict<  Dict<Css.Expr>   >
+            ------------------:---------------------------
+            '@keyframes foo'  : {     {'opacity': 0.5}  },
+            '@keyframes dude' : {            ...        },
+        */
+        for (const [name, kfProp] of Object.entries(genKeyframes)) {
+            if ((kfProp === undefined) || (kfProp === null)) continue; // skip empty keyframes
 
-            const keyframeCopy = {...keyframe};
-            let modified = false;
 
 
-            // key    : frame
-            // string : object
-            // '12%'  : {... opacity: 0.5, ...}
-            //               subKey : unknown
-            for (const [key, frame] of Object.entries(keyframeCopy)) {
-                if ((frame === undefined) || (frame === null)) continue;
+            // we don't want to modify the _props's content, so we need to copy the prop bofore modifying:
+            const kfPropCopy : typeof kfProp = {...kfProp}; // copy the prop
+            let modified      = false; // mark the copy as unmodified
 
-                const frameRep = replaceDuplicates(frame as Dictionary<unknown>, props);
-                if (frameRep) {
-                    (keyframeCopy as { [key: string]: any })[key] = frameRep;
-                    modified = true;
+
+
+            /*
+                key    : frameProp
+                -------:---------------
+                string : Dict<Css.Expr>
+                -------:---------------
+                '12%'  : {
+                            'opacity' : 0.5,
+                            'color'   : 'red',
+                            'some'    : Css.Expr,
+                         }
+            */
+            for (const [key, frameProp] of Object.entries(kfPropCopy)) {
+                if ((frameProp === undefined) || (frameProp === null)) continue; // skip empty frames
+
+
+
+                // find & transform the duplicate props (if any):
+                const framePropTransf = transformDuplicates(frameProp, props);
+
+                // if transformed (modified) => replace the original:
+                if (framePropTransf) {
+                    kfPropCopy[key] = framePropTransf; // replace the original
+                    modified        = true;            // mark the copy as modified
                 }
             } // for
 
-            if (modified) keyframes[id] = keyframeCopy;
+            
+
+            // if the copy (kfPropCopy) is different than the original (kfProp) => replace the original
+            if (modified) genKeyframes[name] = kfPropCopy;
         } // for
+        //#endregion transform the keyframes
 
 
 
+        //#region rebuild a new sheet content
         const styles = {
             '@global': {
-                ':root': this._genProps,
-                ...keyframes,
+                [this._rule]: this._genProps,
+                ...genKeyframes,
             },
         };
-        this._css =
+
+        // detach the old sheet (if any):
+        this._sheet?.detach();
+
+        // create a new sheet & attach:
+        this._sheet =
             getCustomJss()
             .createStyleSheet(styles)
             .attach();
+        //#endregion rebuild a new sheet content
     }
 }

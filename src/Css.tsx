@@ -1,3 +1,7 @@
+export type Dictionary<TValue> = { [key: string]: TValue }
+
+
+
 export type Ref             = string // 'var(--blah)' => string
 export type General         = string | number // 'center', 'inline-flex', 12, '12px', 1.5, '150%'
 export type Expr            = General|Ref|        (General|Ref)[][] // [['clamp(', 12, 'var(--blah)', '100vw', ')']]
@@ -29,7 +33,7 @@ export type Height          = string | 0 |               (string|0)[][]
 export type Transition      = string |                   string[][]
 export type Filter          = string |                   string[][]
 export type Transform       = string |                   string[][]
-export type Keyframes       = object
+export type Keyframes       = Dictionary<Dictionary<Expr>>
 export type Animation       = string | (string | Keyframes)[][]
 
 export type BoxShadow       = string | 0 |               (string|0)[][]
