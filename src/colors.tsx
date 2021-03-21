@@ -8,7 +8,7 @@ import Color               from 'color'                // color utilities
 
 
 
-type ColorVal = (Color | string) | Css.Prop;
+type ColorVal = (Color|string) | Css.Ref;
 
 
 
@@ -143,14 +143,14 @@ export default varProps;
 
 
 const themesProxy = new Proxy(themes, {
-    get: (items, name: string)        => (varProps  as Dictionary<Css.Prop>)[name],
+    get: (items, name: string)        => (varProps  as Dictionary<Css.Ref>)[name],
     set: (items, name: string, value) => (varProps  as Dictionary<ColorVal>)[name] = value,
 }) as typeof themes;
 export { themesProxy as themes };
 
 
 const themesTextProxy = new Proxy(themesText, {
-    get: (items, name: string)        => (varProps  as Dictionary<Css.Prop>)[name],
+    get: (items, name: string)        => (varProps  as Dictionary<Css.Ref>)[name],
     set: (items, name: string, value) => (varProps  as Dictionary<ColorVal>)[name] = value,
 }) as typeof themesText;
 export { themesTextProxy as themesText };

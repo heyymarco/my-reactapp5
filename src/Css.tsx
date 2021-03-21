@@ -1,6 +1,6 @@
-export type Prop            = string // 'var(--blah)' => string
+export type Ref             = string // 'var(--blah)' => string
 export type General         = string | number // 'center', 'inline-flex', 12, '12px', 1.5, '150%'
-export type Expr            = General|Prop|      (General|Prop)[][] // [['clamp(', 12, 'var(--blah)', '100vw', ')']]
+export type Expr            = General|Ref|        (General|Ref)[][] // [['clamp(', 12, 'var(--blah)', '100vw', ')']]
 
 export type FontSize        = string |          (string|number)[][]
 export type FontFamily      = string | string[]

@@ -188,7 +188,7 @@ export class StylesBuilder {
                         theme,     // camel  case
                         Theme,     // pascal case
                         themeProp, // prop name
-                        themeColor as Css.Prop // current theme color css prop
+                        themeColor as Css.Ref // current theme color css prop
                     );
 
                     const extend = (themes[themeProp] as any)?.extend;
@@ -212,7 +212,7 @@ export class StylesBuilder {
      * @param themeColor The backg color of current `theme`.
      * @returns An `object` represents the color definitions for the current `theme`.
      */
-    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Prop) { return {}; }
+    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Ref) { return {}; }
 
     /**
      * Creates sizing definitions *for each* size option.
@@ -380,7 +380,7 @@ export class StylesBuilder {
      * @param color The color of solid background.
      * @returns A string represents a solid background in css.
      */
-    protected solidBackg(color: Css.Prop) {
+    protected solidBackg(color: Css.Ref) {
         return `linear-gradient(${color},${color})`;
     }
 }
@@ -481,11 +481,11 @@ class ElementStylesBuilder extends StylesBuilder {
 
 
     // themes:
-    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Prop) { return {
+    protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Ref) { return {
         // customize the backg & foreg
     
         // customize themed foreground color:
-        [this._colorTh]        : (colors as any)[`${theme}Text`] as Css.Prop, // light on dark backg | dark on light backg
+        [this._colorTh]        : (colors as any)[`${theme}Text`] as Css.Ref, // light on dark backg | dark on light backg
     
         // customize themed background color:
         [this._backgTh]        : this.solidBackg(themeColor),
@@ -496,10 +496,10 @@ class ElementStylesBuilder extends StylesBuilder {
     protected sizeOf(size: string, Size: string, sizeProp: string) { return {
         // overwrite the props with the props{Size}:
 
-        [cssDecls.fontSize]     : (cssProps as any)[`fontSize${Size}`]     as Css.Prop,
-        [cssDecls.paddingX]     : (cssProps as any)[`paddingX${Size}`]     as Css.Prop,
-        [cssDecls.paddingY]     : (cssProps as any)[`paddingY${Size}`]     as Css.Prop,
-        [cssDecls.borderRadius] : (cssProps as any)[`borderRadius${Size}`] as Css.Prop,
+        [cssDecls.fontSize]     : (cssProps as any)[`fontSize${Size}`]     as Css.Ref,
+        [cssDecls.paddingX]     : (cssProps as any)[`paddingX${Size}`]     as Css.Ref,
+        [cssDecls.paddingY]     : (cssProps as any)[`paddingY${Size}`]     as Css.Ref,
+        [cssDecls.borderRadius] : (cssProps as any)[`borderRadius${Size}`] as Css.Ref,
     }}
     protected gradient() { return {
         // customize background gradient:
