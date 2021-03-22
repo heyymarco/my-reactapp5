@@ -144,7 +144,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
     /**
      * Generated *css dom* resides on memory only.  
      * Similar to `_props` but some values has been partially/fully *transformed*.  
-     * The duplicate values has been replaced with the *'var(...)'* linked to the existing one.  
+     * The duplicate values has been replaced with the *'var(...)'* linked to the existing ones.  
      * eg:  
      * // origin:  
      * _props = {  
@@ -410,14 +410,16 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
 
-        const transformDuplicates = <TSrcProp, TRefProp>(srcProps: Dictionary<TSrcProp>, refProps: Dictionary<TRefProp>, propRename = ((prop: string) => prop)): (Dictionary<TSrcProp|Css.Ref> | undefined) => {
-            /**
-             * A frag determines the `copyProps` has modified.
-             */
-            let globalModified = false;
-
-
-
+        /**
+         * Transforms the specified `srcProps` with the equivalent prop in `refProps`,  
+         * in which some values has been partially/fully *transformed*.  
+         * The duplicate values has been replaced with the *'var(...)'* linked to the existing props in `refProps`.  
+         * @param srcProps The literal object to transform.
+         * @param refProps The literal object as the props reference.
+         * @param propRename A handler to rename the props name of `srcProps`.
+         * @returns A copy transformed literal object -or- `undefined` if no transformation performed.
+         */
+        const transformDuplicates = <TSrcProp, TRefProp>(srcProps: Dictionary<TSrcProp>, refProps: Dictionary<TRefProp>, propRename = ((prop: string) => prop)): (Dictionary<TSrcProp|Css.Ref|(any|Css.Ref)[]> | undefined) => {
             /**
              * Determines if the specified `prop` can be transformed to another equivalent prop link `var(...)`.
              * @param prop The value to test.
@@ -481,9 +483,9 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
             
             /**
-             * Stores the modified props of `srcProps`.
+             * Stores the modified props in `srcProps`.
              */
-            const modifProps: Dictionary<Css.Ref> = {}; // initially empty (no modification)
+            const modifSrcProps: Dictionary<Css.Ref|(any|Css.Ref)[]> = {}; // initially empty (no modification)
 
 
 
@@ -510,7 +512,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
                     /**
                      * Determines if the current `srcKeyframeProp` has the equivalent stored `@keyframes`.  
-                     * value:
+                     * value:  
                      * `undefined` => *no* equivalent `@keyframes` found.  
                      * `string`    => represents the name of the equivalent `@keyframes`.
                      */
@@ -519,7 +521,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                         // found => use existing @keyframes name:
 
                         // replace with the equivalent `@keyframes` name:
-                        modifProps[propRename(srcName)] = equalKfName;
+                        modifSrcProps[propRename(srcName)] = equalKfName;
                     }
                     else {
                         // not found => generate a unique @keyframes name:
@@ -529,7 +531,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                         genKeyframes[`@keyframes ${newKfName}`] = srcKeyframeProp;
 
                         // replace with the new `@keyframes` name:
-                        modifProps[propRename(srcName)] = newKfName;
+                        modifSrcProps[propRename(srcName)] = newKfName;
                     } // if
 
 
@@ -541,65 +543,144 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
 
+                //#region handle equal item
+                /**
+                 * Determines if the current `srcProp` has the equivalent prop previously.  
+                 * value:  
+                 * `null`                 => *no* equivalent prop found.  
+                 * A `Css.Ref` (`string`) => represents the name of the equivalent prop.
+                 */
+                const equalPropName = findEqualProp(srcName, srcProp);
+                if (equalPropName) {
+                    modifSrcProps[propRename(srcName)] = equalPropName;
+                    
+                    
+                    
+                    // mission done => continue walk to next prop:
+                    continue;
+                } // if
+                //#endregion handle equal item
+
+
+
                 //#region handle array
                 if (Array.isArray(srcProp)) {
-                    let arr: any[] = srcProp;
-                    let deep = false;
-                    if ((arr.length === 1) && Array.isArray(arr[0])) {
-                        arr = arr[0];
-                        deep = true;
-                    }
-                    arr = arr.slice(); // copy array object
+                    /**
+                     * Transforms the specified `srcArr` with the equivalent array,  
+                     * in which some values has been partially/fully *transformed*.  
+                     * The duplicate values has been replaced with the *'var(...)'* linked to the existing props.  
+                     * @param srcArr The array to transform.
+                     * @returns A copy transformed array -or- `undefined` if no transformation performed.
+                     */
+                    const transformArrayRecursive  = <TArr extends TItem[], TItem>(srcArr: TArr): ((TItem|Css.Ref|(any|Css.Ref)[])[] | undefined) => {
+                        /**
+                         * Stores the modified items in `srcArr`.
+                         */
+                        const modifSrcArr: Dictionary<Css.Ref|(any|Css.Ref)[]> = {}; // initially empty (no modification)
 
 
-                    let modified = false;
-                    for (let index = 0; index < arr.length; index++) { // walk each arrayItem in arr
-                        const arrItem = arr[index];
 
-                        if (!isTransformableProp(arrItem)) continue; // skip uncombinable prop
+                        for (const [index, item] of Object.entries(srcArr)) {
+                            if ((item === undefined) || (item === null)) continue; // skip empty items
+    
+    
+    
+                            //#region handle equal item
+                            /**
+                             * Determines if the current `item` has the equivalent prop previously.  
+                             * value:  
+                             * `null`                 => *no* equivalent prop found.  
+                             * A `Css.Ref` (`string`) => represents the name of the equivalent prop.
+                             */
+                            const equalPropName = findEqualProp(srcName, item);
+    
+                            // if equivalent found => store the equivalent:
+                            if (equalPropName) {
+                                modifSrcArr[index] = equalPropName;
+                                
+                                
+                                
+                                // mission done => continue walk to next item:
+                                continue;
+                            } // if
+                            //#endregion handle equal item
 
 
-                        const found = findEqualProp(srcName, arrItem);
-                        if (found) {
-                            arr[index] = found;
 
-                            modified = true;
-                            globalModified = true;
-                        }
-                    } // for // walk each arrayItem in arr
+                            //#region handle array recursively
+                            if (Array.isArray(item)) {
+                                const subArr = item;
 
 
-                    // save the unmodified/modified array:
-                    modifProps[propRename(srcName)] = modified ? (deep ? [arr] : arr) : srcProp;
-                    if (modified) continue; // continue to investigating next prop, do not execute *code below*
-                }
+
+                                /**
+                                 * Determines if the current `subArr` has the equivalent array,  
+                                 * in which some values has been partially/fully *transformed*.  
+                                 * The duplicate values has been replaced with the *'var(...)'* linked to the existing props.  
+                                 * value:  
+                                 * `undefined` => *no* equivalent array found.  
+                                 * `array`     => represents the equivalent array.
+                                 */
+                                const equalArray = transformArrayRecursive(subArr);
+
+                                // if equivalent found => store the equivalent:
+                                if (equalArray) {
+                                    modifSrcArr[index] = equalArray;
+                                    
+                                    
+                                    
+                                    // mission done => continue walk to next item:
+                                    continue;
+                                } // if
+                            } // if array
+                            //#endregion handle array recursively
+                        } // for
+
+
+
+                        // if the modifSrcArr is not empty (has any modifications) => return the (original + modified):
+                        if (Object.keys(modifSrcArr).length) {
+                            return Object.assign(
+                                srcArr.slice() as typeof srcArr, // clone the original
+                                modifSrcArr as unknown as (typeof modifSrcArr[keyof typeof modifSrcArr])[] // merge with modified
+                            );
+                        } // if
+
+                        return undefined; // undefined means no modification
+                    }; // transformArrayRecursive
+
+
+
+                    /**
+                     * Determines if the current `subArr` has the equivalent array,  
+                     * in which some values has been partially/fully *transformed*.  
+                     * The duplicate values has been replaced with the *'var(...)'* linked to the existing props.  
+                     * value:  
+                     * `undefined` => *no* equivalent array found.  
+                     * `array`     => represents the equivalent array.
+                     */
+                    const equalArray = transformArrayRecursive(srcProp);
+
+                    // if equivalent found => store the equivalent:
+                    if (equalArray) {
+                        modifSrcProps[propRename(srcName)] = equalArray;
+                        
+                        
+                        
+                        // mission done => continue walk to next prop:
+                        continue;
+                    } // if
+                } // if
                 //#endregion handle array
-
-                // *code below*:
-
-
-                let modified = false;
-                const found = findEqualProp(srcName, srcProp);
-                if (found) {
-                    modifProps[propRename(srcName)] = found;
-
-                    modified = true;
-                    globalModified = true;
-                }
-                
-                
-                if (!modified) {
-                    modifProps[propRename(srcName)] = srcProp;
-                }
             } // for // walk each props in srcProps
 
 
 
-            // if the modifProps is not empty (has any modifications) => return the (original + modified):
-            if (Object.keys(modifProps).length) return {...srcProps, ...modifProps};
+            // if the modifSrcProps is not empty (has any modifications) => return the (original + modified):
+            if (Object.keys(modifSrcProps).length) return {...srcProps, ...modifSrcProps};
 
             return undefined; // undefined means no modification
-        }
+        } // transformDuplicates
 
 
         
@@ -622,12 +703,12 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
 
-            type TKeyframes      = typeof kfProp; // keyframes = (key:string : frame:Dict<Expr>)*
-            type TFrame          = TKeyframes[keyof TKeyframes];
-            type TModifFrame     = Dictionary<TFrame[keyof TFrame] | Css.Ref>;
-            type TmodifKeyframes = Dictionary<TModifFrame>;
+            type TKeyframes      = typeof kfProp // keyframes = (key:string : frame:Dict<Expr>)*
+            type TFrame          = TKeyframes[keyof TKeyframes]
+            type TModifFrame     = Dictionary<TFrame[keyof TFrame] | Css.Ref>
+            type TmodifKeyframes = Dictionary<TModifFrame>
             /**
-             * Stores the modified props of `kfProp`.
+             * Stores the modified props in `kfProp`.
              */
             const modifKfProp: TmodifKeyframes = {}; // initially empty (no modification)
 
@@ -658,7 +739,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
             
 
-            // if the modifKfProp is not empty (has any modifications) => replace the original:
+            // if the modifKfProp is not empty (has any modifications) => replace with the (original + modified):
             if (Object.keys(modifKfProp).length) genKeyframes[name] = {...kfProp, ...modifKfProp};
         } // for
         //#endregion transform the keyframes
