@@ -22,7 +22,7 @@ import jssPluginExpand              from 'jss-plugin-expand'
 import jssPluginNormalizeShorthands from './jss-plugin-normalize-shorthands'
 
 // other supports:
-import deepEquals                from 'deep-equal'
+import deepEqual                    from 'deep-equal'
 
 
 
@@ -58,8 +58,6 @@ const getCustomJss = () => {
 
 let idGenerator = createGenerateId();
 const generateKeyframeName = (baseName: string) => idGenerator({key: baseName} as Jss.Rule);
-
-const matchKeyframeName = /(?<=@keyframes\s+).+/;
 
 
 
@@ -412,15 +410,11 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
 
-        const transformDuplicates = <TSrcProp, TRefProp>(srcProps: Dictionary<TSrcProp>, refProps: Dictionary<TRefProp>, propRename = ((prop: string) => prop)): (Dictionary<TSrcProp|Css.Expr> | undefined) => {
+        const transformDuplicates = <TSrcProp, TRefProp>(srcProps: Dictionary<TSrcProp>, refProps: Dictionary<TRefProp>, propRename = ((prop: string) => prop)): (Dictionary<TSrcProp|Css.Ref> | undefined) => {
             /**
              * A frag determines the `copyProps` has modified.
              */
             let globalModified = false;
-            /**
-             * Stores the modified props of `srcProps`.
-             */
-            const modifProps: Dictionary<TSrcProp|Css.Expr> = {}; // initially empty (no modification)
 
 
 
@@ -450,6 +444,14 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
             };
 
             /**
+             * Determines if the specified `srcProp` and `refProp` are deeply the same by value.
+             * @param srcProp The first value to test.
+             * @param refProp The second value to test.
+             * @returns 
+             */
+            const isEqualProp = <TTSrcProp, TTRefProp>(srcProp: TTSrcProp, refProp: TTRefProp) => deepEqual(srcProp, refProp, {strict: true});
+
+            /**
              * Determines if the specified prop [key = `srcName` : value = `srcProp`] has the equivalent prop previously.
              * @param srcName The prop name (key).
              * @param srcProp The prop value.
@@ -465,7 +467,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
                     // comparing the srcProp & refProp:
-                    if (((srcProp as any) === (refProp as any)) || deepEquals(srcProp, refProp, {strict: true})) {
+                    if (isEqualProp(srcProp, refProp)) {
                         return this.getGenRef(refName); // return the link to the ref
                     }
                 } // for // search for duplicates
@@ -474,34 +476,65 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
             }
 
 
+            
+            /**
+             * Stores the modified props of `srcProps`.
+             */
+            const modifProps: Dictionary<Css.Ref> = {}; // initially empty (no modification)
 
-            for (const [name, value] of Object.entries(srcProps)) { // walk each props in srcProps
-                const foundKf = name.match(matchKeyframeName)?.[0];
-                if (foundKf) {
-                    // if current keyframe equals to one of stored keyframes => use the matched stored keyframe
-                    const found = Object.entries(genKeyframes).find(ent => (ent[1] === (value as unknown as Css.Keyframes)));
-                    if (found) {
-                        modifProps[propRename(name)] = found[0]; // replace with the stored keyframe's name
 
-                        globalModified = true;
-                        continue;
+
+            for (const [srcName, srcProp] of Object.entries(srcProps)) { // walk each props in srcProps
+                /**
+                 * Determines if the current `srcName` is a special `@keyframes name`.  
+                 * value:  
+                 * `undefined` => *not* a special `@keyframes name`.  
+                 * `string`    => represents the name of the `@keyframes`.
+                 */
+                const kfName = srcName.match(/(?<=@keyframes\s+).+/)?.[0];
+                if (kfName) {
+                    /**
+                     * Assumes the current `srcProp` is a valid `@keyframes`' value.
+                     */
+                    const srcKeyframeProp = srcProp as unknown as Css.Keyframes;
+
+                    
+
+                    /**
+                     * Determines if the current `srcKeyframeProp` has the equivalent stored `@keyframes`.  
+                     * value:
+                     * `undefined` => *no* equivalent `@keyframes` found.  
+                     * `string`    => represents the name of the equivalent `@keyframes`.
+                     */
+                    const equalKfName = Object.entries(genKeyframes).find(entry => isEqualProp(entry[1], srcKeyframeProp))?.[0];
+                    if (equalKfName) {
+                        // found => use existing @keyframes name:
+
+                        // replace with the equivalent `@keyframes` name:
+                        modifProps[propRename(srcName)] = equalKfName;
                     }
+                    else {
+                        // not found => generate a unique @keyframes name:
+                        const newKfName = generateKeyframeName(kfName);
+
+                        // store the new @keyframes:
+                        genKeyframes[`@keyframes ${newKfName}`] = srcKeyframeProp;
+
+                        // replace with the new `@keyframes` name:
+                        modifProps[propRename(srcName)] = newKfName;
+                    } // if
 
 
-                    // if not found => generate a unique keyframe's name
-                    const kfName = generateKeyframeName(foundKf);
-                    genKeyframes[`@keyframes ${kfName}`] = (value as unknown as Css.Keyframes);
-                    modifProps[propRename(name)] = kfName; // replace with the new keyframe's name
 
-                    globalModified = true;
+                    // mission done => continue walk to next prop:
                     continue;
                 }
 
 
 
-                if (value === undefined) continue; // skip undefined prop
-                if (Array.isArray(value)) {
-                    let arr: any[] = value;
+                if (srcProp === undefined) continue; // skip undefined prop
+                if (Array.isArray(srcProp)) {
+                    let arr: any[] = srcProp;
                     let deep = false;
                     if ((arr.length === 1) && Array.isArray(arr[0])) {
                         arr = arr[0];
@@ -517,7 +550,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                         if (!isTransformableProp(arrItem)) continue; // skip uncombinable prop
 
 
-                        const found = findEqualProp(name, arrItem);
+                        const found = findEqualProp(srcName, arrItem);
                         if (found) {
                             arr[index] = found;
 
@@ -528,7 +561,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
                     // save the unmodified/modified array:
-                    modifProps[propRename(name)] = modified ? (deep ? [arr] : arr) : value;
+                    modifProps[propRename(srcName)] = modified ? (deep ? [arr] : arr) : srcProp;
                     if (modified) continue; // continue to investigating next prop, do not execute *code below*
                 }
 
@@ -536,9 +569,9 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
                 let modified = false;
-                const found = findEqualProp(name, value);
+                const found = findEqualProp(srcName, srcProp);
                 if (found) {
-                    modifProps[propRename(name)] = found;
+                    modifProps[propRename(srcName)] = found;
 
                     modified = true;
                     globalModified = true;
@@ -546,7 +579,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                 
                 
                 if (!modified) {
-                    modifProps[propRename(name)] = value;
+                    modifProps[propRename(srcName)] = srcProp;
                 }
             } // for // walk each props in srcProps
 
@@ -579,10 +612,14 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
 
+            type TKeyframes      = typeof kfProp; // keyframes = (key:string : frame:Dict<Expr>)*
+            type TFrame          = TKeyframes[keyof TKeyframes];
+            type TModifFrame     = Dictionary<TFrame[keyof TFrame] | Css.Ref>;
+            type TmodifKeyframes = Dictionary<TModifFrame>;
             /**
              * Stores the modified props of `kfProp`.
              */
-            const modifKfProp : typeof kfProp = {}; // initially empty (no modification)
+            const modifKfProp: TmodifKeyframes = {}; // initially empty (no modification)
 
 
 
