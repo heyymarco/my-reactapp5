@@ -187,6 +187,15 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
         return prefix ? `--${prefix}-${prop}` : `--${prop}`; // add double dash with prefix '--my-' or double dash without prefix '--'
     }
 
+    /**
+     * Converts the origin prop name to the generated prop ref, eg: `'favColor'` => `'var(--my-favColor)'`.
+     * @param prop The origin prop name.
+     * @returns The generated prop ref with/without prefix (depends on the configuration).
+     */
+    private getGenRef(prop: string): Css.Ref {
+        return `var(${this.getGenProp(prop)})`;
+    }
+
 
 
     // proxies - representing data in various formats:
@@ -396,38 +405,74 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
     
 
     private rebuild() {
+        /**
+         * Generated *keyframes*. Similar to `_props` but the key names starting with `'@keyframe foo'`.
+         */
         const genKeyframes: Dictionary<Css.Keyframes> = {};
-        const transformDuplicates = <TSrcProp, TRefProp>(srcProps: Dictionary<TSrcProp>, refProps: Dictionary<TRefProp>, propRename?: ((prop: string) => string)) => {
-            const propRenameDefault = (prop: string) => prop;
-            if (!propRename) propRename = propRenameDefault; // if no custom renamer => set default handler
-            let globalModified = false; // a flag determines the outProps is different than srcProps
-            const outProps: Dictionary<TSrcProp|Css.Expr> = {}; // an object for storing unmodified & modified properties from srcProps
 
 
-            const isCombinable = <TVal,>(value: TVal) => {
-                if (value === undefined) return false; // skip undefined prop
-                if ((typeof(value) === 'string') && (/^(none|unset|inherit)$/).test(value as string)) return false; // ignore reserved keywords
-                // if (Array.isArray(value)) return false; // ignore prev value if it's kind of array
-                return true; // passed
+
+        const transformDuplicates = <TSrcProp, TRefProp>(srcProps: Dictionary<TSrcProp>, refProps: Dictionary<TRefProp>, propRename = ((prop: string) => prop)): (Dictionary<TSrcProp|Css.Expr> | undefined) => {
+            /**
+             * A frag determines the `copyProps` has modified.
+             */
+            let globalModified = false;
+            /**
+             * Stores the modified props of `srcProps`.
+             */
+            const modifProps: Dictionary<TSrcProp|Css.Expr> = {}; // initially empty (no modification)
+
+
+
+            /**
+             * Determines if the specified `prop` can be transformed to another equivalent prop link `var(...)`.
+             * @param prop The value to test.
+             * @returns `true` indicates its transformable, otherwise `false`.
+             */
+            const isTransformableProp = <TTProp,>(prop: TTProp): boolean => {
+                if (prop === undefined) return false; // skip empty prop
+
+                if ((typeof(prop) === 'string') && (/^(none|unset|inherit)$/).test(prop)) return false; // ignore reserved keywords
+
+                return true; // passed, transformable
             };
-            const isSelf = (name: string, prevName: string) => {
-                if ((srcProps as unknown) !== (refProps as unknown)) return false;
-                return (name === prevName);
+
+            /**
+             * Determines if the specified `srcName` and `refName` are pointed to the same object.
+             * @param srcName The prop name of `srcProps`.
+             * @param refName The prop name of `refProps`.
+             * @returns `true` indicates the same object, otherwise `false`.
+             */
+            const isSelfProp = (srcName: string, refName: string): boolean => {
+                if (!Object.is(srcProps, refProps)) return false; // if srcProps & refProps are not the same object in memory => always return false
+                
+                return (srcName === refName);
             };
-            const findDuplicateProp = <TVal,>(name: string, value: TVal) => {
-                for (const [prevName, prevValue] of Object.entries(refProps)) { // search for duplicate cssProps' value
-                    if (isSelf(name, prevName)) break; // stop search if reaches current pos (search for prev values only)
 
-                    if (!isCombinable(prevValue)) continue; // skip uncombinable prop
+            /**
+             * Determines if the specified prop [key = `srcName` : value = `srcProp`] has the equivalent prop previously.
+             * @param srcName The prop name (key).
+             * @param srcProp The prop value.
+             * @returns A `Css.Ref` (`string`) represents the link to the equivalent prop `var(...)`  
+             * -or- `null` if no equivalent found.
+             */
+            const findEqualProp = <TTSrcProp,>(srcName: string, srcProp: TTSrcProp): (Css.Ref|null) => {
+                for (const [refName, refProp] of Object.entries(refProps)) { // search for duplicates
+                    if (isSelfProp(srcName, refName)) break; // stop search if reaches current pos (search for prev props only)
 
 
-                    if (((value as unknown) === (prevValue as unknown)) || deepEquals(value, prevValue, {strict: true})) {
-                        return `var(${this.getGenProp(prevName)})`;
+                    if (!isTransformableProp(srcProp)) continue; // skip non transformable prop
+
+
+                    // comparing the srcProp & refProp:
+                    if (((srcProp as any) === (refProp as any)) || deepEquals(srcProp, refProp, {strict: true})) {
+                        return this.getGenRef(refName); // return the link to the ref
                     }
-                } // for // searching for duplicates
+                } // for // search for duplicates
 
                 return null; // not found
             }
+
 
 
             for (const [name, value] of Object.entries(srcProps)) { // walk each props in srcProps
@@ -436,7 +481,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                     // if current keyframe equals to one of stored keyframes => use the matched stored keyframe
                     const found = Object.entries(genKeyframes).find(ent => (ent[1] === (value as unknown as Css.Keyframes)));
                     if (found) {
-                        outProps[propRename(name)] = found[0]; // replace with the stored keyframe's name
+                        modifProps[propRename(name)] = found[0]; // replace with the stored keyframe's name
 
                         globalModified = true;
                         continue;
@@ -446,7 +491,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                     // if not found => generate a unique keyframe's name
                     const kfName = generateKeyframeName(foundKf);
                     genKeyframes[`@keyframes ${kfName}`] = (value as unknown as Css.Keyframes);
-                    outProps[propRename(name)] = kfName; // replace with the new keyframe's name
+                    modifProps[propRename(name)] = kfName; // replace with the new keyframe's name
 
                     globalModified = true;
                     continue;
@@ -469,10 +514,10 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                     for (let index = 0; index < arr.length; index++) { // walk each arrayItem in arr
                         const arrItem = arr[index];
 
-                        if (!isCombinable(arrItem)) continue; // skip uncombinable prop
+                        if (!isTransformableProp(arrItem)) continue; // skip uncombinable prop
 
 
-                        const found = findDuplicateProp(name, arrItem);
+                        const found = findEqualProp(name, arrItem);
                         if (found) {
                             arr[index] = found;
 
@@ -483,7 +528,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
                     // save the unmodified/modified array:
-                    outProps[propRename(name)] = modified ? (deep ? [arr] : arr) : value;
+                    modifProps[propRename(name)] = modified ? (deep ? [arr] : arr) : value;
                     if (modified) continue; // continue to investigating next prop, do not execute *code below*
                 }
 
@@ -491,9 +536,9 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
                 let modified = false;
-                const found = findDuplicateProp(name, value);
+                const found = findEqualProp(name, value);
                 if (found) {
-                    outProps[propRename(name)] = found;
+                    modifProps[propRename(name)] = found;
 
                     modified = true;
                     globalModified = true;
@@ -501,20 +546,22 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                 
                 
                 if (!modified) {
-                    outProps[propRename(name)] = value;
+                    modifProps[propRename(name)] = value;
                 }
             } // for // walk each props in srcProps
 
 
-            if (globalModified || (propRename !== propRenameDefault)) return outProps;
 
-            return null; // null means no modification
+            // if the modifProps is not empty (has any modifications) => return the (original + modified):
+            if (Object.keys(modifProps).length) return {...srcProps, ...modifProps};
+
+            return undefined; // undefined means no modification
         }
 
 
         
         const props = this._props;
-        this._genProps = transformDuplicates(props, props, (prop) => this.getGenProp(prop)) ?? props;
+        this._genProps = transformDuplicates(props, props, this.getGenProp) ?? props;
         
 
 
@@ -532,9 +579,10 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
 
-            // we don't want to modify the _props's content, so we need to copy the prop bofore modifying:
-            const kfPropCopy : typeof kfProp = {...kfProp}; // copy the prop
-            let modified      = false; // mark the copy as unmodified
+            /**
+             * Stores the modified props of `kfProp`.
+             */
+            const modifKfProp : typeof kfProp = {}; // initially empty (no modification)
 
 
 
@@ -549,25 +597,22 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                             'some'    : Css.Expr,
                          }
             */
-            for (const [key, frameProp] of Object.entries(kfPropCopy)) {
+            for (const [key, frameProp] of Object.entries(kfProp)) {
                 if ((frameProp === undefined) || (frameProp === null)) continue; // skip empty frames
 
 
 
                 // find & transform the duplicate props (if any):
-                const framePropTransf = transformDuplicates(frameProp, props);
+                const transfFrameProp = transformDuplicates(frameProp, props);
 
-                // if transformed (modified) => replace the original:
-                if (framePropTransf) {
-                    kfPropCopy[key] = framePropTransf; // replace the original
-                    modified        = true;            // mark the copy as modified
-                }
+                // if transformed (modified) => store the modified:
+                if (transfFrameProp) modifKfProp[key] = transfFrameProp;
             } // for
 
             
 
-            // if the copy (kfPropCopy) is different than the original (kfProp) => replace the original
-            if (modified) genKeyframes[name] = kfPropCopy;
+            // if the modifKfProp is not empty (has any modifications) => replace the original:
+            if (Object.keys(modifKfProp).length) genKeyframes[name] = {...kfProp, ...modifKfProp};
         } // for
         //#endregion transform the keyframes
 
