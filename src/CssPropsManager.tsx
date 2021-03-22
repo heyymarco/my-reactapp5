@@ -424,7 +424,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
              * @returns `true` indicates its transformable, otherwise `false`.
              */
             const isTransformableProp = <TTProp,>(prop: TTProp): boolean => {
-                if (prop === undefined) return false; // skip empty prop
+                if ((prop === undefined) || (prop === null)) return false; // skip empty prop
 
                 if ((typeof(prop) === 'string') && (/^(none|unset|inherit)$/).test(prop)) return false; // ignore reserved keywords
 
@@ -460,10 +460,13 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
              */
             const findEqualProp = <TTSrcProp,>(srcName: string, srcProp: TTSrcProp): (Css.Ref|null) => {
                 for (const [refName, refProp] of Object.entries(refProps)) { // search for duplicates
-                    if (isSelfProp(srcName, refName)) break; // stop search if reaches current pos (search for prev props only)
+                    if ((refProp === undefined) || (refProp === null)) continue; // skip empty ref
+                    if (isSelfProp(srcName, refName)) break;                     // stop search if reaches current pos (search for prev props only)
+
 
 
                     if (!isTransformableProp(srcProp)) continue; // skip non transformable prop
+
 
 
                     // comparing the srcProp & refProp:
@@ -485,6 +488,11 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
             for (const [srcName, srcProp] of Object.entries(srcProps)) { // walk each props in srcProps
+                if ((srcProp === undefined) || (srcProp === null)) continue; // skip empty src
+
+
+
+                //#region handle @keyframes foo
                 /**
                  * Determines if the current `srcName` is a special `@keyframes name`.  
                  * value:  
@@ -528,11 +536,12 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
                     // mission done => continue walk to next prop:
                     continue;
-                }
+                } // if
+                //#endregion handle @keyframes foo
 
 
 
-                if (srcProp === undefined) continue; // skip undefined prop
+                //#region handle array
                 if (Array.isArray(srcProp)) {
                     let arr: any[] = srcProp;
                     let deep = false;
@@ -564,6 +573,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                     modifProps[propRename(srcName)] = modified ? (deep ? [arr] : arr) : srcProp;
                     if (modified) continue; // continue to investigating next prop, do not execute *code below*
                 }
+                //#endregion handle array
 
                 // *code below*:
 
