@@ -129,7 +129,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
      * The source of truth.  
      * If changed, causing the `_genProps` needs to rebuild.
      */
-    private readonly _props        : Dictionary</*original: */TProp>;
+    private readonly _props      : Dictionary</*original: */TProp>;
 
 
 
@@ -160,17 +160,17 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
      *    --the-border   : [[ 'solid', 'var(--bd-width)', 'var(--col-blue)' ]],  
      * }
      */
-    private          _genProps     : Dictionary</*original: */TProp | /*transformed: */Css.Expr> = {};
+    public readonly genProps     : Dictionary</*original: */TProp | /*transformed: */Css.Expr> = {};
 
     /**
      * Generated *css dom* of @keyframes.
      */
-    private          _genKeyframes : Dictionary<Css.Keyframes> = {};
+    public readonly genKeyframes : Dictionary<Css.Keyframes> = {};
 
     /**
      * Generated *css dom* resides on html document.
      */
-    private          _sheet        : Jss.StyleSheet<'@global'> | null = null;
+    private          _sheet      : Jss.StyleSheet<'@global'> | null = null;
 
     /**
      * Converts the origin prop name to the generated prop name, eg: `'favColor'` => `'--my-favColor'`.
@@ -201,6 +201,16 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
     private getGenKeyframesName(baseName: string): string {
         const prefix = this._prefix;
         return prefix ? `${prefix}-${baseName}` : baseName; // add prefix '--my-' or just a baseName
+    }
+
+    /**
+     * Removes all props inside the specified `data`.
+     * @param dataContainer The data container.
+     */
+    private clearData(dataContainer: any) {
+        for (const name in Object.keys(dataContainer)) {
+            delete dataContainer[name];
+        }
     }
 
 
@@ -286,7 +296,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
         const genProp = this.getGenProp(prop);
 
         // check if the genProp is already exists:
-        if (!(genProp in this._genProps)) return undefined; // not found
+        if (!(genProp in this.genProps)) return undefined; // not found
         
         return genProp;
     }
@@ -310,7 +320,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
         const genProp = this.getDecl(prop);
         if (!genProp) return undefined; // not found
 
-        return this._genProps[genProp];
+        return this.genProps[genProp];
     }
 
     /**
@@ -370,7 +380,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
             set: (t, prop: string, newValue: TProp) => this.setDirect(prop, newValue), // Sets the *direct* value of the css props.
         });
 
-        this._valsProxy = new Proxy<typeof _this._valsProxy>(this._genProps, {
+        this._valsProxy = new Proxy<typeof _this._valsProxy>(this.genProps, {
             get: (t, prop: string)                  => this.getVal(prop),              // Gets the *equivalent value* of the css prop, might be the *transformed* value, eg: `[['var(--pad-y)', 'var(--pad-x)']]`; or the *direct* value, eg: `[['5px', '10px']]`.
             set: (t, prop: string, newValue: TProp) => this.setDirect(prop, newValue), // Sets the *direct* value of the css props.
         });
@@ -413,9 +423,10 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
     private rebuild() {
         /**
-         * Generated *keyframes*. Similar to `_props` but the key names starting with `'@keyframe foo'`.
+         * Generated *css dom* of @keyframes.
          */
-        const genKeyframes: Dictionary<Css.Keyframes> = {};
+        const genKeyframes = this.genKeyframes;
+        this.clearData(genKeyframes);
 
 
 
@@ -507,70 +518,74 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
 
                 //#region handle @keyframes foo
-                /**
-                 * Determines if the current `srcName` is a special `@keyframes name`.  
-                 * value:  
-                 * `undefined` => *not* a special `@keyframes name`.  
-                 * `string`    => represents the name of the `@keyframes`.
-                 */
-                const kfName = srcName.match(/(?<=@keyframes\s+).+/)?.[0];
-                if (kfName) {
+                {
                     /**
-                     * Assumes the current `srcProp` is a valid `@keyframes`' value.
-                     */
-                    const srcKeyframeProp = srcProp as unknown as Css.Keyframes;
-
-                    
-
-                    /**
-                     * Determines if the current `srcKeyframeProp` has the equivalent stored `@keyframes`.  
+                     * Determines if the current `srcName` is a special `@keyframes name`.  
                      * value:  
-                     * `undefined` => *no* equivalent `@keyframes` found.  
-                     * `string`    => represents the name of the equivalent `@keyframes`.
+                     * `undefined` => *not* a special `@keyframes name`.  
+                     * `string`    => represents the name of the `@keyframes`.
                      */
-                    const equalKfName = Object.entries(genKeyframes).find(entry => isEqualProp(entry[1], srcKeyframeProp))?.[0];
-                    if (equalKfName) {
-                        // found => use existing @keyframes name:
-
-                        // replace with the equivalent `@keyframes` name:
-                        modifSrcProps[propRename?.(srcName) ?? srcName] = equalKfName;
-                    }
-                    else {
-                        // not found => create a @keyframes name:
-                        const newKfName = this.getGenKeyframesName(kfName);
-
-                        // store the new @keyframes:
-                        genKeyframes[`@keyframes ${newKfName}`] = srcKeyframeProp;
-
-                        // replace with the new `@keyframes` name:
-                        modifSrcProps[propRename?.(srcName) ?? srcName] = newKfName;
+                    const kfName = srcName.match(/(?<=@keyframes\s+).+/)?.[0];
+                    if (kfName) {
+                        /**
+                         * Assumes the current `srcProp` is a valid `@keyframes`' value.
+                         */
+                        const srcKeyframeProp = srcProp as unknown as Css.Keyframes;
+    
+                        
+    
+                        /**
+                         * Determines if the current `srcKeyframeProp` has the equivalent stored `@keyframes`.  
+                         * value:  
+                         * `undefined` => *no* equivalent `@keyframes` found.  
+                         * `string`    => represents the name of the equivalent `@keyframes`.
+                         */
+                        const equalKfName = Object.entries(genKeyframes).find(entry => isEqualProp(entry[1], srcKeyframeProp))?.[0];
+                        if (equalKfName) {
+                            // found => use existing @keyframes name:
+    
+                            // replace with the equivalent `@keyframes` name:
+                            modifSrcProps[propRename?.(srcName) ?? srcName] = equalKfName;
+                        }
+                        else {
+                            // not found => create a @keyframes name:
+                            const newKfName = this.getGenKeyframesName(kfName);
+    
+                            // store the new @keyframes:
+                            genKeyframes[`@keyframes ${newKfName}`] = srcKeyframeProp;
+    
+                            // replace with the new `@keyframes` name:
+                            modifSrcProps[propRename?.(srcName) ?? srcName] = newKfName;
+                        } // if
+    
+    
+    
+                        // mission done => continue walk to next prop:
+                        continue;
                     } // if
-
-
-
-                    // mission done => continue walk to next prop:
-                    continue;
-                } // if
+                }
                 //#endregion handle @keyframes foo
 
 
 
                 //#region handle equal item
-                /**
-                 * Determines if the current `srcProp` has the equivalent prop previously.  
-                 * value:  
-                 * `null`                 => *no* equivalent prop found.  
-                 * A `Css.Ref` (`string`) => represents the name of the equivalent prop.
-                 */
-                const equalPropName = findEqualProp(srcName, srcProp);
-                if (equalPropName) {
-                    modifSrcProps[propRename?.(srcName) ?? srcName] = equalPropName;
-                    
-                    
-                    
-                    // mission done => continue walk to next prop:
-                    continue;
-                } // if
+                {
+                    /**
+                     * Determines if the current `srcProp` has the equivalent prop previously.  
+                     * value:  
+                     * `null`                 => *no* equivalent prop found.  
+                     * A `Css.Ref` (`string`) => represents the name of the equivalent prop.
+                     */
+                    const equalPropName = findEqualProp(srcName, srcProp);
+                    if (equalPropName) {
+                        modifSrcProps[propRename?.(srcName) ?? srcName] = equalPropName;
+                        
+                        
+                        
+                        // mission done => continue walk to next prop:
+                        continue;
+                    } // if
+                }
                 //#endregion handle equal item
 
 
@@ -636,8 +651,26 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
         
         //#region transform the props
-        const props = this._props;
-        this._genProps = transformDuplicates(props, props, (srcName) => this.getGenProp(srcName)) ?? props;
+        {
+            const genProps = this.genProps;
+            this.clearData(genProps);
+    
+
+
+            const props = this._props;
+    
+            /**
+             * Determines if the current `props` has the equivalent literal object,  
+             * in which some values has been partially/fully *transformed*.  
+             * The duplicate values has been replaced with the *'var(...)'* linked to the existing props in `props`.  
+             * value:  
+             * `undefined` => *no* transformation was performed.  
+             * -or-  
+             * A copy *transformed* literal object.
+             */
+            const equalLiteral = transformDuplicates(props, props, (srcName) => this.getGenProp(srcName)) ?? props;
+            if (equalLiteral) Object.assign(genProps, equalLiteral);
+        }
         //#endregion transform the props
         
 
@@ -692,7 +725,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
                  * -or-  
                  * A copy *transformed* literal object.
                  */
-                const equalFrameProp = transformDuplicates(frameProp, props);
+                const equalFrameProp = transformDuplicates(frameProp, this._props);
 
                 // if transformed (modified) => store the modified:
                 if (equalFrameProp) modifKfProp[key] = equalFrameProp;
@@ -703,30 +736,28 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
             // if the modifKfProp is not empty (has any modifications) => replace with the (original + modified):
             if (Object.keys(modifKfProp).length) genKeyframes[name] = {...kfProp, ...modifKfProp};
         } // for
-
-
-
-        this._genKeyframes = genKeyframes;
         //#endregion transform the keyframes
 
 
 
         //#region rebuild a new sheet content
-        const styles = {
-            '@global': {
-                [this._rule]: this._genProps,
-                ...this._genKeyframes,
-            },
-        };
-
-        // detach the old sheet (if any):
-        this._sheet?.detach();
-
-        // create a new sheet & attach:
-        this._sheet =
-            getCustomJss()
-            .createStyleSheet(styles)
-            .attach();
+        {
+            const styles = {
+                '@global': {
+                    [this._rule]: this.genProps,
+                    ...genKeyframes,
+                },
+            };
+    
+            // detach the old sheet (if any):
+            this._sheet?.detach();
+    
+            // create a new sheet & attach:
+            this._sheet =
+                getCustomJss()
+                .createStyleSheet(styles)
+                .attach();
+        }
         //#endregion rebuild a new sheet content
     }
 }

@@ -17,8 +17,7 @@ const testTransf = <TProps,>(
 
 
 
-    // @ts-ignore
-    const genProps = css._genProps;
+    const genProps = css.genProps;
     if (!deepEqual(genProps, compare)) {
         console.log(genProps);
         throw new Error('invalid');
@@ -26,8 +25,7 @@ const testTransf = <TProps,>(
 
 
 
-    // @ts-ignore
-    const genKeyframes = css._genKeyframes;
+    const genKeyframes = css.genKeyframes;
     if (!deepEqual(genKeyframes, compKf)) {
         console.log(genKeyframes);
         throw new Error('invalid');
