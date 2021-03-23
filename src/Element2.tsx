@@ -5,7 +5,7 @@ import React               from 'react'             // base technology of our no
 import { createUseStyles } from 'react-jss'         // base technology of our nodestrap components
 import type { Classes }    from 'jss'               // ts defs support for jss
 import type * as Css       from './Css'             // ts defs support for jss
-import CssPropsManager     from './CssPropsManager' // manages & updates the *css props* stored at specified `rule`.
+import CssPropsManager     from './CssPropsManager' // A *css custom property* manager that manages & updates the *css props* stored at specified `rule`.
 import type { Dictionary } from './CssPropsManager' // ts defs support for jss
 import { pascalCase }      from 'pascal-case'       // pascal-case support for jss
 import { camelCase }       from 'camel-case'        // camel-case  support for jss
@@ -25,7 +25,7 @@ import typos               from './typos/index'     // configurable typography (
 // jss:
 
 /**
- * A css manager that manages & update the `cssProps` stored at `:root` level.  
+ * A *css custom property* manager that manages & updates the *css props* stored at specified `rule`.
  */
 const cssPropsManager = new CssPropsManager(() => {
     // common css values:
@@ -87,7 +87,7 @@ const cssPropsManager = new CssPropsManager(() => {
         animNone          : [[keyframesNone]],
         anim              : [[keyframesNone]],
     };
-}, 'elm');
+}, /*prefix: */'elm');
 export const cssProps = cssPropsManager.refs;
 export const cssDecls = cssPropsManager.decls;
 

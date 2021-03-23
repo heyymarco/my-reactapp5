@@ -320,6 +320,7 @@ test('mutation with prefix + keyframes + ref + array', () => {
     //@ts-ignore
     css.vals.endOpa = 0.9;
 
+    //@ts-ignore
     css.refresh(true);
     
     if (!deepEqual(css.genProps, {

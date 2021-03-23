@@ -1,43 +1,41 @@
 // jss   (builds css  using javascript):
-import type * as Css       from './Css'                // ts defs support for jss
-import JssVarCollection    from './jss-var-collection' // stores css props on the :root as global vars
-import type { Dictionary } from './jss-var-collection' // ts defs support for jss
+import type * as Css       from './Css'             // ts defs support for jss
+import CssPropsManager     from './CssPropsManager' // A *css custom property* manager that manages & updates the *css props* stored at specified `rule`.
+import type { Dictionary } from './CssPropsManager' // ts defs support for jss
 
 // other libs:
-import Color               from 'color'                // color utilities
+import Color               from 'color'             // color utilities
 
 
 
-type ColorVal = (Color|string) | Css.Ref;
+// jss:
+
+const transpLevel = 0.5
+const transpColor = (color: Color) => color.alpha(transpLevel)
+const textColor   = (color: Color) => (color.isLight() ? themes.dark : themes.light)
+const thinLevel   = 0.2
+const thinColor   = (color: Color) => color.alpha(thinLevel)
+const contColor   = (color: Color) => color.mix(page2.foreg as Color, 0.8)
 
 
 
-export let transpLevel = 0.5;
-const transpColor = (color: Color) => color.alpha(transpLevel)                       as ColorVal;
-const textColor   = (color: Color) => (color.isLight() ? themes.dark : themes.light) as ColorVal;
-export let thinLevel = 0.2;
-const thinColor   = (color: Color) => color.alpha(thinLevel)                         as ColorVal;
-const contColor   = (color: Color) => color.mix(page2.foreg as Color, 0.8)           as ColorVal;
-
-
-
-// define default cssProps' value to be stored into css vars:
+//#region define colors by group
 const basics = {
-    blue        : Color('#0d6efd') as ColorVal,
-    indigo      : Color('#6610f2') as ColorVal,
-    purple      : Color('#6f42c1') as ColorVal,
-    pink        : Color('#d63384') as ColorVal,
-    red         : Color('#dc3545') as ColorVal,
-    orange      : Color('#fd7e14') as ColorVal,
-    yellow      : Color('#ffc107') as ColorVal,
-    green       : Color('#198754') as ColorVal,
-    teal        : Color('#20c997') as ColorVal,
-    cyan        : Color('#0dcaf0') as ColorVal,
+    blue        : Color('#0d6efd'),
+    indigo      : Color('#6610f2'),
+    purple      : Color('#6f42c1'),
+    pink        : Color('#d63384'),
+    red         : Color('#dc3545'),
+    orange      : Color('#fd7e14'),
+    yellow      : Color('#ffc107'),
+    green       : Color('#198754'),
+    teal        : Color('#20c997'),
+    cyan        : Color('#0dcaf0'),
 
-    black       : Color('#000000') as ColorVal,
-    white       : Color('#ffffff') as ColorVal,
-    gray        : Color('#6c757d') as ColorVal,
-    grayDark    : Color('#343a40') as ColorVal,
+    black       : Color('#000000'),
+    white       : Color('#ffffff'),
+    gray        : Color('#6c757d'),
+    grayDark    : Color('#343a40'),
 };
 
 const themes = {
@@ -47,8 +45,8 @@ const themes = {
     info      : basics.cyan,
     warning   : basics.yellow,
     danger    : basics.red,
-    light     : Color('#f8f9fa') as ColorVal,
-    dark      : Color('#212529') as ColorVal,
+    light     : Color('#f8f9fa'),
+    dark      : Color('#212529'),
 };
 
 const page = {
@@ -56,63 +54,63 @@ const page = {
 };
 
 const page2 = {
-    foreg       : textColor(page.backg as Color),
+    foreg       : textColor(page.backg),
 };
 const page3 = {
-    backgTransp : transpColor(page.backg as Color),
-    backgThin   : thinColor(page.backg as Color),
-    backgCont   : contColor(page.backg as Color),
+    backgTransp : transpColor(page.backg),
+    backgThin   : thinColor(page.backg),
+    backgCont   : contColor(page.backg),
 
-    foregTransp : transpColor(page2.foreg as Color),
-    foregThin   : thinColor(page2.foreg as Color),
-    foregCont   : contColor(page2.foreg as Color),
+    foregTransp : transpColor(page2.foreg),
+    foregThin   : thinColor(page2.foreg),
+    foregCont   : contColor(page2.foreg),
 };
 
 const themesTransp = {
-    primaryTransp   : transpColor(themes.primary   as Color),
-    secondaryTransp : transpColor(themes.secondary as Color),
-    successTransp   : transpColor(themes.success   as Color),
-    infoTransp      : transpColor(themes.info      as Color),
-    warningTransp   : transpColor(themes.warning   as Color),
-    dangerTransp    : transpColor(themes.danger    as Color),
-    lightTransp     : transpColor(themes.light     as Color),
-    darkTransp      : transpColor(themes.dark      as Color),
+    primaryTransp   : transpColor(themes.primary),
+    secondaryTransp : transpColor(themes.secondary),
+    successTransp   : transpColor(themes.success),
+    infoTransp      : transpColor(themes.info),
+    warningTransp   : transpColor(themes.warning),
+    dangerTransp    : transpColor(themes.danger),
+    lightTransp     : transpColor(themes.light),
+    darkTransp      : transpColor(themes.dark),
 };
 
 const themesText = {
-    primaryText   : textColor(themes.primary   as Color),
-    secondaryText : textColor(themes.secondary as Color),
-    successText   : textColor(themes.success   as Color),
-    infoText      : textColor(themes.info      as Color),
-    warningText   : textColor(themes.warning   as Color),
-    dangerText    : textColor(themes.danger    as Color),
-    lightText     : textColor(themes.light     as Color),
-    darkText      : textColor(themes.dark      as Color),
+    primaryText   : textColor(themes.primary),
+    secondaryText : textColor(themes.secondary),
+    successText   : textColor(themes.success),
+    infoText      : textColor(themes.info),
+    warningText   : textColor(themes.warning),
+    dangerText    : textColor(themes.danger),
+    lightText     : textColor(themes.light),
+    darkText      : textColor(themes.dark),
 };
 
 const themesThin = {
-    primaryThin   : thinColor(themes.primary   as Color),
-    secondaryThin : thinColor(themes.secondary as Color),
-    successThin   : thinColor(themes.success   as Color),
-    infoThin      : thinColor(themes.info      as Color),
-    warningThin   : thinColor(themes.warning   as Color),
-    dangerThin    : thinColor(themes.danger    as Color),
-    lightThin     : thinColor(themes.light     as Color),
-    darkThin      : thinColor(themes.dark      as Color),
+    primaryThin   : thinColor(themes.primary),
+    secondaryThin : thinColor(themes.secondary),
+    successThin   : thinColor(themes.success),
+    infoThin      : thinColor(themes.info),
+    warningThin   : thinColor(themes.warning),
+    dangerThin    : thinColor(themes.danger),
+    lightThin     : thinColor(themes.light),
+    darkThin      : thinColor(themes.dark),
 };
 
 const themesCont = {
-    primaryCont   : contColor(themes.primary   as Color),
-    secondaryCont : contColor(themes.secondary as Color),
-    successCont   : contColor(themes.success   as Color),
-    infoCont      : contColor(themes.info      as Color),
-    warningCont   : contColor(themes.warning   as Color),
-    dangerCont    : contColor(themes.danger    as Color),
-    lightCont     : contColor(themes.light     as Color),
-    darkCont      : contColor(themes.dark      as Color),
+    primaryCont   : contColor(themes.primary),
+    secondaryCont : contColor(themes.secondary),
+    successCont   : contColor(themes.success),
+    infoCont      : contColor(themes.info),
+    warningCont   : contColor(themes.warning),
+    dangerCont    : contColor(themes.danger),
+    lightCont     : contColor(themes.light),
+    darkCont      : contColor(themes.dark),
 };
 
-const props = {
+const allColors = {
     ...basics,
     ...themes,
     ...page,
@@ -123,34 +121,29 @@ const props = {
     ...themesThin,
     ...themesCont,
 };
+//#endregion define colors by group
 
 
 
-// convert props => varProps:
-const collection = new JssVarCollection(
-    /*props    :*/ props as { [index: string]: Color},
-    /*config   :*/ { varPrefix: 'col'},
-    /*parser   :*/ (raw)   => Color(raw),
-    /*toString :*/ (color) => (color.alpha() === 1) ? color.hex() : color.toString()
-);
-const config   = collection.config;
-const varProps = collection.varProps as typeof props;
-const valProps = collection.valProps as typeof props;
-// export the configurable props:
-export { config, varProps as colors, valProps as colorValues };
-export default varProps;
+/**
+ * A *css custom property* manager that manages & updates the *css props* stored at specified `rule`.
+ */
+const cssPropsManager = new CssPropsManager(() => {
+    type ColorList  = typeof allColors;
+    type ColorProxy = { [key in keyof ColorList]: Css.Color };
+    return new Proxy(allColors as unknown as ColorProxy, {
+        get: (t, prop: string) => {
+            const color = (allColors as Dictionary<Color>)[prop];
+            return (color.alpha() === 1) ? color.hex() : color.toString();
+        },
+    });
+}, /*prefix: */'col');
+export const colors  = cssPropsManager.refs;
+export default colors;
 
-
-
-const themesProxy = new Proxy(themes, {
-    get: (items, name: string)        => (varProps  as Dictionary<Css.Ref>)[name],
-    set: (items, name: string, value) => (varProps  as Dictionary<ColorVal>)[name] = value,
-}) as typeof themes;
-export { themesProxy as themes };
-
-
-const themesTextProxy = new Proxy(themesText, {
-    get: (items, name: string)        => (varProps  as Dictionary<Css.Ref>)[name],
-    set: (items, name: string, value) => (varProps  as Dictionary<ColorVal>)[name] = value,
-}) as typeof themesText;
-export { themesTextProxy as themesText };
+export const themesAlias     = colors as { [key in keyof typeof themes]: typeof colors[keyof typeof themes] };
+export const themesTextAlias = colors as { [key in keyof typeof themes]: typeof colors[keyof typeof themes] };
+export {
+    themesAlias     as themes,
+    themesTextAlias as themesText,
+}
