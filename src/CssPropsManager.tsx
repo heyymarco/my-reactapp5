@@ -378,7 +378,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
             set: (t, prop: string, newValue: TProp) => this.setDirect(prop, newValue), // Sets the *direct* value of the css props.
         });
 
-        this._valsProxy = new Proxy<typeof _this._valsProxy>(this.genProps, {
+        this._valsProxy = new Proxy<typeof _this._valsProxy>(this._props, {
             get: (t, prop: string)                  => this.getVal(prop),              // Gets the *equivalent value* of the css prop, might be the *transformed* value, eg: `[['var(--pad-y)', 'var(--pad-x)']]`; or the *direct* value, eg: `[['5px', '10px']]`.
             set: (t, prop: string, newValue: TProp) => this.setDirect(prop, newValue), // Sets the *direct* value of the css props.
         });

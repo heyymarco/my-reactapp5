@@ -141,9 +141,33 @@ const cssPropsManager = new CssPropsManager(() => {
 export const colors  = cssPropsManager.refs;
 export default colors;
 
-export const themesAlias     = colors as { [key in keyof typeof themes]: typeof colors[keyof typeof themes] };
-export const themesTextAlias = colors as { [key in keyof typeof themes]: typeof colors[keyof typeof themes] };
+
+
+const createProxy = <TColorGroup extends { [key in keyof TColorGroup]: Color },>(colorGroup: TColorGroup) => new Proxy(colorGroup as unknown as { [key in keyof TColorGroup]: Css.Color }, {
+    get: (t, prop: string): (Css.Color|undefined) => {
+        if (!(prop in colorGroup)) return undefined; // not found
+
+        return (colors as Dictionary<Css.Color>)[prop];
+    },
+    set: (t, prop: string, newValue: Css.Color) => {
+        if (prop in colorGroup) { // already exists => update
+            (colors as Dictionary<Css.Color>)[prop] = newValue;
+        }
+        else { // create a new one and stored both to colorGroup & colors
+            const colorValue = Color(newValue);
+            (colorGroup as Dictionary<Color>)[prop] = colorValue;
+            (colors as Dictionary<Css.Color>)[prop] = (colorValue.alpha() === 1) ? colorValue.hex() : colorValue.toString();
+        } // if
+        
+
+        return true;
+    },
+});
+
+const themesProxy     = createProxy(themes);
+const themesTextProxy = createProxy(themesText);
+
 export {
-    themesAlias     as themes,
-    themesTextAlias as themesText,
+    themesProxy     as themes,
+    themesTextProxy as themesText,
 }
