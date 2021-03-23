@@ -230,7 +230,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
      */
     public get decls() {
         const _this = this;
-        return this._declsProxy as (typeof _this._declsProxy & { [key: string]: string });
+        return this._declsProxy as (typeof _this._declsProxy & { [key: string]: string }); // typescript helper: make the TValue appears as string
     }
     //#endregion decls
 
@@ -247,7 +247,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
      */
     public get refs() {
         const _this = this;
-        return this._refsProxy  as (typeof _this._refsProxy & { [key: string]: Css.Ref });
+        return this._refsProxy  as (typeof _this._refsProxy & { [key: string]: Css.Ref }); // typescript helper: make the TValue appears as Css.Ref (string)
     }
     //#endregion refs
     
@@ -263,7 +263,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
      * Setter: Sets the *direct* value of the css props.
      */
     public get vals() {
-        return this._valsProxy;
+        return this._valsProxy as unknown as TProps; // typescript helper: make the TValue appears as TProps's TValue
     }
     //#endregion vals
 
