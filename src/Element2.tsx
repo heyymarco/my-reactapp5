@@ -5,7 +5,7 @@ import React               from 'react'             // base technology of our no
 import { createUseStyles } from 'react-jss'         // base technology of our nodestrap components
 import type { Classes }    from 'jss'               // ts defs support for jss
 import type * as Css       from './Css'             // ts defs support for jss
-import CssPropsManager     from './CssPropsManager' // stores css props on the :root as global vars
+import CssPropsManager     from './CssPropsManager' // manages & updates the *css props* stored at specified `rule`.
 import type { Dictionary } from './CssPropsManager' // ts defs support for jss
 import { pascalCase }      from 'pascal-case'       // pascal-case support for jss
 import { camelCase }       from 'camel-case'        // camel-case  support for jss
