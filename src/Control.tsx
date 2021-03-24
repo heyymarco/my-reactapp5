@@ -101,10 +101,10 @@ export const vars = {...Indicators.vars,
 };
 
 // re-defined later, we need to construct varProps first
-export const keyframesHover = { from: undefined, to: undefined };
-export const keyframesLeave = { from: undefined, to: undefined };
-export const keyframesFocus = { from: undefined, to: undefined };
-export const keyframesBlur  = { from: undefined, to: undefined };
+export const keyframesHover = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesLeave = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesFocus = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesBlur  = { from: undefined, to: undefined } as unknown as Css.Keyframes;
 const ecssProps = Elements.cssProps;
 const icssProps = Indicators.cssProps;
 // define default cssProps' value to be stored into css vars:

@@ -157,10 +157,10 @@ export const vars = {...EditControls.vars, ...Icons.vars,
 };
 
 // re-defined later, we need to construct varProps first
-export const keyframesCheck       = { from: undefined, to: undefined };
-export const keyframesClear       = { from: undefined, to: undefined };
-export const keyframesSwitchCheck = { from: undefined, to: undefined };
-export const keyframesSwitchClear = { from: undefined, to: undefined };
+export const keyframesCheck       = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesClear       = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesSwitchCheck = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesSwitchClear = { from: undefined, to: undefined } as unknown as Css.Keyframes;
 const ecssProps = Elements.cssProps;
 const icssProps = Indicators.cssProps;
 const ccssProps = Controls.cssProps;

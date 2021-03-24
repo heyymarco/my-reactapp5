@@ -3,8 +3,12 @@ import
     useState }            from 'react';
 import logo from './logo.svg';
 import './App.css';
+
+
 // import Element from './Element';
 import Element from './Element2';
+
+
 import Indicator from './Indicator';
 import Control from './Control';
 import EditControl from './EditableControl';
@@ -18,6 +22,8 @@ import ListGroup from './ListGroup';
 import ListGroupItem from './ListGroupItem';
 import Card from './Card';
 import Modal from './Modal';
+
+
 
 import {ThemeProvider} from 'react-jss';
 import {JssProvider} from 'react-jss'
@@ -108,8 +114,8 @@ export default function App (props: any) {
 				</a>
 				<Element theme={theme} size={size} enableGradient={enableGrad}
 					//@ts-ignore
-					outline={outline}></Element>
-				<Indicator theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active}></Indicator>
+					outlined={outline}></Element>
+				{/* <Indicator theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active}></Indicator>
 				<Control theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus}></Control>
 				<EditControl theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} enableValidation={false}></EditControl>
 				<ETxtControl theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} enableValidation={false}></ETxtControl>
@@ -120,7 +126,7 @@ export default function App (props: any) {
 					<Button  theme='success'>Hello Button</Button>
 					Ipsum aliquam aperiam magni sint eum!
 				</Content>
-				{/* <Button  theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
+				<Button  theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} text='Hello Button' btnStyle={btnStyle}></Button>
 				<Icon icon="face" theme={theme} size={size}/>
 				<Icon icon="instagram" theme={theme} size={size} aria-hidden={false} />
 				<ButtonIcon icon="whatsapp" theme={theme} size={size} enableGradient={enableGrad} enabled={enable} active={active} focus={focus} text='Hello Button Icon' btnStyle={btnStyle}>

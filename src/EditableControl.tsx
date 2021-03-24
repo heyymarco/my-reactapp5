@@ -125,10 +125,10 @@ export const vars = {...Controls.vars,
 };
 
 // re-defined later, we need to construct varProps first
-export const keyframesValid     = { from: undefined, to: undefined };
-export const keyframesUnvalid   = { from: undefined, to: undefined };
-export const keyframesInvalid   = { from: undefined, to: undefined };
-export const keyframesUninvalid = { from: undefined, to: undefined };
+export const keyframesValid     = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesUnvalid   = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesInvalid   = { from: undefined, to: undefined } as unknown as Css.Keyframes;
+export const keyframesUninvalid = { from: undefined, to: undefined } as unknown as Css.Keyframes;
 const ecssProps = Elements.cssProps;
 // define default cssProps' value to be stored into css vars:
 const _cssProps: CssProps = {
