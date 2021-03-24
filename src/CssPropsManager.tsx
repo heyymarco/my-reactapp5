@@ -449,7 +449,7 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
             const isTransformableProp = <TTProp,>(prop: TTProp): boolean => {
                 if ((prop === undefined) || (prop === null)) return false; // skip empty prop
 
-                if ((typeof(prop) === 'string') && (/^(none|unset|inherit)$/).test(prop)) return false; // ignore reserved keywords
+                if ((typeof(prop) === 'string') && (/^(none|unset|inherit|initial)$/).test(prop)) return false; // ignore reserved keywords
 
                 return true; // passed, transformable
             };

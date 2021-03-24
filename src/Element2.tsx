@@ -29,6 +29,7 @@ import typos               from './typos/index'     // configurable typography (
  */
 const cssPropsManager = new CssPropsManager(() => {
     // common css values:
+    // const initial = 'initial';
     // const unset   = 'unset';
     // const none    = 'none';
     const inherit = 'inherit';
@@ -36,7 +37,7 @@ const cssPropsManager = new CssPropsManager(() => {
     // const middle  = 'middle';
 
 
-    const keyframesNone = { };
+    const keyframesNone : Css.Keyframes = { };
 
     return {
         fontSize          : typos.fontSizeNm,
@@ -97,48 +98,41 @@ export const cssDecls = cssPropsManager.decls;
  * A css builder for styling our components.
  * Supports theming, styling, resizeable.
  * Supports many states.
- * Exposes configurable css props.
  */
 export class StylesBuilder {
     //#region global css props
     /**
-     * Defines the prefix name of the `cssProps` stored at `:root` level.  
-     * Useful to avoid name collision if working with another css frameworks.
-     */
-    protected readonly varPfx   : string;
-
-    /**
-     * Excludes the special names of the specified `cssProps`.  
-     * @param cssProps A `cssProps` to be filtered.  
-     * @returns A copy of the `cssProps` that only having *non special* name.
+     * Excludes the *special* prop names in the specified `cssProps`.  
+     * @param cssProps The collection of the prop names to be filtered.  
+     * @returns A copy of the `cssProps` that only having *non special* prop names.
      */
     protected filterValidProps<TCssProps>(cssProps: TCssProps) {
-        const cssPropsCopy: Dictionary<any> = { };
-        for (const [key, value] of Object.entries(cssProps)) {
-            // excludes the entry if matches with following:
-            if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Check|Clear|Hover|Leave|Focus|Blur|Valid|Unvalid|Invalid|Uninvalid)$|^(@)|color|backg|backgGrad|anim|orientation|align/).test(key)) continue;
+        const cssPropsCopy: Dictionary<any> = {};
+        for (const [name, prop] of Object.entries(cssProps)) {
+            // excludes the entry if the name matching with following:
+            if ((/(Xs|Sm|Nm|Md|Lg|Xl|Xxl|Xxxl|None|Enable|Disable|Active|Passive|Check|Clear|Hover|Leave|Focus|Blur|Valid|Unvalid|Invalid|Uninvalid)$|^(@)|color|backg|backgGrad|anim|orientation|align/).test(name)) continue; // exclude
             
             // if not match => include it:
-            cssPropsCopy[key] = value;
+            cssPropsCopy[name] = prop;
         }
         return cssPropsCopy as TCssProps;
     }
 
     /**
-     * Includes the specified `cssProps` starting with specified `prefix`.
-     * @param cssProps A `cssProps` to be filtered.  
-     * @param prefix The prefix name of the `cssProps` to be *included*.  
-     * @returns A copy of the `cssProps` that matches with specified `prefix`.  
-     * The retuning prop names has been normalized, so it doesn't starting with `prefix`.
+     * Includes the prop names in the specified `cssProps` starting with specified `prefix`.
+     * @param cssProps The collection of the prop names to be filtered.  
+     * @param prefix The prefix name of the prop names to be *included*.  
+     * @returns A copy of the `cssProps` that only having matching prop names.  
+     * The retuning prop names has been normalized (renamed), so it doesn't starting with `prefix`.
      */
     protected filterPrefixProps<TCssProps>(cssProps: TCssProps, prefix: string) {
-        const cssPropsCopy: Dictionary<any> = { };
-        for (const [key, value] of Object.entries(cssProps)) {
-            // excludes the entry if not starting with specified prefix:
-            if (!key.startsWith(prefix)) continue;
+        const cssPropsCopy: Dictionary<any> = {};
+        for (const [name, prop] of Object.entries(cssProps)) {
+            // excludes the entry if the name not starting with specified prefix:
+            if (!name.startsWith(prefix)) continue; // exclude
 
             // if match => remove the prefix => normalize the case => then include it:
-            cssPropsCopy[camelCase(key.substr(prefix.length))] = value;
+            cssPropsCopy[camelCase(name.substr(prefix.length))] = prop;
         }
         return cssPropsCopy as TCssProps;
     }
@@ -148,8 +142,14 @@ export class StylesBuilder {
     
     // scoped css props:
     /**
-     * Creates scoped css prop.
-     * @param name The name of prop.
+     * Holds the prefix name of the generated css props.  
+     * Useful to avoid name collision if working with another css frameworks.
+     */
+    protected readonly varPfx   : string;
+
+    /**
+     * Creates a scoped css prop name.
+     * @param name The name of the prop.
      * @returns A prefixed prop name (if `varPfx` applied) -or- prop name without prefix.
      */
     protected prop(name: string) {
@@ -158,7 +158,7 @@ export class StylesBuilder {
     }
 
     /**
-     * Gets the *value* of the specified prop `name`.
+     * Gets the *value* (reference) of the specified prop `name`.
      * @param name The name of prop to retrieve.
      * @param fallback1 The name of secondary prop to retrieve if the `name` was not found.
      * @param fallback2 The name of third prop to retrieve if the `fallback1` was not found.
@@ -174,7 +174,7 @@ export class StylesBuilder {
     /**
      * Creates color definitions *for each* theme `options`.
      * @param themes The previous theme definitions to *extend*.
-     * @param options The list of theme options.
+     * @param options The list of the theme options.
      * @returns An `object` represents the color definitions *for each* theme `options`.
      */
     protected themes(themes: Dictionary<object> = {}, options = Object.entries(color.themes)) {
@@ -183,12 +183,12 @@ export class StylesBuilder {
             const themeProp = `&.th${Theme}`;
             themes[themeProp] = {
                 ...themes[themeProp],
-                extend: (() => {
+                extend: ((): object[] => {
                     const newEntry = this.themeOf(
                         theme,     // camel  case
                         Theme,     // pascal case
                         themeProp, // prop name
-                        themeColor as Css.Ref // current theme color css prop
+                        themeColor // current theme color
                     );
 
                     const extend = (themes[themeProp] as any)?.extend;
@@ -205,19 +205,19 @@ export class StylesBuilder {
         return themes;
     }
     /**
-     * Creates color definitions for a specified `theme`.
+     * Creates a color definition for the specified `theme`.
      * @param theme The current theme name written in camel case.
      * @param Theme The current theme name written in pascal case.
-     * @param themeProp The prop name of current `theme`.
-     * @param themeColor The backg color of current `theme`.
-     * @returns An `object` represents the color definitions for the current `theme`.
+     * @param themeProp The prop name of the current `theme`.
+     * @param themeColor The backg color of the current `theme`.
+     * @returns An `object` represents the color definition for the current `theme`.
      */
     protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Ref) { return {}; }
 
     /**
-     * Creates sizing definitions *for each* size option.
+     * Creates sizing definitions *for each* size `options`.
      * @param sizes The previous size definitions to *extend*.
-     * @param options The list of size options.
+     * @param options The list of the size options.
      * @returns An `object` represents the sizing definitions *for each* size `options`.
      */
     protected sizes(sizes: Dictionary<object> = {}, options = ['sm', 'lg']) {
@@ -226,7 +226,7 @@ export class StylesBuilder {
             const sizeProp = `&.sz${Size}`;
             sizes[sizeProp] = {
                 ...sizes[sizeProp],
-                extend: (() => {
+                extend: ((): object[] => {
                     const newEntry = this.sizeOf(
                         size,    // camel  case
                         Size,    // pascal case
@@ -247,44 +247,44 @@ export class StylesBuilder {
         return sizes;
     }
     /**
-     * Creates sizing definitions for a specified `size`.
+     * Creates a sizing definition for the specified `size`.
      * @param size The current size name written in camel case.
      * @param Size The current size name written in pascal case.
-     * @param sizeProp The prop name of current `size`.
-     * @returns An `object` represents the sizing definitions for the current `size`.
+     * @param sizeProp The prop name of the current `size`.
+     * @returns An `object` represents the sizing definition for the current `size`.
      */
     protected sizeOf(size: string, Size: string, sizeProp: string) { return {}; }
 
     /**
-     * Creates gradient definitions for if the gradient feature is enabled.
-     * @returns An `object` represents the gradient definitions.
+     * Creates a gradient definition for if the gradient feature is enabled.
+     * @returns An `object` represents the gradient definition.
      */
     protected gradient() { return {}; }
 
     /**
-     * Creates outlined definitions for if the outline feature is enabled.
-     * @returns An `object` represents the outlined definitions.
+     * Creates an outlined definition for if the outlined feature is enabled.
+     * @returns An `object` represents the outlined definition.
      */
-    protected outline()  { return {}; }
+    protected outlined()  { return {}; }
 
 
 
     // states:
     /**
-     * Creates functional props in which the values *depends on* another *scoped css props* and/or *global css props* using *fallback* strategy.
-     * @returns An `object` represents the functional props.
+     * Creates functional prop definitions in which the values *depends on* another *scoped css props* and/or *global css props* using *fallback* strategy.
+     * @returns An `object` represents the functional prop definitions.
      */
     protected fnProps()  { return {}; }
 
     /**
-     * Creates conditional color definitions for every *specific* state.
-     * @returns An `object` represents the conditional color definitions for every *specific* state.
+     * Creates conditional color definitions for every *specific* condition (state).
+     * @returns An `object` represents the conditional color definitions for every *specific* condition (state).
      */
     protected themesIf() { return {}; }
 
     /**
-     * Creates css rules for every *specific* states by overriding some *scoped css props* and applied some `themesIf`.
-     * @returns An `object` represents the css rules for every *specific* states.
+     * Creates css rule definitions for every *specific* state by overriding some *scoped css props* and applied some `themesIf`.
+     * @returns An `object` represents the css rule definitions for every *specific* state.
      */
     protected states()   { return {}; }
 
@@ -293,12 +293,12 @@ export class StylesBuilder {
     // styles:
     /**
      * Creates a basic style of a component *without* any themes nor states applied.
-     * @returns An `object` represents the basic style definitions.
+     * @returns An `object` represents the basic style definition.
      */
     protected basicStyle() { return {}; }
 
     /**
-     * Creates the composite style, with the themes & states applied.
+     * Creates one/more composite styles, with the themes & states applied.
      * @returns An `object` represents the composite style definitions.
      */
     protected styles() {
@@ -311,7 +311,7 @@ export class StylesBuilder {
                     this.themes(),                      // variant themes
                     this.sizes(),                       // variant sizes
                     { '&.gradient' : this.gradient() }, // variant gradient
-                    { '&.outline'  : this.outline()  }, // variant outline
+                    { '&.outlined' : this.outlined() }, // variant outlined
         
                     // states:
                     this.fnProps(),  // functional  props
@@ -340,13 +340,13 @@ export class StylesBuilder {
     // constructors:
     /**
      * Creates a `StylesBuilder` instance.
-     * @param varPfx The prefix name of the css props stored at `:root` level.  
+     * @param varPfx The prefix name of the generated css props.  
      * Useful to avoid name collision if working with another css frameworks.
      */
     protected constructor(
         varPfx: string,
     ) {
-        // global css props:
+        // scoped css props:
         this.varPfx     = varPfx;
     }
 
@@ -354,33 +354,34 @@ export class StylesBuilder {
 
     // utilities:
     /**
-     * Escapes some set of character in svg format so it will be valid written in css.
-     * @param svg The raw svg data to be escaped.
+     * Escapes some sets of character in svg data, so it will be valid to be written in css.
+     * @param svgData The raw svg data to be escaped.
      * @returns An escaped svg data.
      */
-    protected escapeSvg(svg: string) {
-        const svgCopy = Array.from(svg);
-        const escapeChars: Dictionary<string> = {
+    protected escapeSvg(svgData: string) {
+        const escapedChars: Dictionary<string> = {
             '<': '%3c',
             '>': '%3e',
             '#': '%23',
             '(': '%28',
             ')': '%29',
         };
-        for (const index in svgCopy) {
-            const char = svgCopy[index];
-            if (char in escapeChars) svgCopy[index] = escapeChars[char];
+
+        const svgDataCopy = Array.from(svgData);
+        for (const index in svgDataCopy) {
+            const char = svgDataCopy[index];
+            if (char in escapedChars) svgDataCopy[index] = escapedChars[char];
         }
     
-        return svgCopy.join('');
+        return svgDataCopy.join('');
     }
 
     /**
-     * Creates a solid background based on specified `color`.
-     * @param color The color of solid background.
+     * Creates a single layer solid background based on specified `color`.
+     * @param color The color of the solid background to create.
      * @returns A string represents a solid background in css.
      */
-    protected solidBackg(color: Css.Ref) {
+    protected solidBackg(color: Css.Ref): string {
         return `linear-gradient(${color},${color})`;
     }
 }
@@ -396,86 +397,86 @@ class ElementStylesBuilder extends StylesBuilder {
     /**
      * themed foreground color.
      */
-    protected readonly _colorTh          = this.prop('colorTh');
+    protected readonly _colorTh           = this.prop('colorTh');
 
     /**
      * conditional foreground color.
      */
-    protected readonly _colorIfIf        = this.prop('colorIfIf');
+    protected readonly _colorIfIf         = this.prop('colorIfIf');
 
     /**
      * conditional unthemed foreground color.
      */
-    protected readonly _colorIf          = this.prop('colorIf');
+    protected readonly _colorIf           = this.prop('colorIf');
 
     /**
      * func foreground color.
      */
-    protected readonly _colorFn          = this.prop('colorFn');
+    protected readonly _colorFn           = this.prop('colorFn');
 
     
     /**
      * none background.
      */
-    protected readonly _backgNo          = this.prop('backgNo');
+    protected readonly _backgNo           = this.prop('backgNo');
 
     /**
      * themed background color.
      */
-    protected readonly _backgTh          = this.prop('backgTh');
+    protected readonly _backgTh           = this.prop('backgTh');
 
     /**
      * conditional background color.
      */
-    protected readonly _backgIfIf        = this.prop('backgIfIf');
+    protected readonly _backgIfIf         = this.prop('backgIfIf');
 
     /**
      * conditional unthemed background color.
      */
-    protected readonly _backgIf          = this.prop('backgIf');
+    protected readonly _backgIf           = this.prop('backgIf');
 
     /**
      * func composite background(s).
      */
-    protected readonly _backgFn          = this.prop('backgFn');
+    protected readonly _backgFn           = this.prop('backgFn');
 
     /**
      * background gradient.
      */
-    protected readonly _backgGradTg      = this.prop('backgGradTg');
+    protected readonly _backgGradTg       = this.prop('backgGradTg');
 
 
     /**
      * themed foreground color at outlined state.
      */
-    protected readonly _colorOutlineTh   = this.prop('colorOutlineTh');
+    protected readonly _colorOutlinedTh   = this.prop('colorOutlinedTh');
 
     /**
      * conditional foreground color at outlined state.
      */
-    protected readonly _colorOutlineIfIf = this.prop('colorOutlineIfIf');
+    protected readonly _colorOutlinedIfIf = this.prop('colorOutlinedIfIf');
 
     /**
      * conditional unthemed foreground color at outlined state.
      */
-    protected readonly _colorOutlineIf   = this.prop('colorOutlineIf');
+    protected readonly _colorOutlinedIf   = this.prop('colorOutlinedIf');
 
     /**
      * func foreground color at outlined state.
      */
-    protected readonly _colorOutlineFn   = this.prop('colorOutlineFn');
+    protected readonly _colorOutlinedFn   = this.prop('colorOutlinedFn');
 
 
     /**
      * func composite background(s) at outlined state.
      */
-    protected readonly _backgOutlineFn   = this.prop('backgOutlineFn');
+    protected readonly _backgOutlinedFn   = this.prop('backgOutlinedFn');
 
 
     /**
      * func composite animation(s).
      */
-    protected readonly _animFn           = this.prop('animFn');
+    protected readonly _animFn            = this.prop('animFn');
     //#endregion scoped css props
 
 
@@ -485,13 +486,13 @@ class ElementStylesBuilder extends StylesBuilder {
         // customize the backg & foreg
     
         // customize themed foreground color:
-        [this._colorTh]        : (colors as any)[`${theme}Text`] as Css.Ref, // light on dark backg | dark on light backg
+        [this._colorTh]         : (colors as any)[`${theme}Text`] as Css.Ref, // light on dark backg | dark on light backg
     
         // customize themed background color:
-        [this._backgTh]        : this.solidBackg(themeColor),
+        [this._backgTh]         : this.solidBackg(themeColor),
     
         // customize themed foreground color at outlined state:
-        [this._colorOutlineTh] : themeColor,
+        [this._colorOutlinedTh] : themeColor,
     }}
     protected sizeOf(size: string, Size: string, sizeProp: string) { return {
         // overwrite the props with the props{Size}:
@@ -505,15 +506,15 @@ class ElementStylesBuilder extends StylesBuilder {
         // customize background gradient:
         [this._backgGradTg]: cssProps.backgGrad,
     }}
-    protected outline() { return {
+    protected outlined() { return {
         // apply func foreground color at outlined state:
-        color       : this.getProp(this._colorOutlineFn),
+        color       : this.getProp(this._colorOutlinedFn),
         
         // apply func composite background(s) at outlined state:
-        backg       : this.getProp(this._backgOutlineFn),
+        backg       : this.getProp(this._backgOutlinedFn),
 
         // set border color = text-color:
-        borderColor : this.getProp(this._colorOutlineFn),
+        borderColor : this.getProp(this._colorOutlinedFn),
     }}
 
 
@@ -549,14 +550,14 @@ class ElementStylesBuilder extends StylesBuilder {
     
     
         // customize func foreground color at outlined state:
-        [this._colorOutlineFn] : this.getProp(
-            this._colorOutlineIfIf, // first  priority
-            this._colorOutlineTh,   // second priority
-            this._colorOutlineIf    // third  priority
+        [this._colorOutlinedFn] : this.getProp(
+            this._colorOutlinedIfIf, // first  priority
+            this._colorOutlinedTh,   // second priority
+            this._colorOutlinedIf    // third  priority
         ),
     
         // customize func composite background(s) at outlined state:
-        [this._backgOutlineFn] : this.getProp(
+        [this._backgOutlinedFn] : this.getProp(
             this._backgGradTg,
             this._backgNo
         ),
@@ -570,9 +571,9 @@ class ElementStylesBuilder extends StylesBuilder {
     }}
     protected themesIf() { return {
         // define default colors:
-        [this._colorIf]        : cssProps.color,
-        [this._backgIf]        : this.getProp(this._backgNo),
-        [this._colorOutlineIf] : cssProps.color,
+        [this._colorIf]         : cssProps.color,
+        [this._backgIf]         : this.getProp(this._backgNo),
+        [this._colorOutlinedIf] : cssProps.color,
     }}
     protected states() { return {
         // customize none background.
@@ -633,12 +634,12 @@ export function useVariantGradient(props: VariantGradient) {
     };
 }
 
-export interface VariantOutline {
-    outline?: boolean
+export interface VariantOutlined {
+    outlined?: boolean
 }
-export function useVariantOutline(props: VariantOutline) {
+export function useVariantOutlined(props: VariantOutlined) {
     return {
-        class: props.outline ? 'outline' : null,
+        class: props.outlined ? 'outlined' : null,
     };
 }
 
@@ -656,13 +657,13 @@ export interface Props
     classes? : string[]
 }
 export default function Element(props: Props) {
-    const elmStyles    = styles.useStyles();
+    const elmStyles     = styles.useStyles();
 
     // themes:
-    const variTheme    = useVariantTheme(props);
-    const variSize     = useVariantSize(props);
-    const variGradient = useVariantGradient(props);
-    const variOutline  = useVariantOutline(props as VariantOutline);
+    const variTheme     = useVariantTheme(props);
+    const variSize      = useVariantSize(props);
+    const variGradient  = useVariantGradient(props);
+    const variOutlined  = useVariantOutlined(props as VariantOutlined);
 
 
 
@@ -675,7 +676,7 @@ export default function Element(props: Props) {
                 variTheme.class,
                 variSize.class,
                 variGradient.class,
-                variOutline.class,
+                variOutlined.class,
 
                 ...(props.classes ?? []),
             ].filter((c) => !!c).join(' ')}
