@@ -68,8 +68,8 @@ const basics = {
     lineHeightNm          : 1.50,
     lineHeightLg          : 2.00,
 
-    color                 : colors.foreg as string,
-    backg                 : colors.backg as string, // defaults is color's backg. It can be an image with the average color as color's backg.
+    color                 : colors.foreg,
+    backg                 : colors.backg, // defaults is color's backg. It can be an image with the average color as color's backg.
 };
 
 const cssProps: CssProps = {

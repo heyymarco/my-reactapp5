@@ -379,10 +379,10 @@ export class StylesBuilder {
     /**
      * Creates a single layer solid background based on specified `color`.
      * @param color The color of the solid background to create.
-     * @returns A string represents a solid background in css.
+     * @returns A `Css.BackgroundLayer` represents a solid background in css.
      */
-    protected solidBackg(color: Css.Ref): string {
-        return `linear-gradient(${color},${color})`;
+    protected solidBackg(color: Css.Ref, clip : Css.BackgroundClip = 'border-box'): Css.BackgroundLayer {
+        return [[`linear-gradient(${color},${color})`, clip]];
     }
 }
 

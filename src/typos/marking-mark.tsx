@@ -35,7 +35,7 @@ const cssProps: CssProps = {
     lineHeight        : inherit,
 
     color             : inherit,
-    backg             : colors.warningTransp as string,
+    backg             : colors.warningTransp,
     
     paddingX          : '0.2em',
     paddingY          : '0em',

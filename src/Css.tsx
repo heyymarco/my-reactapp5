@@ -14,7 +14,9 @@ export type TextDecoration  = string
 export type LineHeight      = string | number
 
 export type Color           = string
-export type Background      = string |                   string[][]
+export type BackgroundClip  = 'content-box' | 'padding-box' | 'border-box'
+export type BackgroundLayer = string |   [[string, BackgroundClip]] // space separated props
+export type Background      = BackgroundLayer  |  BackgroundLayer[] // comma separated background layer(s)
 export type Image           = string |                   string[][]
 export type ImagePosition   = 'center' | 'left' | 'right' | 'top' | 'bottom'
 
