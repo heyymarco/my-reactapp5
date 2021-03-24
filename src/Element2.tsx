@@ -102,11 +102,11 @@ export const cssDecls = cssPropsManager.decls;
 export class StylesBuilder {
     //#region global css props
     /**
-     * Excludes the *special* prop names in the specified `cssProps`.  
-     * @param cssProps The collection of the prop names to be filtered.  
-     * @returns A copy of the `cssProps` that only having *non special* prop names.
+     * Includes the *general* prop names in the specified `cssProps`.  
+     * @param cssProps The collection of the prop name to be filtered.  
+     * @returns A copy of the `cssProps` that only having *general* prop names.
      */
-    protected filterValidProps<TCssProps>(cssProps: TCssProps) {
+    protected filterGeneralProps<TCssProps>(cssProps: TCssProps) {
         const cssPropsCopy: Dictionary<any> = {};
         for (const [name, prop] of Object.entries(cssProps)) {
             // excludes the entry if the name matching with following:
@@ -120,9 +120,9 @@ export class StylesBuilder {
 
     /**
      * Includes the prop names in the specified `cssProps` starting with specified `prefix`.
-     * @param cssProps The collection of the prop names to be filtered.  
+     * @param cssProps The collection of the prop name to be filtered.  
      * @param prefix The prefix name of the prop names to be *included*.  
-     * @returns A copy of the `cssProps` that only having matching prop names.  
+     * @returns A copy of the `cssProps` that only having matching prefix names.  
      * The retuning prop names has been normalized (renamed), so it doesn't starting with `prefix`.
      */
     protected filterPrefixProps<TCssProps>(cssProps: TCssProps, prefix: string) {
@@ -158,14 +158,14 @@ export class StylesBuilder {
     }
 
     /**
-     * Gets the *value* (reference) of the specified prop `name`.
-     * @param name The name of prop to retrieve.
-     * @param fallback1 The name of secondary prop to retrieve if the `name` was not found.
+     * Gets the *value* (reference) of the specified `propName`.
+     * @param propName The name of prop to retrieve.
+     * @param fallback1 The name of secondary prop to retrieve if the `propName` was not found.
      * @param fallback2 The name of third prop to retrieve if the `fallback1` was not found.
      * @returns A generated css expression for retrieving the value.
      */
-    protected getProp(name: string, fallback1?: string, fallback2?: string) {
-        return fallback1 ? (fallback2 ? `var(${name},var(${fallback1},var(${fallback2})))` : `var(${name},var(${fallback1}))`) : `var(${name})`;
+    protected ref(propName: string, fallback1?: string, fallback2?: string) {
+        return fallback1 ? (fallback2 ? `var(${propName},var(${fallback1},var(${fallback2})))` : `var(${propName},var(${fallback1}))`) : `var(${propName})`;
     }
 
 
@@ -410,7 +410,7 @@ class ElementStylesBuilder extends StylesBuilder {
     protected readonly _colorIf           = this.prop('colorIf');
 
     /**
-     * func foreground color.
+     * functional foreground color.
      */
     protected readonly _colorFn           = this.prop('colorFn');
 
@@ -418,25 +418,25 @@ class ElementStylesBuilder extends StylesBuilder {
     /**
      * none background.
      */
-    protected readonly _backgNo           = this.prop('backgNo');
+    protected readonly _backgNone         = this.prop('backgNone');
 
     /**
-     * themed background color.
+     * themed background.
      */
     protected readonly _backgTh           = this.prop('backgTh');
 
     /**
-     * conditional background color.
+     * conditional background.
      */
     protected readonly _backgIfIf         = this.prop('backgIfIf');
 
     /**
-     * conditional unthemed background color.
+     * conditional unthemed background.
      */
     protected readonly _backgIf           = this.prop('backgIf');
 
     /**
-     * func composite background(s).
+     * functional backgrounds.
      */
     protected readonly _backgFn           = this.prop('backgFn');
 
@@ -447,34 +447,34 @@ class ElementStylesBuilder extends StylesBuilder {
 
 
     /**
-     * themed foreground color at outlined state.
+     * themed foreground color - at outlined state.
      */
     protected readonly _colorOutlinedTh   = this.prop('colorOutlinedTh');
 
     /**
-     * conditional foreground color at outlined state.
+     * conditional foreground color - at outlined state.
      */
     protected readonly _colorOutlinedIfIf = this.prop('colorOutlinedIfIf');
 
     /**
-     * conditional unthemed foreground color at outlined state.
+     * conditional unthemed foreground color - at outlined state.
      */
     protected readonly _colorOutlinedIf   = this.prop('colorOutlinedIf');
 
     /**
-     * func foreground color at outlined state.
+     * functional foreground color - at outlined state.
      */
     protected readonly _colorOutlinedFn   = this.prop('colorOutlinedFn');
 
 
     /**
-     * func composite background(s) at outlined state.
+     * functional backgrounds - at outlined state.
      */
     protected readonly _backgOutlinedFn   = this.prop('backgOutlinedFn');
 
 
     /**
-     * func composite animation(s).
+     * functional animations.
      */
     protected readonly _animFn            = this.prop('animFn');
     //#endregion scoped css props
@@ -483,19 +483,14 @@ class ElementStylesBuilder extends StylesBuilder {
 
     // themes:
     protected themeOf(theme: string, Theme: string, themeProp: string, themeColor: Css.Ref) { return {
-        // customize the backg & foreg
+        // customize the *themed* props:
     
-        // customize themed foreground color:
         [this._colorTh]         : (colors as any)[`${theme}Text`] as Css.Ref, // light on dark backg | dark on light backg
-    
-        // customize themed background color:
         [this._backgTh]         : this.solidBackg(themeColor),
-    
-        // customize themed foreground color at outlined state:
         [this._colorOutlinedTh] : themeColor,
     }}
     protected sizeOf(size: string, Size: string, sizeProp: string) { return {
-        // overwrite the props with the props{Size}:
+        // overwrite the global props with the *prop{Size}*:
 
         [cssDecls.fontSize]     : (cssProps as any)[`fontSize${Size}`]     as Css.Ref,
         [cssDecls.paddingX]     : (cssProps as any)[`paddingX${Size}`]     as Css.Ref,
@@ -503,44 +498,42 @@ class ElementStylesBuilder extends StylesBuilder {
         [cssDecls.borderRadius] : (cssProps as any)[`borderRadius${Size}`] as Css.Ref,
     }}
     protected gradient() { return {
-        // customize background gradient:
+        // *toggle on* the background gradient prop:
+
         [this._backgGradTg]: cssProps.backgGrad,
     }}
     protected outlined() { return {
-        // apply func foreground color at outlined state:
-        color       : this.getProp(this._colorOutlinedFn),
-        
-        // apply func composite background(s) at outlined state:
-        backg       : this.getProp(this._backgOutlinedFn),
+        // apply *outlined* fn props:
 
-        // set border color = text-color:
-        borderColor : this.getProp(this._colorOutlinedFn),
+        color       : this.ref(this._colorOutlinedFn),
+        backg       : this.ref(this._backgOutlinedFn),
+        borderColor : this.ref(this._colorOutlinedFn),
     }}
 
 
 
     // states:
     protected fnProps() { return {
-        // customize func foreground color:
-        [this._colorFn] : this.getProp(
+        // define a *foreground* color func:
+        [this._colorFn] : this.ref(
             this._colorIfIf, // first  priority
             this._colorTh,   // second priority
-            this._colorIf    // third  priority
+            this._colorIf,   // third  priority
         ),
     
-        // customize func composite background(s):
+        // define a *backgrounds* func:
         [this._backgFn] : [
             // top layer:
-            this.getProp(
+            this.ref(
                 this._backgGradTg,
-                this._backgNo
+                this._backgNone,
             ),
 
             // middle layer:
-            this.getProp(
+            this.ref(
                 this._backgIfIf, // first  priority
                 this._backgTh,   // second priority
-                this._backgIf    // third  priority
+                this._backgIf,   // third  priority
             ),
 
             // bottom layer:
@@ -549,35 +542,35 @@ class ElementStylesBuilder extends StylesBuilder {
     
     
     
-        // customize func foreground color at outlined state:
-        [this._colorOutlinedFn] : this.getProp(
+        // define a *foreground* color func - at *outlined* state:
+        [this._colorOutlinedFn] : this.ref(
             this._colorOutlinedIfIf, // first  priority
             this._colorOutlinedTh,   // second priority
-            this._colorOutlinedIf    // third  priority
+            this._colorOutlinedIf,   // third  priority
         ),
     
-        // customize func composite background(s) at outlined state:
-        [this._backgOutlinedFn] : this.getProp(
+        // define a *backgrounds* func - at *outlined* state:
+        [this._backgOutlinedFn] : this.ref(
             this._backgGradTg,
-            this._backgNo
+            this._backgNone,
         ),
     
     
     
-        // customize func composite animation(s):
+        // define an *animations* func:
         [this._animFn] : [
             cssProps.anim,
         ],
     }}
     protected themesIf() { return {
-        // define default colors:
+        // define a *default* color theme:
         [this._colorIf]         : cssProps.color,
-        [this._backgIf]         : this.getProp(this._backgNo),
+        [this._backgIf]         : this.ref(this._backgNone),
         [this._colorOutlinedIf] : cssProps.color,
     }}
     protected states() { return {
-        // customize none background.
-        [this._backgNo] : this.solidBackg('transparent'),
+        // define a *none* background:
+        [this._backgNone] : this.solidBackg('transparent'),
     }}
 
 
@@ -585,19 +578,16 @@ class ElementStylesBuilder extends StylesBuilder {
     // styles:
     protected basicStyle() { return {
         extend: [
-            this.filterValidProps(cssProps), // apply our filtered cssProps
+            this.filterGeneralProps(cssProps), // apply *general* cssProps
         ],
     
     
     
-        // apply func foreground color:
-        color : this.getProp(this._colorFn),
-    
-        // apply func composite background(s):
-        backg : this.getProp(this._backgFn),
-    
-        // apply func composite animation(s):
-        anim  : this.getProp(this._animFn),
+        // apply *non conditional* fn props:
+
+        color : this.ref(this._colorFn),
+        backg : this.ref(this._backgFn),
+        anim  : this.ref(this._animFn),
     }}
 }
 export const styles = new ElementStylesBuilder();
