@@ -287,12 +287,13 @@ export default function App (props: any) {
 						)
 					}
 				</p>
-				<p onChange={(e) => setSize(((e.target as any).value || undefined) as ('sm'|'lg'|undefined))}>
+				<p>
 					Size:
 					<label>
 						<input type='radio'
 							value='sm'
 							checked={size==='sm'}
+							onChange={(e) => setSize(((e.target as any).value || undefined) as ('sm'|'lg'|undefined))}
 						/>
 						sm
 					</label>
@@ -300,6 +301,7 @@ export default function App (props: any) {
 						<input type='radio'
 							value=''
 							checked={!size}
+							onChange={(e) => setSize(((e.target as any).value || undefined) as ('sm'|'lg'|undefined))}
 						/>
 						unset
 					</label>
@@ -307,6 +309,7 @@ export default function App (props: any) {
 						<input type='radio'
 							value='lg'
 							checked={size==='lg'}
+							onChange={(e) => setSize(((e.target as any).value || undefined) as ('sm'|'lg'|undefined))}
 						/>
 						lg
 					</label>

@@ -284,13 +284,18 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
 
             generated valProps:
             {
-                '--pfx-keyframes-foo' : 'foo-HASH',            // '@keyframes foo'  => getPropName => '--pfx-keyframes-foo'
+                '--pfx-keyframes-foo' : 'pfx-foo',             // '@keyframes foo'  => getPropName => '--pfx-keyframes-foo'
                 '--pfx-myFavColor'    : 'var(--col-primary)',  // 'myFavColor'      => getPropName => '--pfx-myFavColor'
-                '@keyframes foo-HASH' : {...}
+                '@keyframes pfx-foo'  : {...}
             }
         */
+
+
+
+        this.ensureGenerated(); // ensures the generated data was fully generated.
         
         
+
         const genProp = this.getGenProp(prop);
 
         // check if the genProp is already exists:
@@ -399,23 +404,43 @@ export default class CssPropsManager<TProps, TProp extends TProps[keyof TProps]>
     private _valid = false;
 
     /**
-     * Ensures the css props are valid.
+     * Regenerates the css props.
      * @param immediately `true` to refresh the css props immediately (guaranteed has been refreshed after `refresh` returned) -or- `false` to refresh shortly after current execution finished.
      */
     public refresh(immediately = false) {
         if (immediately) {
+            // regenerate the data now:
+
             this.rebuild();
-            this._valid = true; // mark the generated data is valid
+            this._valid = true; // mark the generated data as valid
+
+            // now the data was guaranteed regenerated.
         }
         else
         {
+            // promises to regenerate the data in a short time:
+
             this._valid = false; // mark the generated data as invalid
             setTimeout(() => {
-                if (this._valid) return; // has been generated => abort
+                if (this._valid) return; // has been previously generated => abort
                 this.rebuild();
-                this._valid = true; // mark the generated data is valid
+                this._valid = true; // mark the generated data as valid
             }, 0);
         }
+    }
+
+    /**
+     * Ensures the generated data was fully generated.
+     */
+    private ensureGenerated() {
+        if (this._valid) {
+            // console.log('refresh not required');
+            return; // if was valid => return immediately
+        } // if
+
+
+        this.refresh(/*immediately*/true); // regenerate the css props and wait until fully done
+        // console.log(`refresh done - prefix: ${this._prefix}`);
     }
     
 

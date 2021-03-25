@@ -3,7 +3,10 @@ import React               from 'react'             // base technology of our no
 
 // jss   (builds css  using javascript):
 import { createUseStyles } from 'react-jss'         // base technology of our nodestrap components
-import type { Classes }    from 'jss'               // ts defs support for jss
+import type {
+    Classes,
+    JssStyle,
+}                          from 'jss'               // ts defs support for jss
 import type * as Css       from './Css'             // ts defs support for jss
 import CssPropsManager     from './CssPropsManager' // A *css custom property* manager that manages & updates the *css props* stored at specified `rule`.
 import type { Dictionary } from './CssPropsManager' // ts defs support for jss
@@ -317,7 +320,7 @@ export class StylesBuilder {
                     this.fnProps(),  // functional  props
                     this.themesIf(), // conditional themes
                     this.states(),   // state rules
-                ],
+                ] as JssStyle,
             },
         };
     }

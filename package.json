@@ -5,24 +5,24 @@
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
-    "@testing-library/user-event": "^12.7.1",
-    "@types/jest": "^26.0.20",
-    "@types/node": "^12.20.4",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/jest": "^26.0.21",
+    "@types/node": "^12.20.6",
     "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
+    "@types/react-dom": "^17.0.3",
     "camel-case": "^4.1.2",
     "color": "^3.1.3",
     "deep-equal": "^2.0.5",
-    "jss": "^10.5.1",
-    "jss-preset-default": "^10.5.1",
+    "jss": "^10.6.0",
+    "jss-preset-default": "^10.6.0",
     "pascal-case": "^3.1.2",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-jss": "^10.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-jss": "^10.6.0",
     "react-scripts": "4.0.2",
     "sass": "^1.32.8",
-    "typescript": "^4.1.5",
-    "web-vitals": "^1.1.0"
+    "typescript": "^4.2.3",
+    "web-vitals": "^1.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -51,5 +51,17 @@
   "devDependencies": {
     "@types/color": "^3.0.1",
     "@types/deep-equal": "^1.0.1"
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heyymarco/my-reactapp5.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/heyymarco/my-reactapp5/issues"
+  },
+  "homepage": "https://github.com/heyymarco/my-reactapp5#readme"
 }
